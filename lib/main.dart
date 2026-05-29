@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'screens/home_screen.dart';
+import 'screens/main_screen.dart';
 import 'services/adb_manager.dart';
+import 'services/theme_manager.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final themeManager = ThemeManager();
+  await themeManager.init();
 
   final adb = AdbManager.instance;
   adb.initialize();
 
   runApp(
-    ChangeNotifierProvider.value(
-      value: adb,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: adb),
+        ChangeNotifierProvider.value(value: themeManager),
+      ],
       child: const MyApp(),
     ),
   );
@@ -23,13 +30,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeManager = context.watch<ThemeManager>();
+
     return MaterialApp(
       title: 'Porpita',
+      themeMode: themeManager.themeMode,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const HomeScreen(),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+          brightness: Brightness.dark,
+        ),
+        useMaterial3: true,
+      ),
+      home: const MainScreen(),
     );
   }
 }
