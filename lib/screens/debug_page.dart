@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../services/adb_manager.dart';
+import '../services/device_manager.dart';
 
 class DebugPage extends StatelessWidget {
   const DebugPage({super.key});
@@ -52,6 +53,83 @@ class DebugPage extends StatelessWidget {
         return ListView(
           padding: const EdgeInsets.all(24),
           children: [
+            Consumer<DeviceManager>(
+              builder: (context, dm, _) {
+                return Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Row(
+                          children: [
+                            Icon(Icons.phone_android, size: 28),
+                            SizedBox(width: 12),
+                            Text(
+                              'Selected Device',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                dm.selected != null && dm.selected!.isConnected
+                                    ? Icons.check_circle
+                                    : Icons.cancel,
+                                size: 16,
+                                color: dm.selected != null && dm.selected!.isConnected
+                                    ? Colors.green
+                                    : Colors.red,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: SelectableText(
+                                  dm.selected?.id ?? 'No device connected',
+                                  style: const TextStyle(
+                                    fontFamily: 'monospace',
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                              if (dm.selected != null)
+                                Text(
+                                  dm.selected!.status,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: dm.selected!.isConnected
+                                        ? Colors.green
+                                        : Colors.red,
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        if (dm.devices.length > 1) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            '${dm.devices.length} devices connected',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(20),
