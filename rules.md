@@ -143,3 +143,4 @@ Desktop ADB utilities don't have 1000+ routing pages — they have **dense, mult
 - No commits to `main` without PR + review
 - Run `flutter analyze` and tests before every PR
 - CI/CD validates codegen output and lints
+ 
