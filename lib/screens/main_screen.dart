@@ -101,6 +101,18 @@ import 'commands/am_dumpheap_page.dart';
 import 'commands/pm_list_features_page.dart';
 import 'commands/pm_list_libraries_page.dart';
 import 'commands/pm_list_permissions_page.dart';
+import 'commands/acpi_page.dart';
+import 'commands/date_page.dart';
+import 'commands/wm_page.dart';
+import 'commands/uimode_page.dart';
+import 'commands/deviceidle_page.dart';
+import 'commands/reboot_readiness_page.dart';
+import 'commands/safety_center_page.dart';
+import 'commands/telecom_page.dart';
+import 'commands/svc_usb_page.dart';
+import 'commands/bmgr_page.dart';
+import 'commands/magisk_page.dart';
+import 'commands/sysfs_page.dart';
 
 // ── navigation items ─────────────────────────────────────────────────────────
 
@@ -202,7 +214,19 @@ enum _Nav {
   catProcModules('cat /proc/modules', Icons.code),
   catProcVersion('cat /proc/version', Icons.code),
   catProcUptime('cat /proc/uptime', Icons.code),
-  catProcNetDev('cat /proc/net/dev', Icons.code),;
+  catProcNetDev('cat /proc/net/dev', Icons.code),
+  acpi('acpi', Icons.code),
+  date('date', Icons.code),
+  wm('wm', Icons.code),
+  uimode('cmd uimode', Icons.code),
+  deviceidle('cmd deviceidle', Icons.code),
+  rebootReadiness('cmd reboot_readiness', Icons.code),
+  safetyCenter('cmd safety_center', Icons.code),
+  telecom('telecom', Icons.code),
+  svcUsb('svc usb', Icons.code),
+  bmgr('bmgr', Icons.code),
+  magisk('magisk', Icons.code),
+  sysfs('sysfs', Icons.code),;
 
   final String label;
   final IconData icon;
@@ -307,6 +331,18 @@ Widget _buildPage(_Nav nav) => switch (nav) {
       _Nav.catProcVersion => const CatProcVersionPage(),
       _Nav.catProcUptime => const CatProcUptimePage(),
       _Nav.catProcNetDev => const CatProcNetDevPage(),
+      _Nav.acpi => const AcpiPage(),
+      _Nav.date => const DatePage(),
+      _Nav.wm => const WmPage(),
+      _Nav.uimode => const UimodePage(),
+      _Nav.deviceidle => const DeviceidlePage(),
+      _Nav.rebootReadiness => const RebootReadinessPage(),
+      _Nav.safetyCenter => const SafetyCenterPage(),
+      _Nav.telecom => const TelecomPage(),
+      _Nav.svcUsb => const SvcUsbPage(),
+      _Nav.bmgr => const BmgrPage(),
+      _Nav.magisk => const MagiskPage(),
+      _Nav.sysfs => const SysfsPage(),
 
     };
 
@@ -375,17 +411,17 @@ class _NavDrawer extends StatelessWidget {
       'Device': [_Nav.debug, _Nav.properties, _Nav.terminal],
       'Data': [_Nav.callLogs, _Nav.messages, _Nav.contacts, _Nav.calendar, _Nav.media],
       'Apps': [_Nav.apps, _Nav.services, _Nav.lifecycle],
-      'System Core & OS State': [_Nav.dumpsys, _Nav.dumpsysL, _Nav.dumpsysActivity, _Nav.dumpsysWindow, _Nav.dumpsysStatusbar, _Nav.dumpsysPower, _Nav.dumpsysAlarm, _Nav.dumpsysUsagestats, _Nav.dumpsysSettings],
-      'Hardware, Power & Battery': [_Nav.dumpsysBattery, _Nav.dumpsysBatterystats, _Nav.dumpsysDisplay, _Nav.dumpsysInput, _Nav.dumpsysSensor, _Nav.dumpsysAudio, _Nav.dumpsysVibrator, _Nav.dumpsysUsb, _Nav.dumpsysThermal, _Nav.dumpsysLights],
-      'Connectivity & Networking': [_Nav.dumpsysNetstats, _Nav.dumpsysConnectivity, _Nav.dumpsysWifi, _Nav.dumpsysBluetooth, _Nav.dumpsysTelephonyRegistry, _Nav.dumpsysNetworkManagement, _Nav.dumpsysLocation],
-      'Diagnostics & Logs': [_Nav.bugreport, _Nav.logcatD, _Nav.dmesg, _Nav.dumpsysBugreport, _Nav.dumpsysDropbox],
+      'System Core & OS State': [_Nav.dumpsys, _Nav.dumpsysL, _Nav.dumpsysActivity, _Nav.dumpsysWindow, _Nav.dumpsysStatusbar, _Nav.dumpsysPower, _Nav.dumpsysAlarm, _Nav.dumpsysUsagestats, _Nav.dumpsysSettings, _Nav.wm, _Nav.uimode, _Nav.date],
+      'Hardware, Power & Battery': [_Nav.dumpsysBattery, _Nav.dumpsysBatterystats, _Nav.dumpsysDisplay, _Nav.dumpsysInput, _Nav.dumpsysSensor, _Nav.dumpsysAudio, _Nav.dumpsysVibrator, _Nav.dumpsysUsb, _Nav.dumpsysThermal, _Nav.dumpsysLights, _Nav.deviceidle, _Nav.svcUsb],
+      'Connectivity & Networking': [_Nav.dumpsysNetstats, _Nav.dumpsysConnectivity, _Nav.dumpsysWifi, _Nav.dumpsysBluetooth, _Nav.dumpsysTelephonyRegistry, _Nav.dumpsysNetworkManagement, _Nav.dumpsysLocation, _Nav.telecom],
+      'Diagnostics & Logs': [_Nav.bugreport, _Nav.logcatD, _Nav.dmesg, _Nav.dumpsysBugreport, _Nav.dumpsysDropbox, _Nav.rebootReadiness, _Nav.safetyCenter],
       'Memory & Process Performance': [_Nav.dumpsysMeminfo, _Nav.dumpsysProcstats, _Nav.dumpsysCpuinfo, _Nav.dumpsysGfxinfo, _Nav.amDumpheap],
-      'App & Package Management': [_Nav.pmListFeatures, _Nav.pmListLibraries, _Nav.pmListPermissions],
+      'App & Package Management': [_Nav.pmListFeatures, _Nav.pmListLibraries, _Nav.pmListPermissions, _Nav.bmgr],
             'Core Service Discovery & Composition': [_Nav.serviceList, _Nav.dumpsysSurfaceflinger, _Nav.dumpsysAppops, _Nav.dumpsysNotification, _Nav.dumpsysKeystore, _Nav.dumpsysMediaSession, _Nav.dumpsysJobscheduler, _Nav.dumpsysWallpaper, _Nav.dumpsysShortcut, _Nav.dumpsysAccount, _Nav.dumpsysMount, _Nav.dumpsysStoragestats, _Nav.dumpsysBackup, _Nav.dumpsysAppHibernation, _Nav.dumpsysFingerprint, _Nav.dumpsysUriGrants, _Nav.dumpsysNetpolicy, _Nav.dumpsysOverlay, _Nav.dumpsysDevicePolicy, _Nav.dumpsysAppSearch, _Nav.dumpsysContentCapture],
       'Activity Manager State Diagnostics': [_Nav.dumpsysActivityTop, _Nav.dumpsysActivityBroadcasts, _Nav.dumpsysActivityServices, _Nav.dumpsysActivityIntents, _Nav.dumpsysActivityProviders, _Nav.dumpsysActivityRecents, _Nav.dumpsysActivityProcesses],
       'Package Manager State Diagnostics': [_Nav.pmDump, _Nav.pmListUsers, _Nav.pmGetMaxUsers, _Nav.pmListInstrumentation],
       'High-Fidelity Service Routing': [_Nav.cmdPackageCompileL, _Nav.cmdShortcutDump, _Nav.cmdWifiStatus, _Nav.cmdOverlayList],
-      'Linux Kernel & Virtual File System': [_Nav.getprop, _Nav.procrank, _Nav.dfH, _Nav.catProcCpuinfo, _Nav.catProcMeminfo, _Nav.catProcPartitions, _Nav.catProcModules, _Nav.catProcVersion, _Nav.catProcUptime, _Nav.catProcNetDev],
+      'Linux Kernel & Virtual File System': [_Nav.getprop, _Nav.procrank, _Nav.dfH, _Nav.catProcCpuinfo, _Nav.catProcMeminfo, _Nav.catProcPartitions, _Nav.catProcModules, _Nav.catProcVersion, _Nav.catProcUptime, _Nav.catProcNetDev, _Nav.sysfs, _Nav.acpi, _Nav.magisk],
       'System': [_Nav.settings],
     };
 
