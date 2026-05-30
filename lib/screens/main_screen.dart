@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../services/device_manager.dart';
+import '../widgets/device_selector_dialog.dart';
 import '../widgets/settings_dialog.dart';
 import 'apps_page.dart';
 import 'debug_page.dart';
@@ -76,52 +77,23 @@ class _MainScreenState extends State<MainScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 child: Consumer<DeviceManager>(
                   builder: (context, dm, _) {
-                    if (dm.devices.isEmpty) {
-                      return const ListTile(
-                        dense: true,
-                        leading: Icon(Icons.phone_android),
-                        title: Text('No device'),
-                        enabled: false,
-                      );
-                    }
+                    final label = dm.selected?.id ?? 'No device';
+                    final connected = dm.selected?.isConnected ?? false;
 
-                    return InputDecorator(
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        isDense: true,
-                        labelText: 'Device',
+                    return OutlinedButton.icon(
+                      onPressed: dm.devices.isNotEmpty
+                          ? () => showDialog(
+                                context: context,
+                                builder: (_) => const DeviceSelectorDialog(),
+                              )
+                          : null,
+                      icon: Icon(
+                        connected ? Icons.phone_android : Icons.warning,
+                        size: 18,
                       ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          value: dm.selected?.id,
-                          isExpanded: true,
-                          isDense: true,
-                          items: dm.devices.map((d) {
-                            final label = d.isConnected ? d.id : '${d.id} (${d.status})';
-                            return DropdownMenuItem(
-                              value: d.id,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    d.isConnected ? Icons.phone_android : Icons.warning,
-                                    size: 18,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Flexible(
-                                    child: Text(label, overflow: TextOverflow.ellipsis),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (id) {
-                            if (id != null) {
-                              final device = dm.devices.firstWhere((d) => d.id == id);
-                              dm.select(device);
-                            }
-                          },
-                        ),
+                      label: Text(
+                        label,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     );
                   },

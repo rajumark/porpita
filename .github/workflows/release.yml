@@ -3,6 +3,9 @@ name: Release Build
 on:
   push:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   check-commit:
     runs-on: ubuntu-latest
@@ -32,8 +35,7 @@ jobs:
       - run: flutter pub get
       - run: flutter build macos --release
       - run: |
-          cd build/macos/Build/Products/Release
-          zip -r ../../../../porpita-macos.zip porpita.app
+          cd build/macos/Build/Products/Release && zip -r ${{ github.workspace }}/porpita-macos.zip porpita.app
       - uses: actions/upload-artifact@v4
         with:
           name: porpita-macos
@@ -54,8 +56,7 @@ jobs:
       - run: flutter pub get
       - run: flutter build linux --release
       - run: |
-          cd build/linux/x64/release/bundle
-          zip -r ../../../../porpita-linux.zip .
+          cd build/linux/x64/release/bundle && zip -r ${{ github.workspace }}/porpita-linux.zip .
       - uses: actions/upload-artifact@v4
         with:
           name: porpita-linux
@@ -86,6 +87,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
+      - name: List downloaded artifacts
+        run: ls -la porpita-*/*
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
