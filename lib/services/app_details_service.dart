@@ -2,6 +2,20 @@ import 'dart:io';
 
 import 'adb_manager.dart';
 
+class DumpsysSection {
+  final String title;
+  final String rawText;
+
+  const DumpsysSection({required this.title, required this.rawText});
+}
+
+class DumpsysResult {
+  final PackageDetails details;
+  final List<DumpsysSection> sections;
+
+  const DumpsysResult({required this.details, required this.sections});
+}
+
 class PackageDetails {
   String packageName;
 
@@ -136,7 +150,7 @@ class DetailEntry {
 }
 
 class AppDetailsService {
-  static Future<PackageDetails?> fetchPackageDetails({
+  static Future<DumpsysResult?> fetchPackageDetails({
     required String deviceId,
     required String packageName,
   }) async {
@@ -150,7 +164,39 @@ class AppDetailsService {
 
     if (result.exitCode != 0) return null;
 
-    return _parseDumpsysOutput(result.stdout.toString(), packageName);
+    final rawOutput = result.stdout.toString();
+    final details = _parseDumpsysOutput(rawOutput, packageName);
+    final sections = _splitIntoSections(rawOutput);
+
+    return DumpsysResult(details: details, sections: sections);
+  }
+
+  static List<DumpsysSection> _splitIntoSections(String rawOutput) {
+    final lines = rawOutput.split('\n');
+    final sections = <DumpsysSection>[];
+    int? sectionStart;
+    String? currentTitle;
+
+    for (int i = 0; i < lines.length; i++) {
+      final line = lines[i];
+      // Match top-level section headers like "Activity Resolver Table:", "Packages:", etc.
+      if (RegExp(r'^[A-Z][a-zA-Z /]+:$').hasMatch(line)) {
+        if (currentTitle != null && sectionStart != null) {
+          final text = lines.sublist(sectionStart, i).join('\n');
+          sections.add(DumpsysSection(title: currentTitle, rawText: text));
+        }
+        currentTitle = line.substring(0, line.length - 1); // Remove trailing ":"
+        sectionStart = i;
+      }
+    }
+
+    // Last section
+    if (currentTitle != null && sectionStart != null) {
+      final text = lines.sublist(sectionStart).join('\n');
+      sections.add(DumpsysSection(title: currentTitle, rawText: text));
+    }
+
+    return sections;
   }
 
   static PackageDetails _parseDumpsysOutput(String output, String packageName) {

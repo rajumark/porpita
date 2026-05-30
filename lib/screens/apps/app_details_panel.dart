@@ -19,14 +19,14 @@ class AppDetailsPanel extends StatefulWidget {
 
 class _AppDetailsPanelState extends State<AppDetailsPanel>
     with SingleTickerProviderStateMixin {
-  PackageDetails? _details;
+  DumpsysResult? _result;
   bool _loading = false;
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 1, vsync: this);
   }
 
   @override
@@ -46,23 +46,41 @@ class _AppDetailsPanelState extends State<AppDetailsPanel>
   Future<void> _fetchDetails() async {
     final pkg = widget.selectedPackage;
     if (pkg == null || pkg.isEmpty) {
-      setState(() => _details = null);
+      setState(() => _result = null);
       return;
     }
 
     setState(() => _loading = true);
 
-    final details = await AppDetailsService.fetchPackageDetails(
+    final result = await AppDetailsService.fetchPackageDetails(
       deviceId: widget.deviceId,
       packageName: pkg,
     );
 
     if (mounted) {
       setState(() {
-        _details = details;
+        _result = result;
         _loading = false;
+        // Recreate tab controller with correct number of tabs
+        final tabCount = _buildTabs().length;
+        _tabController.dispose();
+        _tabController = TabController(length: tabCount, vsync: this);
       });
     }
+  }
+
+  List<_TabData> _buildTabs() {
+    if (_result == null) return [];
+
+    final tabs = <_TabData>[
+      _TabData('Basic Info', _BasicInfoTab(entries: _result!.details.toDetailEntries())),
+    ];
+
+    for (final section in _result!.sections) {
+      tabs.add(_TabData(section.title, _RawDumpTab(rawText: section.rawText)));
+    }
+
+    return tabs;
   }
 
   @override
@@ -75,13 +93,13 @@ class _AppDetailsPanelState extends State<AppDetailsPanel>
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (_details == null) {
+    if (_result == null) {
       return const Center(
         child: Text('Failed to load package details'),
       );
     }
 
-    final entries = _details!.toDetailEntries();
+    final tabs = _buildTabs();
 
     return Column(
       children: [
@@ -120,25 +138,23 @@ class _AppDetailsPanelState extends State<AppDetailsPanel>
           controller: _tabController,
           isScrollable: true,
           tabAlignment: TabAlignment.start,
-          tabs: const [
-            Tab(text: 'Basic Info'),
-            Tab(text: 'Permissions'),
-            Tab(text: 'Full Info'),
-          ],
+          tabs: tabs.map((t) => Tab(text: t.title)).toList(),
         ),
         Expanded(
           child: TabBarView(
             controller: _tabController,
-            children: [
-              _BasicInfoTab(entries: entries),
-              _PermissionsTab(details: _details!),
-              _FullInfoTab(entries: entries),
-            ],
+            children: tabs.map((t) => t.widget).toList(),
           ),
         ),
       ],
     );
   }
+}
+
+class _TabData {
+  final String title;
+  final Widget widget;
+  const _TabData(this.title, this.widget);
 }
 
 class _BasicInfoTab extends StatelessWidget {
@@ -208,124 +224,26 @@ class _BasicInfoTab extends StatelessWidget {
   }
 }
 
-class _PermissionsTab extends StatelessWidget {
-  final PackageDetails details;
+class _RawDumpTab extends StatelessWidget {
+  final String rawText;
 
-  const _PermissionsTab({required this.details});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        _InfoRow(label: 'installPermissionsFixed', value: details.installPermissionsFixed, theme: theme),
-        _InfoRow(label: 'usesNonSdkApi', value: details.usesNonSdkApi, theme: theme),
-        _InfoRow(label: 'forceQueryable', value: details.forceQueryable, theme: theme),
-        _InfoRow(label: 'queriesPackages', value: details.queriesPackages, theme: theme),
-        _InfoRow(label: 'queriesIntents', value: details.queriesIntents, theme: theme),
-      ],
-    );
-  }
-}
-
-class _FullInfoTab extends StatelessWidget {
-  final List<DetailEntry> entries;
-
-  const _FullInfoTab({required this.entries});
+  const _RawDumpTab({required this.rawText});
 
   @override
   Widget build(BuildContext context) {
-    if (entries.isEmpty) {
-      return const Center(child: Text('No details available'));
-    }
-
-    return ListView.separated(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(12),
-      itemCount: entries.length,
-      separatorBuilder: (_, _) => const Divider(height: 1),
-      itemBuilder: (context, i) {
-        final entry = entries[i];
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                entry.key,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  color: Theme.of(context).colorScheme.primary,
-                  fontFamily: 'monospace',
-                ),
-              ),
-              const SizedBox(height: 2),
-              SelectableText(
-                entry.value,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontFamily: 'monospace',
-                ),
-              ),
-              if (entry.description.isNotEmpty) ...[
-                const SizedBox(height: 2),
-                Text(
-                  entry.description,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ],
+      scrollDirection: Axis.vertical,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SelectableText(
+          rawText,
+          style: const TextStyle(
+            fontFamily: 'monospace',
+            fontSize: 11,
+            height: 1.4,
           ),
-        );
-      },
-    );
-  }
-}
-
-class _InfoRow extends StatelessWidget {
-  final String label;
-  final String? value;
-  final ThemeData theme;
-
-  const _InfoRow({
-    required this.label,
-    required this.value,
-    required this.theme,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 160,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: theme.colorScheme.primary,
-                fontFamily: 'monospace',
-              ),
-            ),
-          ),
-          Expanded(
-            child: SelectableText(
-              value ?? '-',
-              style: const TextStyle(
-                fontSize: 12,
-                fontFamily: 'monospace',
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
