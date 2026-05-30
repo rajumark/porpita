@@ -18,7 +18,7 @@
 
 ## Desktop Experience (Critical)
 - Use `window_manager` for window control: custom title bar, drag-to-move, double-click maximize, min/max/close buttons per platform convention
-- Use `tray_manager` for system tray icon with reactive context menu
+- Use `tray_manager` for system tray icon with reactive context menu 
 - Use `local_notifier` for native desktop OS notifications
 - Wrap all desktop integrations in `core/services/desktop_service.dart` — single facade for `window_manager`, `tray_manager`, `local_notifier`. Never call these plugins directly from widgets.
 - **Keyboard-first:** Use `Shortcuts`/`Actions`/`Intent` for all common operations. Bind `FocusNode` for logical tab order. Use `MouseRegion` for hover feedback.
