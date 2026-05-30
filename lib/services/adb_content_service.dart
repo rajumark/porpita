@@ -41,6 +41,16 @@ class AdbContentService {
     return result.stdout.toString();
   }
 
+  static Future<String> adbRaw({
+    required String deviceId,
+    required List<String> args,
+  }) async {
+    final adb = AdbManager.instance.adbPath;
+    if (adb == null) return '';
+    final result = await Process.run(adb, ['-s', deviceId, ...args]);
+    return result.stdout.toString();
+  }
+
   /// Parse `adb content query` output — each line is `Row: N key1=val1, key2=val2, …`
   static List<Map<String, String>> _parse(String output) {
     final rows = <Map<String, String>>[];

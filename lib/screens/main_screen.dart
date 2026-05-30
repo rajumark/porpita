@@ -16,6 +16,45 @@ import 'properties_page.dart';
 import 'services_page.dart';
 import 'settings_page.dart';
 import 'terminal_page.dart';
+import 'commands/dumpsys_page.dart';
+import 'commands/dumpsys_l_page.dart';
+import 'commands/dumpsys_activity_page.dart';
+import 'commands/dumpsys_window_page.dart';
+import 'commands/dumpsys_statusbar_page.dart';
+import 'commands/dumpsys_power_page.dart';
+import 'commands/dumpsys_alarm_page.dart';
+import 'commands/dumpsys_usagestats_page.dart';
+import 'commands/dumpsys_settings_page.dart';
+import 'commands/dumpsys_battery_page.dart';
+import 'commands/dumpsys_batterystats_page.dart';
+import 'commands/dumpsys_display_page.dart';
+import 'commands/dumpsys_input_page.dart';
+import 'commands/dumpsys_sensor_page.dart';
+import 'commands/dumpsys_audio_page.dart';
+import 'commands/dumpsys_vibrator_page.dart';
+import 'commands/dumpsys_usb_page.dart';
+import 'commands/dumpsys_thermal_page.dart';
+import 'commands/dumpsys_lights_page.dart';
+import 'commands/dumpsys_netstats_page.dart';
+import 'commands/dumpsys_connectivity_page.dart';
+import 'commands/dumpsys_wifi_page.dart';
+import 'commands/dumpsys_bluetooth_page.dart';
+import 'commands/dumpsys_telephony_registry_page.dart';
+import 'commands/dumpsys_network_management_page.dart';
+import 'commands/dumpsys_location_page.dart';
+import 'commands/bugreport_page.dart';
+import 'commands/logcat_d_page.dart';
+import 'commands/dmesg_page.dart';
+import 'commands/dumpsys_bugreport_page.dart';
+import 'commands/dumpsys_dropbox_page.dart';
+import 'commands/dumpsys_meminfo_page.dart';
+import 'commands/dumpsys_procstats_page.dart';
+import 'commands/dumpsys_cpuinfo_page.dart';
+import 'commands/dumpsys_gfxinfo_page.dart';
+import 'commands/am_dumpheap_page.dart';
+import 'commands/pm_list_features_page.dart';
+import 'commands/pm_list_libraries_page.dart';
+import 'commands/pm_list_permissions_page.dart';
 
 // ── navigation items ─────────────────────────────────────────────────────────
 
@@ -31,7 +70,47 @@ enum _Nav {
   calendar('Calendar', Icons.calendar_today_outlined),
   properties('Properties', Icons.tune_outlined),
   terminal('Terminal', Icons.terminal_outlined),
-  settings('Settings', Icons.settings_suggest_outlined);
+  settings('Settings', Icons.settings_suggest_outlined),
+
+  dumpsys('dumpsys', Icons.code),
+  dumpsysL('dumpsys -l', Icons.code),
+  dumpsysActivity('dumpsys activity', Icons.code),
+  dumpsysWindow('dumpsys window', Icons.code),
+  dumpsysStatusbar('dumpsys statusbar', Icons.code),
+  dumpsysPower('dumpsys power', Icons.code),
+  dumpsysAlarm('dumpsys alarm', Icons.code),
+  dumpsysUsagestats('dumpsys usagestats', Icons.code),
+  dumpsysSettings('dumpsys settings', Icons.code),
+  dumpsysBattery('dumpsys battery', Icons.code),
+  dumpsysBatterystats('dumpsys batterystats', Icons.code),
+  dumpsysDisplay('dumpsys display', Icons.code),
+  dumpsysInput('dumpsys input', Icons.code),
+  dumpsysSensor('dumpsys sensor', Icons.code),
+  dumpsysAudio('dumpsys audio', Icons.code),
+  dumpsysVibrator('dumpsys vibrator', Icons.code),
+  dumpsysUsb('dumpsys usb', Icons.code),
+  dumpsysThermal('dumpsys thermal', Icons.code),
+  dumpsysLights('dumpsys lights', Icons.code),
+  dumpsysNetstats('dumpsys netstats', Icons.code),
+  dumpsysConnectivity('dumpsys connectivity', Icons.code),
+  dumpsysWifi('dumpsys wifi', Icons.code),
+  dumpsysBluetooth('dumpsys bluetooth', Icons.code),
+  dumpsysTelephonyRegistry('dumpsys telephony.registry', Icons.code),
+  dumpsysNetworkManagement('dumpsys network_management', Icons.code),
+  dumpsysLocation('dumpsys location', Icons.code),
+  bugreport('bugreport', Icons.code),
+  logcatD('logcat -d', Icons.code),
+  dmesg('dmesg', Icons.code),
+  dumpsysBugreport('dumpsys bugreport', Icons.code),
+  dumpsysDropbox('dumpsys dropbox', Icons.code),
+  dumpsysMeminfo('dumpsys meminfo', Icons.code),
+  dumpsysProcstats('dumpsys procstats', Icons.code),
+  dumpsysCpuinfo('dumpsys cpuinfo', Icons.code),
+  dumpsysGfxinfo('dumpsys gfxinfo', Icons.code),
+  amDumpheap('am dumpheap', Icons.code),
+  pmListFeatures('pm list features', Icons.code),
+  pmListLibraries('pm list libraries', Icons.code),
+  pmListPermissions('pm list permissions', Icons.code),;
 
   final String label;
   final IconData icon;
@@ -51,6 +130,46 @@ Widget _buildPage(_Nav nav) => switch (nav) {
       _Nav.properties => const PropertiesPage(),
       _Nav.terminal => const TerminalPage(),
       _Nav.settings => const SettingsPage(),
+      _Nav.dumpsys => const DumpsysPage(),
+      _Nav.dumpsysL => const DumpsysLPage(),
+      _Nav.dumpsysActivity => const DumpsysActivityPage(),
+      _Nav.dumpsysWindow => const DumpsysWindowPage(),
+      _Nav.dumpsysStatusbar => const DumpsysStatusbarPage(),
+      _Nav.dumpsysPower => const DumpsysPowerPage(),
+      _Nav.dumpsysAlarm => const DumpsysAlarmPage(),
+      _Nav.dumpsysUsagestats => const DumpsysUsagestatsPage(),
+      _Nav.dumpsysSettings => const DumpsysSettingsPage(),
+      _Nav.dumpsysBattery => const DumpsysBatteryPage(),
+      _Nav.dumpsysBatterystats => const DumpsysBatterystatsPage(),
+      _Nav.dumpsysDisplay => const DumpsysDisplayPage(),
+      _Nav.dumpsysInput => const DumpsysInputPage(),
+      _Nav.dumpsysSensor => const DumpsysSensorPage(),
+      _Nav.dumpsysAudio => const DumpsysAudioPage(),
+      _Nav.dumpsysVibrator => const DumpsysVibratorPage(),
+      _Nav.dumpsysUsb => const DumpsysUsbPage(),
+      _Nav.dumpsysThermal => const DumpsysThermalPage(),
+      _Nav.dumpsysLights => const DumpsysLightsPage(),
+      _Nav.dumpsysNetstats => const DumpsysNetstatsPage(),
+      _Nav.dumpsysConnectivity => const DumpsysConnectivityPage(),
+      _Nav.dumpsysWifi => const DumpsysWifiPage(),
+      _Nav.dumpsysBluetooth => const DumpsysBluetoothPage(),
+      _Nav.dumpsysTelephonyRegistry => const DumpsysTelephonyRegistryPage(),
+      _Nav.dumpsysNetworkManagement => const DumpsysNetworkManagementPage(),
+      _Nav.dumpsysLocation => const DumpsysLocationPage(),
+      _Nav.bugreport => const BugreportPage(),
+      _Nav.logcatD => const LogcatDPage(),
+      _Nav.dmesg => const DmesgPage(),
+      _Nav.dumpsysBugreport => const DumpsysBugreportPage(),
+      _Nav.dumpsysDropbox => const DumpsysDropboxPage(),
+      _Nav.dumpsysMeminfo => const DumpsysMeminfoPage(),
+      _Nav.dumpsysProcstats => const DumpsysProcstatsPage(),
+      _Nav.dumpsysCpuinfo => const DumpsysCpuinfoPage(),
+      _Nav.dumpsysGfxinfo => const DumpsysGfxinfoPage(),
+      _Nav.amDumpheap => const AmDumpheapPage(),
+      _Nav.pmListFeatures => const PmListFeaturesPage(),
+      _Nav.pmListLibraries => const PmListLibrariesPage(),
+      _Nav.pmListPermissions => const PmListPermissionsPage(),
+
     };
 
 // ── main screen ──────────────────────────────────────────────────────────────
@@ -118,6 +237,12 @@ class _NavDrawer extends StatelessWidget {
       'Device': [_Nav.debug, _Nav.properties, _Nav.terminal],
       'Data': [_Nav.callLogs, _Nav.messages, _Nav.contacts, _Nav.calendar, _Nav.media],
       'Apps': [_Nav.apps, _Nav.services, _Nav.lifecycle],
+      'System Core & OS State': [_Nav.dumpsys, _Nav.dumpsysL, _Nav.dumpsysActivity, _Nav.dumpsysWindow, _Nav.dumpsysStatusbar, _Nav.dumpsysPower, _Nav.dumpsysAlarm, _Nav.dumpsysUsagestats, _Nav.dumpsysSettings],
+      'Hardware, Power & Battery': [_Nav.dumpsysBattery, _Nav.dumpsysBatterystats, _Nav.dumpsysDisplay, _Nav.dumpsysInput, _Nav.dumpsysSensor, _Nav.dumpsysAudio, _Nav.dumpsysVibrator, _Nav.dumpsysUsb, _Nav.dumpsysThermal, _Nav.dumpsysLights],
+      'Connectivity & Networking': [_Nav.dumpsysNetstats, _Nav.dumpsysConnectivity, _Nav.dumpsysWifi, _Nav.dumpsysBluetooth, _Nav.dumpsysTelephonyRegistry, _Nav.dumpsysNetworkManagement, _Nav.dumpsysLocation],
+      'Diagnostics & Logs': [_Nav.bugreport, _Nav.logcatD, _Nav.dmesg, _Nav.dumpsysBugreport, _Nav.dumpsysDropbox],
+      'Memory & Process Performance': [_Nav.dumpsysMeminfo, _Nav.dumpsysProcstats, _Nav.dumpsysCpuinfo, _Nav.dumpsysGfxinfo, _Nav.amDumpheap],
+      'App & Package Management': [_Nav.pmListFeatures, _Nav.pmListLibraries, _Nav.pmListPermissions],
       'System': [_Nav.settings],
     };
 
