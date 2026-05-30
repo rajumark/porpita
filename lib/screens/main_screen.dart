@@ -15,6 +15,52 @@ import 'messages_page.dart';
 import 'properties_page.dart';
 import 'services_page.dart';
 import 'settings_page.dart';
+import 'commands/service_list_page.dart';
+import 'commands/dumpsys_surfaceflinger_page.dart';
+import 'commands/dumpsys_appops_page.dart';
+import 'commands/dumpsys_notification_page.dart';
+import 'commands/dumpsys_keystore_page.dart';
+import 'commands/dumpsys_media_session_page.dart';
+import 'commands/dumpsys_jobscheduler_page.dart';
+import 'commands/dumpsys_wallpaper_page.dart';
+import 'commands/dumpsys_shortcut_page.dart';
+import 'commands/dumpsys_account_page.dart';
+import 'commands/dumpsys_mount_page.dart';
+import 'commands/dumpsys_storagestats_page.dart';
+import 'commands/dumpsys_backup_page.dart';
+import 'commands/dumpsys_app_hibernation_page.dart';
+import 'commands/dumpsys_fingerprint_page.dart';
+import 'commands/dumpsys_uri_grants_page.dart';
+import 'commands/dumpsys_netpolicy_page.dart';
+import 'commands/dumpsys_overlay_page.dart';
+import 'commands/dumpsys_device_policy_page.dart';
+import 'commands/dumpsys_app_search_page.dart';
+import 'commands/dumpsys_content_capture_page.dart';
+import 'commands/dumpsys_activity_top_page.dart';
+import 'commands/dumpsys_activity_broadcasts_page.dart';
+import 'commands/dumpsys_activity_services_page.dart';
+import 'commands/dumpsys_activity_intents_page.dart';
+import 'commands/dumpsys_activity_providers_page.dart';
+import 'commands/dumpsys_activity_recents_page.dart';
+import 'commands/dumpsys_activity_processes_page.dart';
+import 'commands/pm_dump_page.dart';
+import 'commands/pm_list_users_page.dart';
+import 'commands/pm_get_max_users_page.dart';
+import 'commands/pm_list_instrumentation_page.dart';
+import 'commands/cmd_package_compile_l_page.dart';
+import 'commands/cmd_shortcut_dump_page.dart';
+import 'commands/cmd_wifi_status_page.dart';
+import 'commands/cmd_overlay_list_page.dart';
+import 'commands/getprop_page.dart';
+import 'commands/procrank_page.dart';
+import 'commands/df_h_page.dart';
+import 'commands/cat_proc_cpuinfo_page.dart';
+import 'commands/cat_proc_meminfo_page.dart';
+import 'commands/cat_proc_partitions_page.dart';
+import 'commands/cat_proc_modules_page.dart';
+import 'commands/cat_proc_version_page.dart';
+import 'commands/cat_proc_uptime_page.dart';
+import 'commands/cat_proc_net_dev_page.dart';
 import 'terminal_page.dart';
 import 'commands/dumpsys_page.dart';
 import 'commands/dumpsys_l_page.dart';
@@ -110,7 +156,53 @@ enum _Nav {
   amDumpheap('am dumpheap', Icons.code),
   pmListFeatures('pm list features', Icons.code),
   pmListLibraries('pm list libraries', Icons.code),
-  pmListPermissions('pm list permissions', Icons.code),;
+  pmListPermissions('pm list permissions', Icons.code),
+  serviceList('service list', Icons.code),
+  dumpsysSurfaceflinger('dumpsys SurfaceFlinger', Icons.code),
+  dumpsysAppops('dumpsys appops', Icons.code),
+  dumpsysNotification('dumpsys notification', Icons.code),
+  dumpsysKeystore('dumpsys keystore', Icons.code),
+  dumpsysMediaSession('dumpsys media_session', Icons.code),
+  dumpsysJobscheduler('dumpsys jobscheduler', Icons.code),
+  dumpsysWallpaper('dumpsys wallpaper', Icons.code),
+  dumpsysShortcut('dumpsys shortcut', Icons.code),
+  dumpsysAccount('dumpsys account', Icons.code),
+  dumpsysMount('dumpsys mount', Icons.code),
+  dumpsysStoragestats('dumpsys storagestats', Icons.code),
+  dumpsysBackup('dumpsys backup', Icons.code),
+  dumpsysAppHibernation('dumpsys app_hibernation', Icons.code),
+  dumpsysFingerprint('dumpsys fingerprint', Icons.code),
+  dumpsysUriGrants('dumpsys uri_grants', Icons.code),
+  dumpsysNetpolicy('dumpsys netpolicy', Icons.code),
+  dumpsysOverlay('dumpsys overlay', Icons.code),
+  dumpsysDevicePolicy('dumpsys device_policy', Icons.code),
+  dumpsysAppSearch('dumpsys app_search', Icons.code),
+  dumpsysContentCapture('dumpsys content_capture', Icons.code),
+  dumpsysActivityTop('dumpsys activity top', Icons.code),
+  dumpsysActivityBroadcasts('dumpsys activity broadcasts', Icons.code),
+  dumpsysActivityServices('dumpsys activity services', Icons.code),
+  dumpsysActivityIntents('dumpsys activity intents', Icons.code),
+  dumpsysActivityProviders('dumpsys activity providers', Icons.code),
+  dumpsysActivityRecents('dumpsys activity recents', Icons.code),
+  dumpsysActivityProcesses('dumpsys activity processes', Icons.code),
+  pmDump('pm dump', Icons.code),
+  pmListUsers('pm list users', Icons.code),
+  pmGetMaxUsers('pm get-max-users', Icons.code),
+  pmListInstrumentation('pm list instrumentation', Icons.code),
+  cmdPackageCompileL('cmd package compile -l', Icons.code),
+  cmdShortcutDump('cmd shortcut dump', Icons.code),
+  cmdWifiStatus('cmd wifi status', Icons.code),
+  cmdOverlayList('cmd overlay list', Icons.code),
+  getprop('getprop', Icons.code),
+  procrank('procrank', Icons.code),
+  dfH('df -h', Icons.code),
+  catProcCpuinfo('cat /proc/cpuinfo', Icons.code),
+  catProcMeminfo('cat /proc/meminfo', Icons.code),
+  catProcPartitions('cat /proc/partitions', Icons.code),
+  catProcModules('cat /proc/modules', Icons.code),
+  catProcVersion('cat /proc/version', Icons.code),
+  catProcUptime('cat /proc/uptime', Icons.code),
+  catProcNetDev('cat /proc/net/dev', Icons.code),;
 
   final String label;
   final IconData icon;
@@ -169,6 +261,52 @@ Widget _buildPage(_Nav nav) => switch (nav) {
       _Nav.pmListFeatures => const PmListFeaturesPage(),
       _Nav.pmListLibraries => const PmListLibrariesPage(),
       _Nav.pmListPermissions => const PmListPermissionsPage(),
+      _Nav.serviceList => const ServiceListPage(),
+      _Nav.dumpsysSurfaceflinger => const DumpsysSurfaceflingerPage(),
+      _Nav.dumpsysAppops => const DumpsysAppopsPage(),
+      _Nav.dumpsysNotification => const DumpsysNotificationPage(),
+      _Nav.dumpsysKeystore => const DumpsysKeystorePage(),
+      _Nav.dumpsysMediaSession => const DumpsysMediaSessionPage(),
+      _Nav.dumpsysJobscheduler => const DumpsysJobschedulerPage(),
+      _Nav.dumpsysWallpaper => const DumpsysWallpaperPage(),
+      _Nav.dumpsysShortcut => const DumpsysShortcutPage(),
+      _Nav.dumpsysAccount => const DumpsysAccountPage(),
+      _Nav.dumpsysMount => const DumpsysMountPage(),
+      _Nav.dumpsysStoragestats => const DumpsysStoragestatsPage(),
+      _Nav.dumpsysBackup => const DumpsysBackupPage(),
+      _Nav.dumpsysAppHibernation => const DumpsysAppHibernationPage(),
+      _Nav.dumpsysFingerprint => const DumpsysFingerprintPage(),
+      _Nav.dumpsysUriGrants => const DumpsysUriGrantsPage(),
+      _Nav.dumpsysNetpolicy => const DumpsysNetpolicyPage(),
+      _Nav.dumpsysOverlay => const DumpsysOverlayPage(),
+      _Nav.dumpsysDevicePolicy => const DumpsysDevicePolicyPage(),
+      _Nav.dumpsysAppSearch => const DumpsysAppSearchPage(),
+      _Nav.dumpsysContentCapture => const DumpsysContentCapturePage(),
+      _Nav.dumpsysActivityTop => const DumpsysActivityTopPage(),
+      _Nav.dumpsysActivityBroadcasts => const DumpsysActivityBroadcastsPage(),
+      _Nav.dumpsysActivityServices => const DumpsysActivityServicesPage(),
+      _Nav.dumpsysActivityIntents => const DumpsysActivityIntentsPage(),
+      _Nav.dumpsysActivityProviders => const DumpsysActivityProvidersPage(),
+      _Nav.dumpsysActivityRecents => const DumpsysActivityRecentsPage(),
+      _Nav.dumpsysActivityProcesses => const DumpsysActivityProcessesPage(),
+      _Nav.pmDump => const PmDumpPage(),
+      _Nav.pmListUsers => const PmListUsersPage(),
+      _Nav.pmGetMaxUsers => const PmGetMaxUsersPage(),
+      _Nav.pmListInstrumentation => const PmListInstrumentationPage(),
+      _Nav.cmdPackageCompileL => const CmdPackageCompileLPage(),
+      _Nav.cmdShortcutDump => const CmdShortcutDumpPage(),
+      _Nav.cmdWifiStatus => const CmdWifiStatusPage(),
+      _Nav.cmdOverlayList => const CmdOverlayListPage(),
+      _Nav.getprop => const GetpropPage(),
+      _Nav.procrank => const ProcrankPage(),
+      _Nav.dfH => const DfHPage(),
+      _Nav.catProcCpuinfo => const CatProcCpuinfoPage(),
+      _Nav.catProcMeminfo => const CatProcMeminfoPage(),
+      _Nav.catProcPartitions => const CatProcPartitionsPage(),
+      _Nav.catProcModules => const CatProcModulesPage(),
+      _Nav.catProcVersion => const CatProcVersionPage(),
+      _Nav.catProcUptime => const CatProcUptimePage(),
+      _Nav.catProcNetDev => const CatProcNetDevPage(),
 
     };
 
@@ -243,6 +381,11 @@ class _NavDrawer extends StatelessWidget {
       'Diagnostics & Logs': [_Nav.bugreport, _Nav.logcatD, _Nav.dmesg, _Nav.dumpsysBugreport, _Nav.dumpsysDropbox],
       'Memory & Process Performance': [_Nav.dumpsysMeminfo, _Nav.dumpsysProcstats, _Nav.dumpsysCpuinfo, _Nav.dumpsysGfxinfo, _Nav.amDumpheap],
       'App & Package Management': [_Nav.pmListFeatures, _Nav.pmListLibraries, _Nav.pmListPermissions],
+            'Core Service Discovery & Composition': [_Nav.serviceList, _Nav.dumpsysSurfaceflinger, _Nav.dumpsysAppops, _Nav.dumpsysNotification, _Nav.dumpsysKeystore, _Nav.dumpsysMediaSession, _Nav.dumpsysJobscheduler, _Nav.dumpsysWallpaper, _Nav.dumpsysShortcut, _Nav.dumpsysAccount, _Nav.dumpsysMount, _Nav.dumpsysStoragestats, _Nav.dumpsysBackup, _Nav.dumpsysAppHibernation, _Nav.dumpsysFingerprint, _Nav.dumpsysUriGrants, _Nav.dumpsysNetpolicy, _Nav.dumpsysOverlay, _Nav.dumpsysDevicePolicy, _Nav.dumpsysAppSearch, _Nav.dumpsysContentCapture],
+      'Activity Manager State Diagnostics': [_Nav.dumpsysActivityTop, _Nav.dumpsysActivityBroadcasts, _Nav.dumpsysActivityServices, _Nav.dumpsysActivityIntents, _Nav.dumpsysActivityProviders, _Nav.dumpsysActivityRecents, _Nav.dumpsysActivityProcesses],
+      'Package Manager State Diagnostics': [_Nav.pmDump, _Nav.pmListUsers, _Nav.pmGetMaxUsers, _Nav.pmListInstrumentation],
+      'High-Fidelity Service Routing': [_Nav.cmdPackageCompileL, _Nav.cmdShortcutDump, _Nav.cmdWifiStatus, _Nav.cmdOverlayList],
+      'Linux Kernel & Virtual File System': [_Nav.getprop, _Nav.procrank, _Nav.dfH, _Nav.catProcCpuinfo, _Nav.catProcMeminfo, _Nav.catProcPartitions, _Nav.catProcModules, _Nav.catProcVersion, _Nav.catProcUptime, _Nav.catProcNetDev],
       'System': [_Nav.settings],
     };
 
