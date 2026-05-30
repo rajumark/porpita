@@ -50,7 +50,7 @@ lib/
             ├── screens/          # Main viewport containing layout splits
             └── widgets/          # Performance-isolated log rows, auto-scroll anchors
 ```
-
+ 
 Other possible features: `device_manager`, `file_explorer`, `package_inspector`, `screen_mirror`, `app_installer`
 
 **Self-containment rule:** A feature folder must be deletable without breaking other features. Shared entities go in `core/`, never in a feature that other features import.
