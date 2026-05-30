@@ -91,7 +91,7 @@ jobs:
         run: ls -la porpita-*/*
       - name: Create GitHub Release
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN_FLUTTER }}
         run: |
           TAG="build-${{ github.run_number }}-${{ github.run_attempt }}"
           gh release create "$TAG" \
