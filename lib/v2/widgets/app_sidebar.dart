@@ -30,6 +30,8 @@ class AppSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return SizedBox(
       width: 200,
       child: Padding(
@@ -40,16 +42,19 @@ class AppSidebar extends StatelessWidget {
           itemBuilder: (context, index) {
             final isSelected = index == selectedIndex;
             return Material(
-              color: isSelected
-                  ? Theme.of(context).colorScheme.primaryContainer
-                  : Theme.of(context).colorScheme.surfaceContainerHighest,
+              color: isSelected ? scheme.secondaryContainer : Colors.transparent,
               borderRadius: _borderRadius(index),
               child: InkWell(
                 borderRadius: _borderRadius(index),
                 onTap: () => onItemSelected(index),
                 child: Padding(
                   padding: const EdgeInsets.only(left: 8, right: 16, top: 6, bottom: 6),
-                  child: Text(items[index]),
+                  child: Text(
+                    items[index],
+                    style: TextStyle(
+                      color: isSelected ? scheme.onSecondaryContainer : scheme.onSurface,
+                    ),
+                  ),
                 ),
               ),
             );
