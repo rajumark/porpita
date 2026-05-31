@@ -181,28 +181,54 @@ class _AppsListScreenState extends State<AppsListScreen> {
       );
     }
 
-    return ListView.builder(
+    return ListView.separated(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
       itemCount: _filteredApps.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 2),
       itemBuilder: (context, index) {
         final app = _filteredApps[index];
-        return ListTile(
-          dense: true,
-          title: Text(app, style: Theme.of(context).textTheme.bodyMedium),
-          onTap: () => widget.onAppSelected(app),
-          trailing: PopupMenuButton<String>(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            onSelected: (value) {},
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 'start', child: Text('Start')),
-              const PopupMenuItem(value: 'stop', child: Text('Stop')),
-              const PopupMenuItem(value: 'restart', child: Text('Restart')),
-            ],
-            child: IconButton(
-              icon: const Icon(Icons.more_vert),
-              iconSize: 20,
-              onPressed: null,
-              padding: EdgeInsets.zero,
-              constraints: BoxConstraints.tight(const Size(32, 32)),
+        final borderRadius = index == 0
+            ? const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12),
+              )
+            : index == _filteredApps.length - 1
+                ? const BorderRadius.only(
+                    bottomLeft: Radius.circular(12),
+                    bottomRight: Radius.circular(12),
+                  )
+                : BorderRadius.circular(2);
+        return Material(
+          color: Theme.of(context).colorScheme.surfaceContainer,
+          borderRadius: borderRadius,
+          child: InkWell(
+            borderRadius: borderRadius,
+            onTap: () => widget.onAppSelected(app),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8, right: 8, top: 6, bottom: 6),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(app, style: Theme.of(context).textTheme.bodyMedium),
+                  ),
+                  PopupMenuButton<String>(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    onSelected: (value) {},
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(value: 'start', child: Text('Start')),
+                      const PopupMenuItem(value: 'stop', child: Text('Stop')),
+                      const PopupMenuItem(value: 'restart', child: Text('Restart')),
+                    ],
+                    child: IconButton(
+                      icon: const Icon(Icons.more_vert),
+                      iconSize: 20,
+                      onPressed: null,
+                      padding: EdgeInsets.zero,
+                      constraints: BoxConstraints.tight(const Size(32, 32)),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
