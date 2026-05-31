@@ -33,7 +33,7 @@ class AppSidebar extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return SizedBox(
-      width: 200,
+      width: 140,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: ListView.separated(

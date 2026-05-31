@@ -10,7 +10,7 @@ class AppsBaseScreen extends StatelessWidget {
       padding: const EdgeInsets.only(left: 0, right: 8, top: 0, bottom: 8),
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceContainerLow,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
         ),
         clipBehavior: Clip.antiAlias,
