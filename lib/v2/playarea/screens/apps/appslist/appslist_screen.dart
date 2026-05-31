@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:porpita/services/device_manager.dart';
+import 'package:porpita/v2/widgets/search_view.dart';
 import 'apps_list_service.dart';
 
 class AppsListScreen extends StatefulWidget {
@@ -20,11 +22,13 @@ class _AppsListScreenState extends State<AppsListScreen> {
   String? _lastDeviceId;
   AppFilter _selectedFilter = AppFilter.user;
   final _searchController = TextEditingController();
+  static const _filterKey = 'apps_filter_index';
 
   @override
   void initState() {
     super.initState();
     _searchController.addListener(_onSearchChanged);
+    _loadFilter();
   }
 
   @override
@@ -32,6 +36,19 @@ class _AppsListScreenState extends State<AppsListScreen> {
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadFilter() async {
+    final prefs = await SharedPreferences.getInstance();
+    final index = prefs.getInt(_filterKey) ?? 1;
+    if (mounted) {
+      setState(() => _selectedFilter = AppFilter.values[index]);
+    }
+  }
+
+  Future<void> _saveFilter(AppFilter filter) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_filterKey, filter.index);
   }
 
   void _onSearchChanged() {
@@ -58,25 +75,9 @@ class _AppsListScreenState extends State<AppsListScreen> {
           child: Row(
             children: [
               Expanded(
-                child: TextField(
+                child: SearchView(
                   controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search apps...',
-                    prefixIcon: const Icon(Icons.search, size: 20),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(24),
-                      borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(24),
-                      borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(24),
-                      borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
-                    ),
-                  ),
+                  hintText: 'Search apps...',
                 ),
               ),
               const SizedBox(width: 8),
@@ -90,12 +91,15 @@ class _AppsListScreenState extends State<AppsListScreen> {
                   const PopupMenuItem(value: 'sort', child: Text('Sort by')),
                   const PopupMenuItem(value: 'install', child: Text('Install app')),
                 ],
-                child: IconButton(
-                  icon: const Icon(Icons.more_vert),
-                  iconSize: 24,
-                  onPressed: null,
-                  padding: EdgeInsets.zero,
-                  constraints: BoxConstraints.tight(const Size(36, 36)),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: IconButton(
+                    icon: const Icon(Icons.more_vert),
+                    iconSize: 24,
+                    onPressed: null,
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints.tight(const Size(36, 36)),
+                  ),
                 ),
               ),
             ],
@@ -124,6 +128,7 @@ class _AppsListScreenState extends State<AppsListScreen> {
                 onChanged: (value) {
                   if (value != null) {
                     setState(() => _selectedFilter = value);
+                    _saveFilter(value);
                     Navigator.of(context).pop();
                     final device = context.read<DeviceManager>().selected;
                     if (device != null) _fetchApps(device.id);
@@ -164,6 +169,23 @@ class _AppsListScreenState extends State<AppsListScreen> {
     }
   }
 
+  BorderRadius _borderRadius(int index, int total) {
+    if (total == 1) return BorderRadius.circular(12);
+    if (index == 0) {
+      return const BorderRadius.only(
+        topLeft: Radius.circular(12),
+        topRight: Radius.circular(12),
+      );
+    }
+    if (index == total - 1) {
+      return const BorderRadius.only(
+        bottomLeft: Radius.circular(12),
+        bottomRight: Radius.circular(12),
+      );
+    }
+    return BorderRadius.circular(2);
+  }
+
   Widget _buildContent() {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -181,25 +203,17 @@ class _AppsListScreenState extends State<AppsListScreen> {
       );
     }
 
+    final total = _filteredApps.length;
+
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 8),
-      itemCount: _filteredApps.length,
+      itemCount: total,
       separatorBuilder: (_, __) => const SizedBox(height: 2),
       itemBuilder: (context, index) {
         final app = _filteredApps[index];
-        final borderRadius = index == 0
-            ? const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                topRight: Radius.circular(12),
-              )
-            : index == _filteredApps.length - 1
-                ? const BorderRadius.only(
-                    bottomLeft: Radius.circular(12),
-                    bottomRight: Radius.circular(12),
-                  )
-                : BorderRadius.circular(2);
+        final borderRadius = _borderRadius(index, total);
         return Material(
-          color: Theme.of(context).colorScheme.surfaceContainer,
+          color: Theme.of(context).colorScheme.surfaceContainerLow,
           borderRadius: borderRadius,
           child: InkWell(
             borderRadius: borderRadius,
@@ -219,12 +233,15 @@ class _AppsListScreenState extends State<AppsListScreen> {
                       const PopupMenuItem(value: 'stop', child: Text('Stop')),
                       const PopupMenuItem(value: 'restart', child: Text('Restart')),
                     ],
-                    child: IconButton(
-                      icon: const Icon(Icons.more_vert),
-                      iconSize: 20,
-                      onPressed: null,
-                      padding: EdgeInsets.zero,
-                      constraints: BoxConstraints.tight(const Size(32, 32)),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: IconButton(
+                        icon: const Icon(Icons.more_vert),
+                        iconSize: 20,
+                        onPressed: null,
+                        padding: EdgeInsets.zero,
+                        constraints: BoxConstraints.tight(const Size(32, 32)),
+                      ),
                     ),
                   ),
                 ],
