@@ -44,9 +44,7 @@ class _BaseScreenState extends State<BaseScreen> {
           Expanded(
             child: Row(
               children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeInOut,
+                SizedBox(
                   width: _showSidebar ? 140 : 0,
                   child: _showSidebar
                       ? Sidebar(
