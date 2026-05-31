@@ -113,10 +113,12 @@ import 'commands/svc_usb_page.dart';
 import 'commands/bmgr_page.dart';
 import 'commands/magisk_page.dart';
 import 'commands/sysfs_page.dart';
+import 'command_browser_page.dart';
 
 // ── navigation items ─────────────────────────────────────────────────────────
 
 enum _Nav {
+  commandBrowser('Commands', Icons.build_outlined),
   debug('Debug', Icons.bug_report_outlined),
   apps('Apps', Icons.apps_outlined),
   callLogs('Call Logs', Icons.phone_outlined),
@@ -234,6 +236,7 @@ enum _Nav {
 }
 
 Widget _buildPage(_Nav nav) => switch (nav) {
+      _Nav.commandBrowser => const CommandBrowserPage(),
       _Nav.debug => const DebugPage(),
       _Nav.apps => const AppsPage(),
       _Nav.callLogs => const CallLogsPage(),
@@ -408,7 +411,7 @@ class _NavDrawer extends StatelessWidget {
 
     // Group nav items
     final groups = <String, List<_Nav>>{
-      'Device': [_Nav.debug, _Nav.properties, _Nav.terminal],
+      'Device': [_Nav.commandBrowser, _Nav.debug, _Nav.properties, _Nav.terminal],
       'Data': [_Nav.callLogs, _Nav.messages, _Nav.contacts, _Nav.calendar, _Nav.media],
       'Apps': [_Nav.apps, _Nav.services, _Nav.lifecycle],
       'System Core & OS State': [_Nav.dumpsys, _Nav.dumpsysL, _Nav.dumpsysActivity, _Nav.dumpsysWindow, _Nav.dumpsysStatusbar, _Nav.dumpsysPower, _Nav.dumpsysAlarm, _Nav.dumpsysUsagestats, _Nav.dumpsysSettings, _Nav.wm, _Nav.uimode, _Nav.date],
