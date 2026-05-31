@@ -5,22 +5,31 @@ class BaseScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      appBar: _AppBar(),
+    return Scaffold(
+      body: Column(
+        children: [
+          SizedBox(
+            height: 36,
+            child: Row(
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.menu),
+                  iconSize: 24,
+                  onPressed: () {},
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints.tight(const Size(36, 36)),
+                ),
+                const Text('Porpita'),
+              ],
+            ),
+          ),
+          const Expanded(
+            child: Center(
+              child: Text('Comming SOon'),
+            ),
+          ),
+        ],
+      ),
     );
-
-class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _AppBar();
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-
-  @override
-  Widget build(BuildContext context) {
-    return const AppBar(
-      title: Text('Porpita'),
-    );
-  }
-}
   }
 }
