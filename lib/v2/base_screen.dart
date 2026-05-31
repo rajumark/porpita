@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'sidebar/sidebar.dart';
 import 'playarea/play_area.dart';
-import 'playarea/screens/apps/appslist/appslist_screen.dart';
+import 'playarea/screens/apps/apps_base_screen.dart';
 import 'playarea/screens/settings/settings_screen.dart';
 import 'playarea/screens/terminal/terminal_screen.dart';
 import 'playarea/screens/debuginfo/debuginfo_screen.dart';
@@ -21,7 +21,7 @@ class _BaseScreenState extends State<BaseScreen> {
   Widget _buildScreen(int index) {
     switch (index) {
       case 0:
-        return const AppsListScreen();
+        return const AppsBaseScreen();
       case 1:
         return const SettingsScreen();
       case 2:
