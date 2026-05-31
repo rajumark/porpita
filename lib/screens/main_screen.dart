@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../services/device_manager.dart';
 import '../widgets/device_selector_dialog.dart';
 import '../widgets/settings_dialog.dart';
-import 'apps_page.dart';
+import '../features/apps/screens/apps_page.dart';
 import 'call_logs_page.dart';
 import 'calendar_page.dart';
 import 'contacts_page.dart';
@@ -398,11 +398,25 @@ class _MainScreenState extends State<MainScreen> {
 
 // ── navigation drawer ────────────────────────────────────────────────────────
 
-class _NavDrawer extends StatelessWidget {
+class _NavDrawer extends StatefulWidget {
   final _Nav current;
   final ValueChanged<_Nav> onSelected;
 
   const _NavDrawer({required this.current, required this.onSelected});
+
+  @override
+  State<_NavDrawer> createState() => _NavDrawerState();
+}
+
+class _NavDrawerState extends State<_NavDrawer> {
+  final _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -410,7 +424,7 @@ class _NavDrawer extends StatelessWidget {
     final tt = Theme.of(context).textTheme;
 
     // Group nav items
-    final groups = <String, List<_Nav>>{
+    final allGroups = <String, List<_Nav>>{
       'Device': [_Nav.commandBrowser, _Nav.debug, _Nav.properties, _Nav.terminal],
       'Data': [_Nav.callLogs, _Nav.messages, _Nav.contacts, _Nav.calendar, _Nav.media],
       'Apps': [_Nav.apps, _Nav.services, _Nav.lifecycle],
@@ -420,13 +434,24 @@ class _NavDrawer extends StatelessWidget {
       'Diagnostics & Logs': [_Nav.bugreport, _Nav.logcatD, _Nav.dmesg, _Nav.dumpsysBugreport, _Nav.dumpsysDropbox, _Nav.rebootReadiness, _Nav.safetyCenter],
       'Memory & Process Performance': [_Nav.dumpsysMeminfo, _Nav.dumpsysProcstats, _Nav.dumpsysCpuinfo, _Nav.dumpsysGfxinfo, _Nav.amDumpheap],
       'App & Package Management': [_Nav.pmListFeatures, _Nav.pmListLibraries, _Nav.pmListPermissions, _Nav.bmgr],
-            'Core Service Discovery & Composition': [_Nav.serviceList, _Nav.dumpsysSurfaceflinger, _Nav.dumpsysAppops, _Nav.dumpsysNotification, _Nav.dumpsysKeystore, _Nav.dumpsysMediaSession, _Nav.dumpsysJobscheduler, _Nav.dumpsysWallpaper, _Nav.dumpsysShortcut, _Nav.dumpsysAccount, _Nav.dumpsysMount, _Nav.dumpsysStoragestats, _Nav.dumpsysBackup, _Nav.dumpsysAppHibernation, _Nav.dumpsysFingerprint, _Nav.dumpsysUriGrants, _Nav.dumpsysNetpolicy, _Nav.dumpsysOverlay, _Nav.dumpsysDevicePolicy, _Nav.dumpsysAppSearch, _Nav.dumpsysContentCapture],
+      'Core Service Discovery & Composition': [_Nav.serviceList, _Nav.dumpsysSurfaceflinger, _Nav.dumpsysAppops, _Nav.dumpsysNotification, _Nav.dumpsysKeystore, _Nav.dumpsysMediaSession, _Nav.dumpsysJobscheduler, _Nav.dumpsysWallpaper, _Nav.dumpsysShortcut, _Nav.dumpsysAccount, _Nav.dumpsysMount, _Nav.dumpsysStoragestats, _Nav.dumpsysBackup, _Nav.dumpsysAppHibernation, _Nav.dumpsysFingerprint, _Nav.dumpsysUriGrants, _Nav.dumpsysNetpolicy, _Nav.dumpsysOverlay, _Nav.dumpsysDevicePolicy, _Nav.dumpsysAppSearch, _Nav.dumpsysContentCapture],
       'Activity Manager State Diagnostics': [_Nav.dumpsysActivityTop, _Nav.dumpsysActivityBroadcasts, _Nav.dumpsysActivityServices, _Nav.dumpsysActivityIntents, _Nav.dumpsysActivityProviders, _Nav.dumpsysActivityRecents, _Nav.dumpsysActivityProcesses],
       'Package Manager State Diagnostics': [_Nav.pmDump, _Nav.pmListUsers, _Nav.pmGetMaxUsers, _Nav.pmListInstrumentation],
       'High-Fidelity Service Routing': [_Nav.cmdPackageCompileL, _Nav.cmdShortcutDump, _Nav.cmdWifiStatus, _Nav.cmdOverlayList],
       'Linux Kernel & Virtual File System': [_Nav.getprop, _Nav.procrank, _Nav.dfH, _Nav.catProcCpuinfo, _Nav.catProcMeminfo, _Nav.catProcPartitions, _Nav.catProcModules, _Nav.catProcVersion, _Nav.catProcUptime, _Nav.catProcNetDev, _Nav.sysfs, _Nav.acpi, _Nav.magisk],
       'System': [_Nav.settings],
     };
+
+    // Filter groups by search query
+    final q = _searchQuery.toLowerCase().trim();
+    final groups = q.isEmpty
+        ? allGroups
+        : allGroups.map((key, value) {
+            final filtered = value.where((nav) =>
+              nav.label.toLowerCase().contains(q)
+            ).toList();
+            return MapEntry(key, filtered);
+          })..removeWhere((key, value) => value.isEmpty);
 
     return Drawer(
       child: SafeArea(
@@ -461,30 +486,65 @@ class _NavDrawer extends StatelessWidget {
                 },
               ),
             ),
-            const Divider(),
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: groups.entries.expand((entry) => [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                    child: Text(
-                      entry.key.toUpperCase(),
-                      style: tt.labelSmall?.copyWith(color: cs.primary, letterSpacing: 1.2, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  ...entry.value.map((nav) => ListTile(
-                        leading: Icon(nav.icon, size: 20),
-                        title: Text(nav.label),
-                        selected: nav == current,
-                        selectedColor: cs.primary,
-                        selectedTileColor: cs.primaryContainer,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                        onTap: () => onSelected(nav),
-                      )),
-                ]).toList(),
+            // Search field
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search menus…',
+                  prefixIcon: const Icon(Icons.search, size: 20),
+                  suffixIcon: _searchQuery.isEmpty
+                      ? null
+                      : IconButton(
+                          icon: const Icon(Icons.close, size: 18),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                        ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                ),
+                onChanged: (v) => setState(() => _searchQuery = v),
               ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: groups.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.search_off, size: 32, color: cs.outlineVariant),
+                          const SizedBox(height: 8),
+                          Text('No menus match "$_searchQuery"', style: TextStyle(color: cs.onSurfaceVariant)),
+                        ],
+                      ),
+                    )
+                  : ListView(
+                      padding: EdgeInsets.zero,
+                      children: groups.entries.expand((entry) => [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                          child: Text(
+                            entry.key.toUpperCase(),
+                            style: tt.labelSmall?.copyWith(color: cs.primary, letterSpacing: 1.2, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        ...entry.value.map((nav) => ListTile(
+                              leading: Icon(nav.icon, size: 20),
+                              title: Text(nav.label),
+                              selected: nav == widget.current,
+                              selectedColor: cs.primary,
+                              selectedTileColor: cs.primaryContainer,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                              onTap: () => widget.onSelected(nav),
+                            )),
+                      ]).toList(),
+                    ),
             ),
           ],
         ),

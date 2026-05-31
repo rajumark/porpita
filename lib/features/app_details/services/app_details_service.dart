@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'adb_manager.dart';
+import '../../../services/adb_manager.dart';
 
 class DumpsysSection {
   final String title;
@@ -19,14 +19,12 @@ class DumpsysResult {
 class PackageDetails {
   String packageName;
 
-  // Core app information
   String? appId;
   String? versionName;
   String? versionCode;
   String? minSdk;
   String? targetSdk;
 
-  // Installation and update details
   String? installerPackageName;
   String? installerPackageUid;
   String? initiatingPackageName;
@@ -36,7 +34,6 @@ class PackageDetails {
   String? timeStamp;
   String? lastUpdateTime;
 
-  // Technical details
   String? codePath;
   String? resourcePath;
   String? legacyNativeLibraryDir;
@@ -179,18 +176,16 @@ class AppDetailsService {
 
     for (int i = 0; i < lines.length; i++) {
       final line = lines[i];
-      // Match top-level section headers like "Activity Resolver Table:", "Packages:", etc.
       if (RegExp(r'^[A-Z][a-zA-Z /]+:$').hasMatch(line)) {
         if (currentTitle != null && sectionStart != null) {
           final text = lines.sublist(sectionStart, i).join('\n');
           sections.add(DumpsysSection(title: currentTitle, rawText: text));
         }
-        currentTitle = line.substring(0, line.length - 1); // Remove trailing ":"
+        currentTitle = line.substring(0, line.length - 1);
         sectionStart = i;
       }
     }
 
-    // Last section
     if (currentTitle != null && sectionStart != null) {
       final text = lines.sublist(sectionStart).join('\n');
       sections.add(DumpsysSection(title: currentTitle, rawText: text));

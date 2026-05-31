@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../services/device_manager.dart';
-import 'apps/app_details_panel.dart';
-import 'apps/apps_left_panel.dart';
+import '../../../services/device_manager.dart';
+import '../../app_details/screens/app_details_panel.dart';
+import 'apps_left_panel.dart';
 
 class AppsPage extends StatefulWidget {
   const AppsPage({super.key});
@@ -57,7 +57,6 @@ class _AppsPageState extends State<AppsPage> {
           );
         }
 
-        // Narrow screen: show list or detail
         if (_selectedPackage != null) {
           return Column(
             children: [

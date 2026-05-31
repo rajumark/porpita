@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../services/app_details_service.dart';
+import '../services/app_details_service.dart';
 import 'no_package_selected.dart';
 
 class AppDetailsPanel extends StatefulWidget {
@@ -21,18 +21,23 @@ class _AppDetailsPanelState extends State<AppDetailsPanel>
     with SingleTickerProviderStateMixin {
   DumpsysResult? _result;
   bool _loading = false;
+  String? _errorMessage;
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 1, vsync: this);
+    if (widget.selectedPackage != null) {
+      _fetchDetails();
+    }
   }
 
   @override
   void didUpdateWidget(AppDetailsPanel oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.selectedPackage != oldWidget.selectedPackage) {
+    if (widget.selectedPackage != oldWidget.selectedPackage ||
+        widget.deviceId != oldWidget.deviceId) {
       _fetchDetails();
     }
   }
@@ -46,26 +51,50 @@ class _AppDetailsPanelState extends State<AppDetailsPanel>
   Future<void> _fetchDetails() async {
     final pkg = widget.selectedPackage;
     if (pkg == null || pkg.isEmpty) {
-      setState(() => _result = null);
+      setState(() {
+        _result = null;
+        _errorMessage = null;
+      });
       return;
     }
 
-    setState(() => _loading = true);
+    setState(() {
+      _loading = true;
+      _errorMessage = null;
+    });
 
-    final result = await AppDetailsService.fetchPackageDetails(
-      deviceId: widget.deviceId,
-      packageName: pkg,
-    );
+    try {
+      final result = await AppDetailsService.fetchPackageDetails(
+        deviceId: widget.deviceId,
+        packageName: pkg,
+      );
 
-    if (mounted) {
-      setState(() {
-        _result = result;
-        _loading = false;
-        // Recreate tab controller with correct number of tabs
-        final tabCount = _buildTabs().length;
-        _tabController.dispose();
-        _tabController = TabController(length: tabCount, vsync: this);
-      });
+      if (mounted) {
+        if (result == null) {
+          setState(() {
+            _result = null;
+            _loading = false;
+            _errorMessage = 'Service returned null (ADB not ready or command failed)';
+          });
+          return;
+        }
+        setState(() {
+          _result = result;
+          _loading = false;
+          _errorMessage = null;
+          final tabCount = _buildTabs().length;
+          _tabController.dispose();
+          _tabController = TabController(length: tabCount, vsync: this);
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _result = null;
+          _loading = false;
+          _errorMessage = 'Error: $e';
+        });
+      }
     }
   }
 
@@ -94,8 +123,35 @@ class _AppDetailsPanelState extends State<AppDetailsPanel>
     }
 
     if (_result == null) {
-      return const Center(
-        child: Text('Failed to load package details'),
+      final cs = Theme.of(context).colorScheme;
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.error_outline, size: 32, color: cs.error),
+            const SizedBox(height: 8),
+            Text('Failed to load package details',
+              style: TextStyle(color: cs.onSurfaceVariant)),
+            if (_errorMessage != null) ...[
+              const SizedBox(height: 4),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Text(
+                  _errorMessage!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 11, fontFamily: 'monospace',
+                    color: cs.onSurfaceVariant)),
+              ),
+            ],
+            const SizedBox(height: 12),
+            FilledButton.tonalIcon(
+              onPressed: _fetchDetails,
+              icon: const Icon(Icons.refresh, size: 16),
+              label: const Text('Retry'),
+            ),
+          ],
+        ),
       );
     }
 

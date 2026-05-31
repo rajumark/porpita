@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/services.dart';
 
-import 'adb_manager.dart';
+import '../../../services/adb_manager.dart';
 
 enum AppType {
   all('All'),
