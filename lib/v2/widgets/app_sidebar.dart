@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 
 class AppSidebar extends StatelessWidget {
   final List<String> items;
+  final List<IconData>? icons;
   final int selectedIndex;
   final ValueChanged<int> onItemSelected;
 
   const AppSidebar({
     super.key,
     required this.items,
+    this.icons,
     required this.selectedIndex,
     required this.onItemSelected,
   });
@@ -49,11 +51,19 @@ class AppSidebar extends StatelessWidget {
                 onTap: () => onItemSelected(index),
                 child: Padding(
                   padding: const EdgeInsets.only(left: 8, right: 16, top: 6, bottom: 6),
-                  child: Text(
-                    items[index],
-                    style: TextStyle(
-                      color: isSelected ? scheme.onSecondaryContainer : scheme.onSurface,
-                    ),
+                  child: Row(
+                    children: [
+                      if (icons != null && index < icons!.length) ...[
+                        Icon(icons![index], size: 18),
+                        const SizedBox(width: 8),
+                      ],
+                      Text(
+                        items[index],
+                        style: TextStyle(
+                          color: isSelected ? scheme.onSecondaryContainer : scheme.onSurface,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
