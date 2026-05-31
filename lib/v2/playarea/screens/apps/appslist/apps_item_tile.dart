@@ -1,13 +1,31 @@
 import 'package:flutter/material.dart';
 import 'app_actions_service.dart';
 
-class AppItemTile extends StatelessWidget {
+class AppItemTile extends StatefulWidget {
   final String title;
   final Widget? leading;
   final BorderRadius borderRadius;
   final VoidCallback onTap;
   final String packageName;
   final ValueChanged<AppAction>? onMenuItemSelected;
+
+  static const _mainActions = [
+    AppAction.open,
+    AppAction.forceStop,
+    AppAction.restart,
+    AppAction.clearData,
+    AppAction.uninstall,
+    AppAction.copy,
+  ];
+
+  static const _moreActions = [
+    AppAction.appInfo,
+    AppAction.playStore,
+    AppAction.findOnline,
+    AppAction.home,
+    AppAction.enable,
+    AppAction.disable,
+  ];
 
   const AppItemTile({
     super.key,
@@ -20,46 +38,103 @@ class AppItemTile extends StatelessWidget {
   });
 
   @override
+  State<AppItemTile> createState() => _AppItemTileState();
+}
+
+class _AppItemTileState extends State<AppItemTile> {
+  final _menuKey = GlobalKey();
+
+  void _showMoreMenu() {
+    final box = _menuKey.currentContext?.findRenderObject() as RenderBox?;
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox?;
+    if (box == null || overlay == null) return;
+
+    final position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        box.localToGlobal(Offset.zero, ancestor: overlay),
+        box.localToGlobal(box.size.bottomRight(Offset.zero), ancestor: overlay),
+      ),
+      Offset.zero & overlay.size,
+    );
+
+    showMenu<String>(
+      context: context,
+      position: position,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      items: [
+        PopupMenuItem<String>(
+          value: '__back__',
+          child: Row(children: [
+            Icon(Icons.arrow_back, size: 18),
+            const SizedBox(width: 8),
+            const Text('Back'),
+          ]),
+        ),
+        const PopupMenuDivider(),
+        ...AppItemTile._moreActions.map((action) => PopupMenuItem<String>(
+          value: action.name,
+          child: Text(action.label),
+        )),
+      ],
+    ).then((value) {
+      if (value != null && value != '__back__') {
+        final action = AppAction.values.firstWhere((a) => a.name == value);
+        widget.onMenuItemSelected?.call(action);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
     return Material(
       color: scheme.surfaceContainer,
-      borderRadius: borderRadius,
+      borderRadius: widget.borderRadius,
       child: InkWell(
-        borderRadius: borderRadius,
-        onTap: onTap,
+        borderRadius: widget.borderRadius,
+        onTap: widget.onTap,
         child: Padding(
           padding: const EdgeInsets.only(left: 12, right: 8, top: 6, bottom: 6),
           child: Row(
             children: [
-              if (leading != null) ...[
-                leading!,
+              if (widget.leading != null) ...[
+                widget.leading!,
                 const SizedBox(width: 10),
               ],
               Expanded(
                 child: Text(
-                  title,
+                  widget.title,
                   style: Theme.of(context).textTheme.bodyMedium,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              PopupMenuButton<AppAction>(
+              PopupMenuButton<String>(
+                key: _menuKey,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                onSelected: (action) => onMenuItemSelected?.call(action),
-                itemBuilder: (context) {
-                  final items = <PopupMenuEntry<AppAction>>[];
-                  for (final action in AppActionsService.menuItems) {
-                    items.add(PopupMenuItem<AppAction>(
-                      value: action,
-                      child: Text(action.label),
-                    ));
-                    if (action == AppAction.copy) {
-                      items.add(const PopupMenuDivider());
-                    }
+                onSelected: (value) {
+                  if (value == '__more__') {
+                    _showMoreMenu();
+                  } else {
+                    final action = AppAction.values.firstWhere((a) => a.name == value);
+                    widget.onMenuItemSelected?.call(action);
                   }
-                  return items;
                 },
+                itemBuilder: (_) => [
+                  ...AppItemTile._mainActions.map((a) => PopupMenuItem<String>(
+                    value: a.name,
+                    child: Text(a.label),
+                  )),
+                  const PopupMenuDivider(),
+                  const PopupMenuItem<String>(
+                    value: '__more__',
+                    child: Row(children: [
+                      Icon(Icons.more_horiz, size: 18),
+                      const SizedBox(width: 8),
+                      const Text('More'),
+                    ]),
+                  ),
+                ],
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: IconButton(

@@ -347,7 +347,6 @@ class _AppsListScreenState extends State<AppsListScreen> {
           ),
            AppItemTile(
             title: '${_foregroundApp!.packageName} (${_foregroundApp!.activityName.split('.').last})',
-            leading: Icon(Icons.mobile_screen_share, size: 20),
             borderRadius: BorderRadius.circular(12),
             onTap: () => widget.onAppSelected(_foregroundApp!.packageName),
             packageName: _foregroundApp!.packageName,

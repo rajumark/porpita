@@ -42,11 +42,11 @@ class CurrentAppService {
     final lines = output.split('\n');
     for (final line in lines) {
       if (line.contains('mResumedActivity')) {
-        final match = RegExp(r'mResumedActivity.*\{[^}]+\s+(\S+)/(\S+)').firstMatch(line);
+        final match = RegExp(r'mResumedActivity.*\{[^}]+\s+([\w.]+)/([\w.}]+)').firstMatch(line);
         if (match != null) {
           return ForegroundApp(
             packageName: match.group(1)!,
-            activityName: match.group(2)!,
+            activityName: match.group(2)!.replaceAll('}', ''),
           );
         }
       }
@@ -55,11 +55,11 @@ class CurrentAppService {
   }
 
   static ForegroundApp? _extractFromFocusLine(String line) {
-    final match = RegExp(r'm(CurrentFocus|FocusedApp)=Window\{[^}]+\s+(\S+)/(\S+)').firstMatch(line);
+    final match = RegExp(r'm(CurrentFocus|FocusedApp)=Window\{[^}]+\s+([\w.]+)/([\w.}]+)').firstMatch(line);
     if (match != null) {
       return ForegroundApp(
         packageName: match.group(2)!,
-        activityName: match.group(3)!,
+        activityName: match.group(3)!.replaceAll('}', ''),
       );
     }
     return null;
