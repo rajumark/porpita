@@ -17,6 +17,7 @@ class BaseScreen extends StatefulWidget {
 
 class _BaseScreenState extends State<BaseScreen> {
   int _selectedIndex = 0;
+  bool _showSidebar = true;
 
   Widget _buildScreen(int index) {
     switch (index) {
@@ -39,17 +40,29 @@ class _BaseScreenState extends State<BaseScreen> {
       backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       body: Column(
         children: [
-          const TopBar(),
+          TopBar(onMenuTap: () => setState(() => _showSidebar = !_showSidebar)),
           Expanded(
             child: Row(
               children: [
-                Sidebar(
-                  selectedIndex: _selectedIndex,
-                  onItemSelected: (index) {
-                    setState(() => _selectedIndex = index);
-                  },
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeInOut,
+                  width: _showSidebar ? 140 : 0,
+                  child: _showSidebar
+                      ? Sidebar(
+                          selectedIndex: _selectedIndex,
+                          onItemSelected: (index) {
+                            setState(() => _selectedIndex = index);
+                          },
+                        )
+                      : const SizedBox.shrink(),
                 ),
-                PlayArea(child: _buildScreen(_selectedIndex)),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.only(left: _showSidebar ? 0 : 8),
+                    child: PlayArea(child: _buildScreen(_selectedIndex)),
+                  ),
+                ),
               ],
             ),
           ),
