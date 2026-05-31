@@ -48,8 +48,12 @@ class DeviceButton extends StatelessWidget {
           );
         }).toList();
       },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).colorScheme.outline),
+          borderRadius: BorderRadius.circular(4),
+        ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
