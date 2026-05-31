@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,6 +16,37 @@ class AppsPage extends StatefulWidget {
 
 class _AppsPageState extends State<AppsPage> {
   String? _selectedPackage;
+
+  Future<void> _handleAppAction(String deviceId, String pkg, AppAction action) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(action.title),
+        content: Text('${action.message}\n\nPackage: $pkg'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Confirm'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    final args = action.adbArgs(pkg);
+    final result = await Process.run('adb', ['-s', deviceId, 'shell'] + args);
+    if (!mounted) return;
+
+    final output = result.exitCode == 0 ? 'Done' : result.stderr;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(output)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +76,7 @@ class _AppsPageState extends State<AppsPage> {
                     onPackageSelected: (pkg) {
                       setState(() => _selectedPackage = pkg);
                     },
+                    onAppAction: (pair) => _handleAppAction(deviceId, pair.$1, pair.$2),
                   ),
                 ),
               ),
@@ -97,6 +131,7 @@ class _AppsPageState extends State<AppsPage> {
           onPackageSelected: (pkg) {
             setState(() => _selectedPackage = pkg);
           },
+          onAppAction: (pair) => _handleAppAction(deviceId, pair.$1, pair.$2),
         );
       },
     );

@@ -4,14 +4,41 @@ import 'package:provider/provider.dart';
 import '../../../services/device_manager.dart';
 import '../services/apps_service.dart';
 
+enum AppAction { forceStop, clearData, uninstall, openInfo }
+
+extension AppActionExt on AppAction {
+  String get title => switch (this) {
+    AppAction.forceStop => 'Force Stop',
+    AppAction.clearData => 'Clear Data',
+    AppAction.uninstall => 'Uninstall',
+    AppAction.openInfo => 'App Info',
+  };
+
+  String get message => switch (this) {
+    AppAction.forceStop => 'This will stop the app immediately.',
+    AppAction.clearData => 'This will delete all app data.',
+    AppAction.uninstall => 'This will uninstall the app.',
+    AppAction.openInfo => 'This will open the app info screen.',
+  };
+
+  List<String> adbArgs(String pkg) => switch (this) {
+    AppAction.forceStop => ['am', 'force-stop', pkg],
+    AppAction.clearData => ['pm', 'clear', pkg],
+    AppAction.uninstall => ['pm', 'uninstall', pkg],
+    AppAction.openInfo => ['am', 'start', '-a', 'android.settings.APPLICATION_DETAILS_SETTINGS', '-d', 'package:$pkg'],
+  };
+}
+
 class AppsLeftPanel extends StatefulWidget {
   final String? selectedPackage;
   final ValueChanged<String> onPackageSelected;
+  final ValueChanged<(String, AppAction)>? onAppAction;
 
   const AppsLeftPanel({
     super.key,
     required this.onPackageSelected,
     this.selectedPackage,
+    this.onAppAction,
   });
 
   @override
@@ -149,6 +176,7 @@ class _AppsLeftPanelState extends State<AppsLeftPanel> {
                           packageName: pkg,
                           isSelected: isSelected,
                           onTap: () => widget.onPackageSelected(pkg),
+                          onAction: (action) => widget.onAppAction?.call((pkg, action)),
                         );
                       },
                     ),
@@ -162,11 +190,13 @@ class _AppListItem extends StatelessWidget {
   final String packageName;
   final bool isSelected;
   final VoidCallback onTap;
+  final ValueChanged<AppAction>? onAction;
 
   const _AppListItem({
     required this.packageName,
     required this.isSelected,
     required this.onTap,
+    this.onAction,
   });
 
   @override
@@ -203,6 +233,60 @@ class _AppListItem extends StatelessWidget {
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
+              ),
+              PopupMenuButton<AppAction>(
+                icon: Icon(
+                  Icons.more_vert,
+                  size: 18,
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
+                ),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onSelected: onAction,
+                itemBuilder: (_) => [
+                  const PopupMenuItem(
+                    value: AppAction.forceStop,
+                    child: Row(
+                      children: [
+                        Icon(Icons.stop, size: 18),
+                        SizedBox(width: 8),
+                        Text('Force stop'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: AppAction.clearData,
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete_sweep, size: 18),
+                        SizedBox(width: 8),
+                        Text('Clear data'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: AppAction.uninstall,
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, size: 18),
+                        SizedBox(width: 8),
+                        Text('Uninstall'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: AppAction.openInfo,
+                    child: Row(
+                      children: [
+                        Icon(Icons.info_outline, size: 18),
+                        SizedBox(width: 8),
+                        Text('App info'),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
