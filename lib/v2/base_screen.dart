@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'sidebar.dart';
-import 'play_area.dart';
+import 'sidebar/sidebar.dart';
+import 'playarea/play_area.dart';
+import 'playarea/screens/apps/appslist/appslist_screen.dart';
+import 'playarea/screens/settings/settings_screen.dart';
+import 'playarea/screens/terminal/terminal_screen.dart';
+import 'playarea/screens/debuginfo/debuginfo_screen.dart';
+import 'topbar/topbar.dart';
 
 class BaseScreen extends StatefulWidget {
   const BaseScreen({super.key});
@@ -11,28 +16,29 @@ class BaseScreen extends StatefulWidget {
 }
 
 class _BaseScreenState extends State<BaseScreen> {
-  int _selectedIndex = -1;
+  int _selectedIndex = 0;
+
+  Widget _buildScreen(int index) {
+    switch (index) {
+      case 0:
+        return const AppsListScreen();
+      case 1:
+        return const SettingsScreen();
+      case 2:
+        return const TerminalScreen();
+      case 3:
+        return const DebugInfoScreen();
+      default:
+        return const SizedBox.shrink();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
-          SizedBox(
-            height: 36,
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.menu),
-                  iconSize: 24,
-                  onPressed: () {},
-                  padding: EdgeInsets.zero,
-                  constraints: BoxConstraints.tight(const Size(36, 36)),
-                ),
-                const Text('Porpita'),
-              ],
-            ),
-          ),
+          const TopBar(),
           Expanded(
             child: Row(
               children: [
@@ -42,11 +48,7 @@ class _BaseScreenState extends State<BaseScreen> {
                     setState(() => _selectedIndex = index);
                   },
                 ),
-                PlayArea(
-                  selectedItem: _selectedIndex >= 0
-                      ? 'Item ${_selectedIndex + 1}'
-                      : null,
-                ),
+                PlayArea(child: _buildScreen(_selectedIndex)),
               ],
             ),
           ),

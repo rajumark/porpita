@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+const menuItems = ['Apps', 'Settings', 'Terminal', 'DebugInfo'];
+
 class Sidebar extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onItemSelected;
@@ -17,7 +19,7 @@ class Sidebar extends StatelessWidget {
         topRight: Radius.circular(12),
       );
     }
-    if (index == 9) {
+    if (index == menuItems.length - 1) {
       return const BorderRadius.only(
         bottomLeft: Radius.circular(12),
         bottomRight: Radius.circular(12),
@@ -33,25 +35,25 @@ class Sidebar extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: ListView.separated(
-        itemCount: 10,
-        separatorBuilder: (_, __) => const SizedBox(height: 2),
-        itemBuilder: (context, index) {
-          final isSelected = index == selectedIndex;
-          return Material(
-            color: isSelected
-                ? Theme.of(context).colorScheme.primaryContainer
-                : Theme.of(context).colorScheme.surfaceContainerHighest,
-            borderRadius: _borderRadius(index),
-            child: InkWell(
+          itemCount: menuItems.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 2),
+          itemBuilder: (context, index) {
+            final isSelected = index == selectedIndex;
+            return Material(
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primaryContainer
+                  : Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: _borderRadius(index),
-              onTap: () => onItemSelected(index),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8, right: 16, top: 6, bottom: 6),
-                child: Text('Item ${index + 1}'),
+              child: InkWell(
+                borderRadius: _borderRadius(index),
+                onTap: () => onItemSelected(index),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8, right: 16, top: 6, bottom: 6),
+                  child: Text(menuItems[index]),
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
         ),
       ),
     );
