@@ -1,0 +1,125 @@
+Positive best practices
+
+```markdown
+# Flutter Desktop at Scale — 100 Rules for AI Agents
+
+## Project Structure
+- 01. Organize by feature, not by type — screens, logic, and models for each feature live in the same folder.
+- 02. Use a `core/` folder for shared utilities, theme, constants, and base classes used across all features.
+- 03. Each feature folder must have its own `widgets/`, `screens/`, `controllers/`, and `models/` subfolders.
+- 04. Never put more than one screen per file; one screen = one file, always.
+- 05. Name files in `snake_case` and classes in `PascalCase` with no exceptions.
+- 06. Keep `main.dart` under 30 lines — it only bootstraps the app and injects providers.
+- 07. Use a `routes/` folder with a central router file; never define routes inline inside widgets.
+- 08. Create a `services/` folder for all ADB, system, and external integrations, never mix into UI.
+- 09. Place all ADB command definitions in `services/adb/` with one file per functional group (e.g., `adb_network.dart`, `adb_battery.dart`).
+- 10. Use a `constants/` folder for all magic strings, command templates, and hardcoded values.
+
+## ADB Command Management
+- 11. Every ADB command must be defined as a named constant or method, never inline string literals in UI code.
+- 12. Group ADB commands by device domain: network, display, input, battery, package, system, media — one file each.
+- 13. Wrap every ADB call in a service class method that returns a typed result, never call `Process.run` from a widget.
+- 14. All ADB service methods must be async and return `Either<Failure, T>` or a sealed result type.
+- 15. Log every ADB command execution with its arguments and response in a structured debug logger.
+- 16. Create an `AdbCommandRegistry` class that lists all 700+ commands as typed metadata (name, description, category, flags).
+- 17. Build a command executor abstraction so swapping ADB for another tool requires changing one class only.
+- 18. Never hardcode device serial in command strings — always pass it as a parameter at call time.
+- 19. Each ADB command group must have a corresponding test file that mocks the process output.
+- 20. Throttle rapid ADB calls with a debounce or queue to prevent device flooding.
+
+## Screen & Navigation Management
+- 21. With 800+ screens, use GoRouter with lazy-loaded shell routes — never Navigator.push directly.
+- 22. Define all route paths as constants in a single `app_routes.dart` file.
+- 23. Every screen must accept its dependencies via constructor, never read from global state inside the screen body.
+- 24. Use a screen registry or route manifest so an AI agent can enumerate all screens without reading the file tree.
+- 25. Keep screen files under 200 lines — extract any widget over 50 lines into its own file.
+- 26. Group related screens under a shared shell route so they share sidebar, toolbar, and layout chrome.
+- 27. Never nest Navigator inside a screen unless it is an intentional sub-navigation flow with its own route stack.
+- 28. Use `AutoDispose` or equivalent cleanup hooks on every screen to prevent state leaks on navigation.
+- 29. Each screen must have a corresponding ViewModel or Controller — zero business logic in `build()`.
+- 30. Screens must declare their minimum required window size as a constant at the top of the file.
+
+## State Management
+- 31. Use Riverpod or Bloc consistently — never mix state management patterns in the same feature.
+- 32. Each provider or bloc handles exactly one domain concern; no god-state objects.
+- 33. Device connection state must live in a singleton provider accessible from any screen.
+- 34. UI state (loading, error, data) must be modeled as a sealed class, never as separate booleans.
+- 35. Never put network or ADB calls inside a Riverpod provider's build method — use `AsyncNotifier`.
+- 36. Keep all global state in `core/state/` — feature-local state lives inside the feature folder.
+- 37. Command execution state must be tracked per-command, not globally, to support parallel operations.
+- 38. Use `StateNotifier` or `Notifier` over `ChangeNotifier` for testability.
+- 39. Observable streams from ADB processes must be explicitly disposed when the screen unmounts.
+- 40. Use optimistic UI updates for fast-feedback ADB commands and roll back on failure.
+
+## Desktop UX & Layout
+- 41. Design every layout for a minimum window size of 1280×720; test at 2560×1440 as the upper bound.
+- 42. Use a persistent left sidebar for feature navigation — never rely on tab bars alone for 100+ screens.
+- 43. Implement a global command palette (Ctrl+K / Cmd+K) that can search and invoke any ADB command or screen.
+- 44. Support keyboard shortcuts for all primary actions; define them in a central `shortcuts.dart` file.
+- 45. All list views with device data must be virtualized — never render more than the visible viewport.
+- 46. Provide loading skeletons, not spinners, for any data fetch over 200ms to maintain layout stability.
+- 47. Error states must be actionable — always show what failed and offer a retry button.
+- 48. Use resizable panes for any split-panel layout; persist pane sizes to user preferences.
+- 49. Avoid modal dialogs for destructive ADB commands — use inline confirmation patterns instead.
+- 50. Every text input that triggers an ADB command must debounce user input by at least 300ms.
+
+## Performance
+- 51. Profile every screen in release mode before shipping — debug mode hides real jank.
+- 52. Use `const` constructors on every widget that does not depend on runtime state.
+- 53. Never call `setState` or `notifyListeners` from within a build method.
+- 54. Lazy-load heavy feature modules using deferred imports (`deferred as`).
+- 55. Cache ADB command results aggressively and invalidate only on explicit user refresh or device event.
+- 56. Use `RepaintBoundary` around widgets that update at high frequency (log streams, live metrics).
+- 57. Run ADB output parsing on an isolate, never on the main UI thread.
+- 58. Batch multiple rapid ADB poll results before pushing to the UI layer.
+- 59. Use `ListView.builder` and `TableView` variants — never `Column` with unbounded children inside a scroll view.
+- 60. Measure widget rebuild counts in CI using Flutter DevTools timeline export assertions.
+
+## Code Quality & Consistency
+- 61. Enforce `flutter_lints` plus a custom lint ruleset checked in at `analysis_options.yaml`.
+- 62. All public classes, methods, and constants must have Dart doc comments — no exceptions.
+- 63. Run `dart fix --apply` in CI and fail the pipeline if it produces any changes.
+- 64. Enforce a maximum file length of 300 lines via a custom lint or CI script.
+- 65. Every service class must implement an abstract interface so it can be mocked in tests.
+- 66. Use `freezed` for all data models and result types — no manual `copyWith` or `==` overrides.
+- 67. No `dynamic` types anywhere in the codebase — use generics or sealed classes.
+- 68. All string formatting for ADB commands must go through a dedicated formatter class, not string interpolation in UI.
+- 69. Enforce no orphan `TODO` comments — every TODO must include a ticket reference.
+- 70. Use `very_good_analysis` lints as a baseline and document any rule exceptions explicitly.
+
+## Testing
+- 71. Every ADB service method must have a unit test with a mocked process runner.
+- 72. Every ViewModel or Controller must have unit tests covering all UI states.
+- 73. Write widget tests for any screen with conditional rendering logic.
+- 74. Use golden tests for complex layout screens to catch unintended visual regressions.
+- 75. Maintain a minimum 80% code coverage enforced in CI.
+- 76. Integration tests must cover the full happy-path flow for each major feature group.
+- 77. Mock the device connection at the service layer — never depend on a real device in automated tests.
+- 78. Name tests descriptively: `given_[context]_when_[action]_then_[outcome]`.
+- 79. Run tests in parallel in CI using `--concurrency` to keep pipeline time under 10 minutes.
+- 80. Fuzz test ADB output parsers with malformed and empty strings to harden edge cases.
+
+## CI/CD & Tooling
+- 81. Build all three desktop targets (Windows, macOS Intel, macOS ARM) in CI on every PR.
+- 82. Sign and notarize macOS builds in CI before any release artifact is produced.
+- 83. Use artifact naming that includes platform, architecture, and git SHA to prevent collisions.
+- 84. Cache Flutter and Gradle/pub dependencies per runner OS and invalidate on pubspec lock change.
+- 85. Gate merges on passing tests, lint, and build for all targets — no partial green.
+- 86. Produce a build summary comment on every PR listing artifact sizes and test counts.
+- 87. Use job matrix strategies for multi-platform builds, never duplicate job definitions.
+- 88. Store release artifacts in a version-namespaced path, never overwrite previous builds.
+- 89. Run `flutter analyze` as a separate CI step before the build step to fail fast on errors.
+- 90. Automate changelog generation from conventional commit messages on every release tag.
+
+## Developer Experience & Maintainability
+- 91. Maintain a `CONTRIBUTING.md` that documents the feature folder template every new screen must follow.
+- 92. Create a CLI or Makefile target that scaffolds a new feature with all required files and boilerplate.
+- 93. Document every ADB command in the registry with a plain-English description usable by non-engineers.
+- 94. Use semantic versioning and enforce it via a CI version check on the `pubspec.yaml`.
+- 95. Keep a `DECISIONS.md` architectural decision record for every major structural choice.
+- 96. All environment-specific config (device defaults, timeouts, feature flags) must live in a `.env`-backed config class.
+- 97. Maintain a live storybook-style widget gallery using `widgetbook` so designers can review components without running the full app.
+- 98. Any screen added without a route entry, test file, and doc comment must fail the PR review checklist.
+- 99. Use dependency injection at the app root — never use service locator patterns inside feature code.
+- 100. Treat the AI agent as a first-class contributor: every file, method, and command must be self-describing enough that an agent reading only that file understands its full contract without needing to read its dependencies.
+```

@@ -1,0 +1,123 @@
+```markdown
+# Flutter Desktop Anti-Patterns — 100 Things To Never Do
+
+## Architecture Violations
+- 01. Never put `if (Platform.isWindows)` checks inside widget `build()` methods — abstract platform differences into a service.
+- 02. Never use `BuildContext` outside the widget tree — never store it in a controller, service, or notifier.
+- 03. Never call `Navigator.of(context)` from inside a Riverpod provider or Bloc — navigation is a UI concern only.
+- 04. Never create a single `AppState` class that holds all application state — it becomes unmaintainable past 10 screens.
+- 05. Never use `InheritedWidget` manually when Riverpod or Bloc already solves the same problem cleaner.
+- 06. Never let a repository class know about UI models — repositories return domain entities only.
+- 07. Never place business logic in `initState()` — use a controller lifecycle method instead.
+- 08. Never have a screen directly instantiate its own dependencies with `MyService()` — always inject them.
+- 09. Never put `SharedPreferences`, `Hive`, or any storage call directly inside a widget.
+- 10. Never use `get_it` as a global service locator inside feature code — it hides dependencies and breaks testability.
+
+## ADB & Process Mistakes
+- 11. Never concatenate user input directly into an ADB command string without sanitizing it first.
+- 12. Never run `Process.run` from the UI thread for any command that could take more than 50ms.
+- 13. Never ignore the `exitCode` from an ADB process and assume success because stdout is non-empty.
+- 14. Never parse ADB output with brittle positional string splits — model the output format explicitly.
+- 15. Never fire an ADB command on every `build()` call or every widget rebuild.
+- 16. Never swallow ADB `stderr` — always capture and surface it to your error logging layer.
+- 17. Never hardcode `adb` binary path — resolve it at runtime via PATH or a user-configured setting.
+- 18. Never assume ADB output format is stable across Android versions — version-gate your parsers.
+- 19. Never open an unbounded process stream without a dispose mechanism — it will leak after screen unmount.
+- 20. Never run 700 ADB commands sequentially on startup to "initialize" — lazy-load command results on demand.
+
+## State Management Mistakes
+- 21. Never use `setState()` in a `StatefulWidget` to manage anything that outlives that one widget.
+- 22. Never share a `TextEditingController` across multiple widgets without a clear owner.
+- 23. Never use `FutureBuilder` inside a widget that rebuilds frequently — it re-fires the future on every rebuild.
+- 24. Never store a `Future` in a local variable inside `build()` — it creates a new future on every rebuild.
+- 25. Never mutate a list or map inside a Riverpod state object in-place — always produce a new instance.
+- 26. Never use `context.read()` inside `build()` — use `context.watch()` or `ref.watch()` instead.
+- 27. Never put a `StreamController` inside a widget — put it in a controller/notifier with explicit lifecycle.
+- 28. Never let two separate providers both fetch the same ADB data independently — share a single source of truth.
+- 29. Never use `late` variables for state that may not be initialized before first access in async flows.
+- 30. Never use `GlobalKey` to access state from a sibling or parent widget — rethink the data flow instead.
+
+## Widget & UI Code Smells
+- 31. Never write a `build()` method longer than 60 lines — extract into named sub-widgets or builder methods.
+- 32. Never use `Expanded` inside a `Column` that is itself inside an unbounded scroll view — it throws at runtime.
+- 33. Never use `MediaQuery.of(context).size` on every build for layout decisions — use `LayoutBuilder` instead.
+- 34. Never render a `ListView` of 500+ items without `.builder` — it mounts all children at once and freezes the UI.
+- 35. Never use `Opacity(opacity: 0)` to hide a widget — use `Visibility` or conditional rendering to avoid painting cost.
+- 36. Never animate a widget by calling `setState` on a timer loop — use `AnimationController` properly.
+- 37. Never use `Stack` with `Positioned` for layouts that should be `Row`/`Column` — it breaks on window resize.
+- 38. Never hardcode pixel sizes for spacing and typography — always reference your design token constants.
+- 39. Never use `DefaultTextStyle` override deep in the tree to fix a text style — fix the theme at the root.
+- 40. Never rebuild an entire screen to update a single counter or badge — use a targeted scoped widget.
+
+## Performance Killers
+- 41. Never use `print()` in production builds — it is synchronous and blocks the UI thread.
+- 42. Never decode or parse JSON on the main isolate when the payload is larger than 10KB.
+- 43. Never load images from disk synchronously inside a `build()` method.
+- 44. Never use `BoxDecoration` with a `BoxShadow` inside a fast-animating widget — it is extremely expensive.
+- 45. Never call `setState` inside a `ScrollController` listener on every pixel scroll event without throttling.
+- 46. Never create a new `ColorTween` or `CurvedAnimation` object inside `build()` on every frame.
+- 47. Never use `CustomPaint` for something a standard widget already handles — unnecessary canvas ops are costly.
+- 48. Never await multiple sequential ADB calls when they are independent — run them with `Future.wait`.
+- 49. Never keep a raw ADB log stream pushing thousands of lines per second directly into a `Text` widget.
+- 50. Never use `Isolate.spawn` for every individual ADB call — reuse a persistent isolate or use compute pools.
+
+## Navigation & Routing Mistakes
+- 51. Never use `pushReplacement` as a hack to avoid managing back-stack properly — model your route hierarchy correctly.
+- 52. Never pass complex objects through route arguments — pass an ID and load the data in the destination screen.
+- 53. Never mix `Navigator 1.0` push/pop with GoRouter declarative routing in the same flow.
+- 54. Never define routes as anonymous lambdas inside `MaterialApp` when you have more than 10 screens.
+- 55. Never use `WillPopScope` without actually implementing the intended back-navigation behavior.
+- 56. Never deep-link to a screen that requires device connection without guard logic at the router level.
+- 57. Never build a settings flow as a separate `Navigator` stack when GoRouter shell routes solve it cleanly.
+- 58. Never navigate to a screen and then immediately dispatch an ADB command from `initState` without checking readiness.
+- 59. Never use route names as plain strings in call sites — always reference the `AppRoutes` constant.
+- 60. Never push a loading screen as a route — use overlay or in-place async state instead.
+
+## Testing Negligence
+- 61. Never write a test that actually calls `adb` on the host machine — always mock the process runner.
+- 62. Never use `sleep()` or `Future.delayed` in tests to wait for async operations — use `pump` and `pumpAndSettle`.
+- 63. Never test implementation details like private method calls — test observable behavior and state output only.
+- 64. Never share mutable mock state between test cases — reset all mocks in `setUp` before every test.
+- 65. Never write a widget test that depends on a real `BuildContext` from another test — tests must be isolated.
+- 66. Never skip writing a test because "it's just a UI file" — conditional rendering bugs are the most user-visible.
+- 67. Never commit code with `skip: true` on a test without a linked issue explaining why.
+- 68. Never golden-test a widget that contains a `DateTime.now()` call — it will break on every run.
+- 69. Never write tests that test the framework itself (e.g., that `Text` renders text) — test your app logic only.
+- 70. Never let test coverage drop silently — enforce the minimum threshold in CI so it fails loudly.
+
+## CI/CD & Build Mistakes
+- 71. Never commit a `flutter build` artifact to the git repository — build artifacts belong in release storage only.
+- 72. Never use `--debug` flag for any artifact intended for QA or user testing.
+- 73. Never cache the `.dart_tool/` folder in CI across branches — it causes subtle build cache poisoning.
+- 74. Never let a CI job run without a timeout — a hung ADB process or test can block a runner for hours.
+- 75. Never store signing certificates or keystore files unencrypted in the repository.
+- 76. Never use `flutter clean` as the first step of every CI build — it defeats caching entirely.
+- 77. Never deploy a release build that has not been built on a clean runner with a fresh checkout.
+- 78. Never skip the macOS notarization step to save time — unsigned builds are blocked by Gatekeeper for users.
+- 79. Never manually bump the `pubspec.yaml` version without a corresponding git tag and changelog entry.
+- 80. Never run `pub upgrade` in CI without pinning to a lock file — it silently pulls breaking changes.
+
+## Dependency & Package Misuse
+- 81. Never add a pub package to solve a problem that Dart's core libraries already handle well.
+- 82. Never use a package that hasn't had a commit in 18+ months for a critical path feature.
+- 83. Never import a package's internal `/src/` files — only use its public API surface.
+- 84. Never use `path_provider` to resolve desktop paths on Windows without validating the returned path exists.
+- 85. Never depend on a package that requires native compilation without verifying it compiles on all three desktop targets.
+- 86. Never upgrade a major package version mid-sprint without a dedicated integration testing session.
+- 87. Never use `dio` and `http` in the same project for the same purpose — pick one HTTP client and standardize.
+- 88. Never use `json_serializable` generated code that you then manually edit — regenerate, never hand-patch.
+- 89. Never add `flutter_test` as a non-dev dependency — it inflates release binary size.
+- 90. Never use `any` as a version constraint in `pubspec.yaml` for anything other than a local dev prototype.
+
+## Developer Habit Failures
+- 91. Never leave a `// TODO: fix later` comment in code that is about to be merged to main.
+- 92. Never use `dynamic` as a return type to "deal with it later" — later never comes in a 100-screen app.
+- 93. Never name a variable `data`, `info`, `result`, or `value` without a qualifying noun — they communicate nothing.
+- 94. Never write a method that does more than one thing and name it with `and` in the method name — split it.
+- 95. Never suppress a lint warning with `// ignore:` without a comment explaining the exact reason.
+- 96. Never copy-paste an ADB command string more than once — extract it to the registry immediately.
+- 97. Never let a PR grow beyond 400 lines changed — split it into stacked, reviewable units.
+- 98. Never merge code that breaks `flutter analyze` by adding `--no-fatal-infos` to the command to hide it.
+- 99. Never design a screen's UI before defining the data contract it consumes — data shape drives layout, not the reverse.
+- 100. Never assume the AI agent knows your intent from a vague file name — every file, class, and method must be self-documenting because at 800 screens, no human or agent remembers the implicit context.
+```
