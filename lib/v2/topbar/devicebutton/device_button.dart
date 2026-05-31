@@ -12,6 +12,7 @@ class DeviceButton extends StatelessWidget {
     final label = selected?.id ?? 'No device';
 
     return PopupMenuButton<String>(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       onSelected: (id) {
         final device = dm.devices.firstWhere(
           (d) => d.id == id,

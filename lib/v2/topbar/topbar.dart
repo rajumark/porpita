@@ -11,6 +11,7 @@ class TopBar extends StatelessWidget {
       height: 36,
       child: Row(
         children: [
+          const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.menu),
             iconSize: 24,
@@ -19,6 +20,7 @@ class TopBar extends StatelessWidget {
             constraints: BoxConstraints.tight(const Size(36, 36)),
           ),
           const Text('Porpita'),
+          const SizedBox(width: 16),
           const DeviceButton(),
           const Spacer(),
           IconButton(
