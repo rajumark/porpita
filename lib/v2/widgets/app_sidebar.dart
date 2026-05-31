@@ -54,7 +54,10 @@ class AppSidebar extends StatelessWidget {
                   child: Row(
                     children: [
                       if (icons != null && index < icons!.length) ...[
-                        Icon(icons![index], size: 18),
+                        Opacity(
+                          opacity: isSelected ? 1.0 : 0.8,
+                          child: Icon(icons![index], size: 18),
+                        ),
                         const SizedBox(width: 8),
                       ],
                       Text(

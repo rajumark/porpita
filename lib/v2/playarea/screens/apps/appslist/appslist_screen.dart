@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:porpita/services/device_manager.dart';
 import 'package:porpita/v2/widgets/search_view.dart';
 import 'apps_list_service.dart';
+import 'appinstall/app_install_service.dart';
+import 'appinstall/app_install_dialog.dart';
 
 class AppsListScreen extends StatefulWidget {
   final ValueChanged<String> onAppSelected;
@@ -84,7 +86,11 @@ class _AppsListScreenState extends State<AppsListScreen> {
               PopupMenuButton<String>(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 onSelected: (value) {
-                  if (value == 'filter') _showFilterDialog();
+                  if (value == 'filter') {
+                    _showFilterDialog();
+                  } else if (value == 'install') {
+                    _installApk();
+                  }
                 },
                 itemBuilder: (context) => [
                   const PopupMenuItem(value: 'filter', child: Text('Filter by')),
@@ -140,6 +146,31 @@ class _AppsListScreenState extends State<AppsListScreen> {
         );
       },
     );
+  }
+
+  Future<void> _installApk() async {
+    final device = context.read<DeviceManager>().selected;
+    if (device == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No device connected')),
+      );
+      return;
+    }
+
+    final result = await AppInstallService.pickAndInstall(device.id);
+
+    if (!mounted) return;
+    showInstallResultDialog(
+      context,
+      success: result.success,
+      message: result.message,
+      filePath: result.filePath,
+    );
+
+    if (result.success) {
+      _fetchApps(device.id);
+    }
   }
 
   Future<void> _fetchApps(String deviceId) async {

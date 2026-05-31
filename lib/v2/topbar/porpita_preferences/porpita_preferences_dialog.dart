@@ -5,6 +5,7 @@ import 'screens/alert/alert_screen.dart';
 import 'screens/about/about_screen.dart';
 
 const _menuItems = ['Theme', 'Alert', 'About'];
+const _menuIcons = [Icons.palette, Icons.notifications, Icons.info_outline];
 
 class PorpitaPreferencesDialog extends StatefulWidget {
   const PorpitaPreferencesDialog({super.key});
@@ -69,6 +70,7 @@ class _PorpitaPreferencesDialogState extends State<PorpitaPreferencesDialog> {
               children: [
                 AppSidebar(
                   items: _menuItems,
+                  icons: _menuIcons,
                   selectedIndex: _selectedIndex,
                   onItemSelected: (index) {
                     setState(() => _selectedIndex = index);
