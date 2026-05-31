@@ -1,10 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:porpita/v2/widgets/rounded_container.dart';
+import 'overview/overview_tab.dart';
+import 'permissions/permissions_tab.dart';
+import 'activities/activities_tab.dart';
 
-class AppDetailsScreen extends StatelessWidget {
+class AppDetailsScreen extends StatefulWidget {
   final String packageName;
   final VoidCallback onBack;
   const AppDetailsScreen({super.key, required this.packageName, required this.onBack});
+
+  @override
+  State<AppDetailsScreen> createState() => _AppDetailsScreenState();
+}
+
+class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,13 +40,13 @@ class AppDetailsScreen extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.arrow_back),
                   iconSize: 24,
-                  onPressed: onBack,
+                  onPressed: widget.onBack,
                   padding: EdgeInsets.zero,
                   constraints: BoxConstraints.tight(const Size(36, 36)),
                 ),
                 Expanded(
                   child: Text(
-                    packageName,
+                    widget.packageName,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
@@ -32,9 +54,22 @@ class AppDetailsScreen extends StatelessWidget {
               ],
             ),
           ),
+          TabBar(
+            controller: _tabController,
+            tabs: const [
+              Tab(text: 'Overview'),
+              Tab(text: 'Permissions'),
+              Tab(text: 'Activities'),
+            ],
+          ),
           Expanded(
-            child: Center(
-              child: Text(packageName, style: Theme.of(context).textTheme.titleMedium),
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                OverviewTab(packageName: widget.packageName),
+                PermissionsTab(packageName: widget.packageName),
+                ActivitiesTab(packageName: widget.packageName),
+              ],
             ),
           ),
         ],

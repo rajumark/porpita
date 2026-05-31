@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:porpita/services/device_manager.dart';
 import 'package:porpita/services/settings_service.dart';
 import 'package:porpita/v2/widgets/search_view.dart';
+import 'package:porpita/v2/widgets/rounded_container.dart';
 import 'settings_intents_data.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -116,65 +117,70 @@ class _SettingsScreenState extends State<SettingsScreen> {
       builder: (context, dm, _) {
         final device = dm.selected;
 
-        return Row(
-          children: [
-            _CategorySidebar(
-              selectedIndex: _selectedCategoryIndex,
-              onItemSelected: (index) {
-                setState(() => _selectedCategoryIndex = index);
-              },
-            ),
-            Expanded(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: SearchView(
-                      controller: _searchController,
-                      hintText: 'Search in ${kSettingsIntents.length} intents…',
-                    ),
-                  ),
-                  Expanded(
-                    child: items.isEmpty
-                        ? const _EmptyState()
-                        : CustomScrollView(
-                            slivers: [
-                              if (pinned.isNotEmpty) ...[
-                                _SectionHeader(
-                                  icon: Icons.push_pin,
-                                  label: 'Pinned',
-                                  count: pinned.length,
-                                ),
-                                _IntentChipGrid(
-                                  items: pinned,
-                                  pinnedIds: _pinnedIds,
-                                  onTap: (item) => _launch(context, device, item),
-                                  onPinToggle: _togglePin,
-                                ),
-                              ],
-                              if (others.isNotEmpty) ...[
-                                _SectionHeader(
-                                  icon: Icons.settings,
-                                  label: pinned.isEmpty && _selectedCategoryIndex == 1 ? kSettingCategories[_selectedCategoryIndex] : kSettingCategories[_selectedCategoryIndex],
-                                  count: others.length,
-                                ),
-                                _IntentChipGrid(
-                                  items: others,
-                                  pinnedIds: _pinnedIds,
-                                  onTap: (item) => _launch(context, device, item),
-                                  onPinToggle: _togglePin,
-                                ),
-                              ],
-                              const SliverToBoxAdapter(
-                                child: SizedBox(height: 24),
+        return Padding(
+          padding: const EdgeInsets.all(8),
+          child: RoundedContainer(
+            child: Row(
+              children: [
+                _CategorySidebar(
+                  selectedIndex: _selectedCategoryIndex,
+                  onItemSelected: (index) {
+                    setState(() => _selectedCategoryIndex = index);
+                  },
+                ),
+                Expanded(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: SearchView(
+                          controller: _searchController,
+                          hintText: 'Search in ${kSettingsIntents.length} intents…',
+                        ),
+                      ),
+                      Expanded(
+                        child: items.isEmpty
+                            ? const _EmptyState()
+                            : CustomScrollView(
+                                slivers: [
+                                  if (pinned.isNotEmpty) ...[
+                                    _SectionHeader(
+                                      icon: Icons.push_pin,
+                                      label: 'Pinned',
+                                      count: pinned.length,
+                                    ),
+                                    _IntentChipGrid(
+                                      items: pinned,
+                                      pinnedIds: _pinnedIds,
+                                      onTap: (item) => _launch(context, device, item),
+                                      onPinToggle: _togglePin,
+                                    ),
+                                  ],
+                                  if (others.isNotEmpty) ...[
+                                    _SectionHeader(
+                                      icon: Icons.settings,
+                                      label: pinned.isEmpty && _selectedCategoryIndex == 1 ? kSettingCategories[_selectedCategoryIndex] : kSettingCategories[_selectedCategoryIndex],
+                                      count: others.length,
+                                    ),
+                                    _IntentChipGrid(
+                                      items: others,
+                                      pinnedIds: _pinnedIds,
+                                      onTap: (item) => _launch(context, device, item),
+                                      onPinToggle: _togglePin,
+                                    ),
+                                  ],
+                                  const SliverToBoxAdapter(
+                                    child: SizedBox(height: 24),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
