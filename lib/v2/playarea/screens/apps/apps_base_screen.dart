@@ -1,20 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:porpita/v2/widgets/rounded_container.dart';
 import 'appslist/appslist_screen.dart';
+import 'appslist/app_details_screen.dart';
 
-class AppsBaseScreen extends StatelessWidget {
+class AppsBaseScreen extends StatefulWidget {
   const AppsBaseScreen({super.key});
+
+  @override
+  State<AppsBaseScreen> createState() => _AppsBaseScreenState();
+}
+
+class _AppsBaseScreenState extends State<AppsBaseScreen> {
+  String? _selectedPackageName;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 0, right: 8, top: 0, bottom: 8),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
+      child: RoundedContainer(
+        child: Stack(
+          children: [
+            AppsListScreen(
+              onAppSelected: (name) => setState(() => _selectedPackageName = name),
+            ),
+            if (_selectedPackageName != null)
+              AppDetailsScreen(
+                packageName: _selectedPackageName!,
+                onBack: () => setState(() => _selectedPackageName = null),
+              ),
+          ],
         ),
-        clipBehavior: Clip.antiAlias,
-        child: const AppsListScreen(),
       ),
     );
   }
