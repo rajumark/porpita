@@ -42,7 +42,7 @@ class AppSidebar extends StatelessWidget {
           itemBuilder: (context, index) {
             final isSelected = index == selectedIndex;
             return Material(
-              color: isSelected ? scheme.secondaryContainer : Colors.transparent,
+              color: isSelected ? scheme.secondaryContainer : scheme.surfaceContainerHighest,
               borderRadius: _borderRadius(index),
               child: InkWell(
                 borderRadius: _borderRadius(index),
