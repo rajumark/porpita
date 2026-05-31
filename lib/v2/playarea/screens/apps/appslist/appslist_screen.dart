@@ -213,7 +213,7 @@ class _AppsListScreenState extends State<AppsListScreen> {
         final app = _filteredApps[index];
         final borderRadius = _borderRadius(index, total);
         return Material(
-          color: Theme.of(context).colorScheme.surfaceContainerLow,
+          color: Theme.of(context).colorScheme.surfaceContainer,
           borderRadius: borderRadius,
           child: InkWell(
             borderRadius: borderRadius,

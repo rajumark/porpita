@@ -52,6 +52,7 @@ class _PorpitaPreferencesDialogState extends State<PorpitaPreferencesDialog> {
             height: 36,
             child: Row(
               children: [
+                const SizedBox(width: 8),
                 IconButton(
                   icon: const Icon(Icons.arrow_back),
                   iconSize: 24,
