@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AppSidebar extends StatelessWidget {
   final List<String> items;
   final List<IconData>? icons;
+  final List<IconData>? selectedIcons;
   final int selectedIndex;
   final ValueChanged<int> onItemSelected;
 
@@ -10,6 +11,7 @@ class AppSidebar extends StatelessWidget {
     super.key,
     required this.items,
     this.icons,
+    this.selectedIcons,
     required this.selectedIndex,
     required this.onItemSelected,
   });
@@ -56,7 +58,12 @@ class AppSidebar extends StatelessWidget {
                       if (icons != null && index < icons!.length) ...[
                         Opacity(
                           opacity: isSelected ? 1.0 : 0.8,
-                          child: Icon(icons![index], size: 18),
+                          child: Icon(
+                            isSelected && selectedIcons != null && index < selectedIcons!.length
+                                ? selectedIcons![index]
+                                : icons![index],
+                            size: 18,
+                          ),
                         ),
                         const SizedBox(width: 8),
                       ],

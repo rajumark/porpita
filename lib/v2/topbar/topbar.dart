@@ -4,7 +4,8 @@ import 'porpita_preferences/porpita_preferences_dialog.dart';
 
 class TopBar extends StatelessWidget {
   final VoidCallback onMenuTap;
-  const TopBar({super.key, required this.onMenuTap});
+  final VoidCallback onQuickSettingsTap;
+  const TopBar({super.key, required this.onMenuTap, required this.onQuickSettingsTap});
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +32,15 @@ class TopBar extends StatelessWidget {
             padding: EdgeInsets.zero,
             constraints: BoxConstraints.tight(const Size(36, 36)),
           ),
+          const SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(Icons.menu),
+            iconSize: 24,
+            onPressed: onQuickSettingsTap,
+            padding: EdgeInsets.zero,
+            constraints: BoxConstraints.tight(const Size(36, 36)),
+          ),
+          const SizedBox(width: 8),
         ],
       ),
     );

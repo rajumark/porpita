@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import 'package:porpita/services/device_manager.dart';
 import 'sidebar/sidebar.dart';
 import 'playarea/play_area.dart';
 import 'playarea/screens/apps/apps_base_screen.dart';
@@ -7,6 +9,7 @@ import 'playarea/screens/settings/settings_screen.dart';
 import 'playarea/screens/terminal/terminal_screen.dart';
 import 'playarea/screens/debuginfo/debuginfo_screen.dart';
 import 'topbar/topbar.dart';
+import 'quickpanel/quick_panel.dart';
 
 class BaseScreen extends StatefulWidget {
   const BaseScreen({super.key});
@@ -18,6 +21,7 @@ class BaseScreen extends StatefulWidget {
 class _BaseScreenState extends State<BaseScreen> {
   int _selectedIndex = 0;
   bool _showSidebar = true;
+  bool _showQuickSettings = false;
 
   Widget _buildScreen(int index) {
     switch (index) {
@@ -36,11 +40,17 @@ class _BaseScreenState extends State<BaseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final dm = context.watch<DeviceManager>();
+    final deviceId = dm.selected?.id;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       body: Column(
         children: [
-          TopBar(onMenuTap: () => setState(() => _showSidebar = !_showSidebar)),
+          TopBar(
+            onMenuTap: () => setState(() => _showSidebar = !_showSidebar),
+            onQuickSettingsTap: () => setState(() => _showQuickSettings = !_showQuickSettings),
+          ),
           Expanded(
             child: Row(
               children: [
@@ -61,6 +71,8 @@ class _BaseScreenState extends State<BaseScreen> {
                     child: PlayArea(child: _buildScreen(_selectedIndex)),
                   ),
                 ),
+                if (_showQuickSettings && deviceId != null)
+                  QuickPanel(deviceId: deviceId),
               ],
             ),
           ),

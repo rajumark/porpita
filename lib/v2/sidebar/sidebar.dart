@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../widgets/app_sidebar.dart';
 
 const menuItems = ['Apps', 'Settings', 'Terminal', 'DebugInfo'];
-const menuIcons = [Icons.widgets, Icons.settings, Icons.terminal, Icons.bug_report];
+const menuIcons = [Icons.widgets_outlined, Icons.settings_outlined, Icons.terminal_outlined, Icons.bug_report_outlined];
+const menuIconsSelected = [Icons.widgets, Icons.settings, Icons.terminal, Icons.bug_report];
 
 class Sidebar extends StatelessWidget {
   final int selectedIndex;
@@ -19,6 +20,7 @@ class Sidebar extends StatelessWidget {
     return AppSidebar(
       items: menuItems,
       icons: menuIcons,
+      selectedIcons: menuIconsSelected,
       selectedIndex: selectedIndex,
       onItemSelected: onItemSelected,
     );
