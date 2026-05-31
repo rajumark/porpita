@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:porpita/services/device_manager.dart';
+import 'package:porpita/v2/widgets/search_view.dart';
+import '../permission_row.dart';
 import 'install_permissions_model.dart';
 import 'install_permissions_service.dart';
 
@@ -9,13 +11,15 @@ class InstallPermissionsPage extends StatefulWidget {
   const InstallPermissionsPage({super.key, required this.packageName});
 
   @override
-  State<InstallPermissionsPage> createState() => _InstallPermissionsPageState();
+  State<InstallPermissionsPage> createState() => InstallPermissionsPageState();
 }
 
-class _InstallPermissionsPageState extends State<InstallPermissionsPage> with AutomaticKeepAliveClientMixin {
+class InstallPermissionsPageState extends State<InstallPermissionsPage> with AutomaticKeepAliveClientMixin {
   List<InstallPermission> _permissions = [];
   bool _loading = true;
   String? _error;
+  final _searchController = TextEditingController();
+  String _query = '';
 
   @override
   bool get wantKeepAlive => true;
@@ -23,16 +27,25 @@ class _InstallPermissionsPageState extends State<InstallPermissionsPage> with Au
   @override
   void initState() {
     super.initState();
-    _fetch();
+    _searchController.addListener(() {
+      setState(() => _query = _searchController.text.trim().toLowerCase());
+    });
+    fetch();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
   void didUpdateWidget(covariant InstallPermissionsPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.packageName != widget.packageName) _fetch();
+    if (oldWidget.packageName != widget.packageName) fetch();
   }
 
-  Future<void> _fetch() async {
+  Future<void> fetch() async {
     final device = context.read<DeviceManager>().selected;
     if (device == null) {
       setState(() { _loading = false; _error = 'No device connected'; });
@@ -49,6 +62,13 @@ class _InstallPermissionsPageState extends State<InstallPermissionsPage> with Au
     }
   }
 
+  List<InstallPermission> get _filtered {
+    var list = _permissions;
+    if (_query.isNotEmpty) list = list.where((p) => p.name.toLowerCase().contains(_query)).toList();
+    list = list.where((p) => p.name.contains('.')).toList();
+    return list;
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -56,24 +76,34 @@ class _InstallPermissionsPageState extends State<InstallPermissionsPage> with Au
     if (_error != null) return Center(child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)));
     if (_permissions.isEmpty) return const Center(child: Text('No install permissions'));
 
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: _permissions.length,
-      itemBuilder: (context, index) {
-        final p = _permissions[index];
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 3),
-          child: Row(
-            children: [
-              Expanded(
-                child: SelectableText(p.name, style: Theme.of(context).textTheme.bodySmall),
-              ),
-              const SizedBox(width: 8),
-              _grantedChip(context, p.granted),
-            ],
+    final filtered = _filtered;
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: SearchView(controller: _searchController, hintText: 'Search install permissions...'),
+        ),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            itemCount: filtered.length,
+            itemBuilder: (context, index) {
+              final p = filtered[index];
+              return PermissionRow(
+                name: p.name,
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(width: 8),
+                    _grantedChip(context, p.granted),
+                  ],
+                ),
+              );
+            },
           ),
-        );
-      },
+        ),
+      ],
     );
   }
 

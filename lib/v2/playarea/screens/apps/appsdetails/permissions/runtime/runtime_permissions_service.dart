@@ -1,3 +1,4 @@
+import 'package:porpita/services/commands/adb_exec_service.dart';
 import '../permissions_fetch_service.dart';
 import 'runtime_permissions_model.dart';
 
@@ -5,6 +6,14 @@ class RuntimePermissionsService {
   static Future<List<RuntimePermission>> fetch(String deviceId, String packageName) async {
     final raw = await PermissionsFetchService.fetchDump(deviceId, packageName);
     return _parse(raw);
+  }
+
+  static Future<String> grant(String deviceId, String packageName, String permission) {
+    return AdbExecService.run(deviceId, ['pm', 'grant', packageName, permission]);
+  }
+
+  static Future<String> revoke(String deviceId, String packageName, String permission) {
+    return AdbExecService.run(deviceId, ['pm', 'revoke', packageName, permission]);
   }
 
   static List<RuntimePermission> _parse(String raw) {
