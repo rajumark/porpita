@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'screens/main_screen.dart';
+import 'v2/base_screen.dart';
 import 'services/adb_manager.dart';
 import 'services/device_manager.dart';
 import 'services/theme_manager.dart';
@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MainScreen(),
+      home: const BaseScreen(),
     );
   }
 }
