@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
 
-class BaseScreen extends StatelessWidget {
+import 'sidebar.dart';
+import 'play_area.dart';
+
+class BaseScreen extends StatefulWidget {
   const BaseScreen({super.key});
+
+  @override
+  State<BaseScreen> createState() => _BaseScreenState();
+}
+
+class _BaseScreenState extends State<BaseScreen> {
+  int _selectedIndex = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +33,21 @@ class BaseScreen extends StatelessWidget {
               ],
             ),
           ),
-          const Expanded(
-            child: Center(
-              child: Text('Comming SOon'),
+          Expanded(
+            child: Row(
+              children: [
+                Sidebar(
+                  selectedIndex: _selectedIndex,
+                  onItemSelected: (index) {
+                    setState(() => _selectedIndex = index);
+                  },
+                ),
+                PlayArea(
+                  selectedItem: _selectedIndex >= 0
+                      ? 'Item ${_selectedIndex + 1}'
+                      : null,
+                ),
+              ],
             ),
           ),
         ],
