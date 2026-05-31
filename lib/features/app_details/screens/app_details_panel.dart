@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../services/app_details_service.dart';
 import 'no_package_selected.dart';
@@ -18,7 +19,7 @@ class AppDetailsPanel extends StatefulWidget {
 }
 
 class _AppDetailsPanelState extends State<AppDetailsPanel>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   DumpsysResult? _result;
   bool _loading = false;
   String? _errorMessage;
@@ -78,13 +79,14 @@ class _AppDetailsPanelState extends State<AppDetailsPanel>
           });
           return;
         }
+        final tabCount = 1 + result.sections.length;
+        final newController = TabController(length: tabCount, vsync: this);
+        _tabController.dispose();
         setState(() {
           _result = result;
           _loading = false;
           _errorMessage = null;
-          final tabCount = _buildTabs().length;
-          _tabController.dispose();
-          _tabController = TabController(length: tabCount, vsync: this);
+          _tabController = newController;
         });
       }
     } catch (e) {
@@ -136,12 +138,31 @@ class _AppDetailsPanelState extends State<AppDetailsPanel>
               const SizedBox(height: 4),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32),
-                child: Text(
-                  _errorMessage!,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 11, fontFamily: 'monospace',
-                    color: cs.onSurfaceVariant)),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        _errorMessage!,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 11, fontFamily: 'monospace',
+                          color: cs.onSurfaceVariant)),
+                    ),
+                    const SizedBox(width: 4),
+                    IconButton(
+                      icon: const Icon(Icons.copy, size: 14),
+                      tooltip: 'Copy error',
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: _errorMessage!));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Error copied')),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             ],
             const SizedBox(height: 12),
