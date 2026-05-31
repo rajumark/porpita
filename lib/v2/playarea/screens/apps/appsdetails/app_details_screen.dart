@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:porpita/v2/widgets/rounded_container.dart';
 import 'overview/overview_tab.dart';
 import 'permissions/permissions_tab.dart';
+import 'queries/queries_tab.dart';
+import 'dexopt/dexopt_tab.dart';
 import 'activities/activities_tab.dart';
+import 'rawdata/raw_data_tab.dart';
 
 class AppDetailsScreen extends StatefulWidget {
   final String packageName;
@@ -19,7 +22,7 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 6, vsync: this);
   }
 
   @override
@@ -56,10 +59,15 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerPr
           ),
           TabBar(
             controller: _tabController,
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
             tabs: const [
               Tab(text: 'Overview'),
               Tab(text: 'Permissions'),
+              Tab(text: 'Queries'),
+              Tab(text: 'Dexopt'),
               Tab(text: 'Activities'),
+              Tab(text: 'Raw Data'),
             ],
           ),
           Expanded(
@@ -68,7 +76,10 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerPr
               children: [
                 OverviewTab(packageName: widget.packageName),
                 PermissionsTab(packageName: widget.packageName),
+                QueriesTab(packageName: widget.packageName),
+                DexoptTab(packageName: widget.packageName),
                 ActivitiesTab(packageName: widget.packageName),
+                RawDataTab(packageName: widget.packageName),
               ],
             ),
           ),

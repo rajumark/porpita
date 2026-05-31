@@ -1,41 +1,9 @@
 import 'package:porpita/services/commands/adb_exec_service.dart';
 
 class AppDetailsInfo {
-  final String versionName;
-  final String versionCode;
-  final String minSdk;
-  final String targetSdk;
-  final String appId;
-  final String codePath;
-  final String resourcePath;
-  final String primaryCpuAbi;
-  final String flags;
-  final String privateFlags;
-  final String timeStamp;
-  final String lastUpdateTime;
-  final String installerPackageName;
-  final String forceQueryable;
-  final String sharedUser;
-  final String signatures;
+  final List<MapEntry<String, String>> properties;
 
-  const AppDetailsInfo({
-    this.versionName = '',
-    this.versionCode = '',
-    this.minSdk = '',
-    this.targetSdk = '',
-    this.appId = '',
-    this.codePath = '',
-    this.resourcePath = '',
-    this.primaryCpuAbi = '',
-    this.flags = '',
-    this.privateFlags = '',
-    this.timeStamp = '',
-    this.lastUpdateTime = '',
-    this.installerPackageName = '',
-    this.forceQueryable = '',
-    this.sharedUser = '',
-    this.signatures = '',
-  });
+  const AppDetailsInfo({this.properties = const []});
 }
 
 class AppDetailsService {
@@ -44,68 +12,93 @@ class AppDetailsService {
     return _parse(raw, packageName);
   }
 
+  static int _indentLevel(String line) {
+    var count = 0;
+    for (final ch in line.runes) {
+      if (ch == 0x20) {
+        count++;
+      } else {
+        break;
+      }
+    }
+    return count;
+  }
+
+  static bool _isExclude(String trimmed, List<String> excludeStubs) {
+    for (final stub in excludeStubs) {
+      if (trimmed == stub || trimmed.startsWith('$stub ')) return true;
+    }
+    return false;
+  }
+
   static AppDetailsInfo _parse(String raw, String packageName) {
     final lines = raw.split('\n');
 
     int start = -1;
     for (int i = 0; i < lines.length; i++) {
-      if (lines[i].contains('Package [')) {
+      if (lines[i].contains('Package [$packageName]') ||
+          (lines[i].contains('Package [') && start == -1)) {
         start = i;
         break;
       }
     }
     if (start == -1) return const AppDetailsInfo();
 
-    final map = <String, String>{};
-    for (int i = start + 1; i < lines.length; i++) {
+    final excludeStubs = <String>[
+      'declared permissions:',
+      'requested permissions:',
+      'install permissions:',
+      'runtime permissions:',
+      'User 0:',
+    ];
+
+    final properties = <MapEntry<String, String>>[];
+    int skipUntilIndent = -1;
+    int i = start + 1;
+
+    while (i < lines.length) {
       final line = lines[i];
-      if (line.trim().isEmpty || line.contains('Package [') || line.contains('User 0:') || line.startsWith('Packages:')) {
-        if (line.contains('Package [') && i != start) break;
+
+      if (line.contains('Package [') && i != start) break;
+
+      final trimmed = line.trim();
+      if (trimmed.isEmpty) {
+        i++;
         continue;
       }
-      final trimmed = line.trim();
+
+      final currentIndent = _indentLevel(line);
+
+      if (skipUntilIndent >= 0) {
+        if (currentIndent <= skipUntilIndent) {
+          if (_isExclude(trimmed, excludeStubs)) {
+            skipUntilIndent = currentIndent;
+            i++;
+            continue;
+          }
+          skipUntilIndent = -1;
+        } else {
+          i++;
+          continue;
+        }
+      }
+
+      if (_isExclude(trimmed, excludeStubs)) {
+        skipUntilIndent = currentIndent;
+        i++;
+        continue;
+      }
+
       final eq = trimmed.indexOf('=');
       if (eq > 0) {
         final key = trimmed.substring(0, eq).trim();
-        var val = trimmed.substring(eq + 1).trim();
-        final brack = val.indexOf(' [');
-        if (brack == 0) {
-          val = trimmed.substring(eq + 1).trim();
-        }
-        map[key] = val;
+        final val = trimmed.substring(eq + 1).trim();
+        properties.add(MapEntry(key, val));
       }
+
+      i++;
     }
 
-    final vcLine = map['versionCode'];
-    String vc = '', ms = '', ts = '';
-    if (vcLine != null) {
-      final m = RegExp(r'(\d+)\s+minSdk=(\d+)\s+targetSdk=(\d+)').firstMatch(vcLine);
-      if (m != null) {
-        vc = m.group(1)!;
-        ms = m.group(2)!;
-        ts = m.group(3)!;
-      } else {
-        vc = vcLine;
-      }
-    }
-
-    return AppDetailsInfo(
-      versionName: map['versionName'] ?? '',
-      versionCode: vc,
-      minSdk: ms,
-      targetSdk: ts,
-      appId: map['appId'] ?? '',
-      codePath: map['codePath'] ?? '',
-      resourcePath: map['resourcePath'] ?? '',
-      primaryCpuAbi: map['primaryCpuAbi'] ?? '',
-      flags: map['flags'] ?? map['pkgFlags'] ?? '',
-      privateFlags: map['privateFlags'] ?? map['privatePkgFlags'] ?? '',
-      timeStamp: map['timeStamp'] ?? '',
-      lastUpdateTime: map['lastUpdateTime'] ?? '',
-      installerPackageName: map['installerPackageName'] ?? '',
-      forceQueryable: map['forceQueryable'] ?? '',
-      sharedUser: map['sharedUser'] ?? '',
-      signatures: map['signatures'] ?? '',
-    );
+    return AppDetailsInfo(properties: properties);
   }
 }

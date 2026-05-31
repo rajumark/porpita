@@ -67,7 +67,7 @@ class _OverviewTabState extends State<OverviewTab> {
     if (_error != null) {
       return Center(child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)));
     }
-    if (_info == null) {
+    if (_info == null || _info!.properties.isEmpty) {
       return const Center(child: Text('No data'));
     }
     return _buildInfo(context, _info!);
@@ -75,31 +75,13 @@ class _OverviewTabState extends State<OverviewTab> {
 
   Widget _buildInfo(BuildContext context, AppDetailsInfo info) {
     final theme = Theme.of(context);
-    final rows = <_Row>[
-      _Row('Version Name', info.versionName),
-      _Row('Version Code', info.versionCode),
-      _Row('Min SDK', info.minSdk),
-      _Row('Target SDK', info.targetSdk),
-      _Row('App ID', info.appId),
-      _Row('Code Path', info.codePath),
-      _Row('Resource Path', info.resourcePath),
-      _Row('CPU ABI', info.primaryCpuAbi),
-      _Row('Flags', info.flags),
-      _Row('Private Flags', info.privateFlags),
-      _Row('Install Time', info.timeStamp),
-      _Row('Last Update', info.lastUpdateTime),
-      _Row('Installer', info.installerPackageName),
-      _Row('Force Queryable', info.forceQueryable),
-      _Row('Shared User', info.sharedUser),
-      _Row('Signatures', info.signatures),
-    ];
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: rows.length,
+      itemCount: info.properties.length,
       itemBuilder: (context, index) {
-        final row = rows[index];
-        if (row.value.isEmpty) return const SizedBox.shrink();
+        final entry = info.properties[index];
+        if (entry.value.isEmpty) return const SizedBox.shrink();
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 4),
           child: Row(
@@ -107,10 +89,10 @@ class _OverviewTabState extends State<OverviewTab> {
             children: [
               SizedBox(
                 width: 140,
-                child: Text(row.label, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                child: Text(entry.key, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
               ),
               Expanded(
-                child: SelectableText(row.value, style: theme.textTheme.bodySmall),
+                child: SelectableText(entry.value, style: theme.textTheme.bodySmall),
               ),
             ],
           ),
@@ -118,10 +100,4 @@ class _OverviewTabState extends State<OverviewTab> {
       },
     );
   }
-}
-
-class _Row {
-  final String label;
-  final String value;
-  const _Row(this.label, this.value);
 }
