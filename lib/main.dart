@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'v2/base_screen.dart';
 import 'services/adb_manager.dart';
 import 'services/device_manager.dart';
+import 'services/emulator_manager.dart';
 import 'services/theme_manager.dart';
 
 void main() async {
@@ -18,12 +19,15 @@ void main() async {
   final deviceManager = DeviceManager();
   deviceManager.start();
 
+  final emulatorManager = EmulatorManager();
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: adb),
         ChangeNotifierProvider.value(value: themeManager),
         ChangeNotifierProvider.value(value: deviceManager),
+        ChangeNotifierProvider.value(value: emulatorManager),
       ],
       child: const MyApp(),
     ),

@@ -12,6 +12,7 @@ class AdbDevice {
   const AdbDevice({required this.id, required this.status});
 
   bool get isConnected => status == 'device';
+  bool get isEmulator => id.startsWith('emulator-');
 
   @override
   bool operator ==(Object other) =>
@@ -31,6 +32,8 @@ class DeviceManager extends ChangeNotifier {
   bool _running = false;
 
   List<AdbDevice> get devices => List.unmodifiable(_devices);
+  List<AdbDevice> get physicalDevices => _devices.where((d) => !d.isEmulator).toList();
+  List<AdbDevice> get emulatorDevices => _devices.where((d) => d.isEmulator).toList();
   AdbDevice? get selected => _selected;
   bool get hasDevices => _devices.isNotEmpty;
 

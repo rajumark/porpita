@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:porpita/services/device_manager.dart';
 import 'package:porpita/services/settings_service.dart';
+import 'package:porpita/v2/widgets/app_sidebar.dart';
 import 'package:porpita/v2/widgets/search_view.dart';
 import 'package:porpita/v2/widgets/rounded_container.dart';
 import 'settings_intents_data.dart';
@@ -122,7 +123,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: RoundedContainer(
             child: Row(
               children: [
-                _CategorySidebar(
+                AppSidebar(
+                  width: 200,
+                  items: kSettingCategories,
+                  icons: kSettingCategories.map((c) => kCategoryIcons[c] ?? Icons.category).toList(),
                   selectedIndex: _selectedCategoryIndex,
                   onItemSelected: (index) {
                     setState(() => _selectedCategoryIndex = index);
@@ -183,82 +187,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         );
       },
-    );
-  }
-}
-
-class _CategorySidebar extends StatelessWidget {
-  final int selectedIndex;
-  final ValueChanged<int> onItemSelected;
-
-  const _CategorySidebar({
-    required this.selectedIndex,
-    required this.onItemSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return SizedBox(
-      width: 160,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: ListView.builder(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          itemCount: kSettingCategories.length,
-          itemBuilder: (context, index) {
-            final isSelected = index == selectedIndex;
-            final category = kSettingCategories[index];
-            final icon = kCategoryIcons[category] ?? Icons.category;
-            final count = category == 'All Settings'
-                ? kSettingsIntents.length
-                : kSettingsIntents.where((e) => e.category == category).length;
-
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 1),
-              child: Material(
-                color: isSelected ? scheme.secondaryContainer : Colors.transparent,
-                borderRadius: BorderRadius.circular(8),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(8),
-                  onTap: () => onItemSelected(index),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    child: Row(
-                      children: [
-                        Icon(
-                          icon,
-                          size: 16,
-                          color: isSelected ? scheme.onSecondaryContainer : scheme.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            category,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: isSelected ? scheme.onSecondaryContainer : scheme.onSurface,
-                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          '$count',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: isSelected ? scheme.onSecondaryContainer : scheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
     );
   }
 }

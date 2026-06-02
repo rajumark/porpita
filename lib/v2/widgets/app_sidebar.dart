@@ -6,6 +6,7 @@ class AppSidebar extends StatelessWidget {
   final List<IconData>? selectedIcons;
   final int selectedIndex;
   final ValueChanged<int> onItemSelected;
+  final double width;
 
   const AppSidebar({
     super.key,
@@ -14,6 +15,7 @@ class AppSidebar extends StatelessWidget {
     this.selectedIcons,
     required this.selectedIndex,
     required this.onItemSelected,
+    this.width = 140,
   });
 
   BorderRadius _borderRadius(int index) {
@@ -37,7 +39,7 @@ class AppSidebar extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return SizedBox(
-      width: 140,
+      width: width,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: ListView.separated(
