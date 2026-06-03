@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:porpita/services/device_manager.dart';
 import 'package:porpita/v2/widgets/search_view.dart';
@@ -23,6 +25,9 @@ class _RawDataTabState extends State<RawDataTab> with AutomaticKeepAliveClientMi
   List<_TextSpan> _spans = [];
   int _matchCount = 0;
   int _currentMatch = 0;
+  List<int> _matchOffsets = [];
+
+  Timer? _debounce;
 
   @override
   bool get wantKeepAlive => true;
@@ -36,6 +41,7 @@ class _RawDataTabState extends State<RawDataTab> with AutomaticKeepAliveClientMi
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     _scrollController.dispose();
@@ -49,51 +55,96 @@ class _RawDataTabState extends State<RawDataTab> with AutomaticKeepAliveClientMi
   }
 
   void _onSearchChanged() {
-    _buildSpans(_searchController.text);
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 200), () {
+      _buildSpans(_searchController.text);
+    });
   }
 
-  void _buildSpans(String query) {
+  static _SpanResult _computeSpans(String data, String query) {
     if (query.isEmpty) {
-      setState(() {
-        _spans = [_TextSpan(_data, _SpanType.normal)];
-        _matchCount = 0;
-        _currentMatch = 0;
-      });
-      return;
+      return _SpanResult(
+        spans: [_TextSpan(data, _SpanType.normal)],
+        matchCount: 0,
+        matchOffsets: [],
+      );
     }
 
     final q = query.toLowerCase();
-    final lowerData = _data.toLowerCase();
+    final lowerData = data.toLowerCase();
     final spans = <_TextSpan>[];
+    final offsets = <int>[];
     int matchIdx = 0;
 
-    // Track which match index each match belongs to
     var start = 0;
     while (start < lowerData.length) {
       final idx = lowerData.indexOf(q, start);
       if (idx == -1) break;
       if (idx > start) {
-        spans.add(_TextSpan(_data.substring(start, idx), _SpanType.normal));
+        spans.add(_TextSpan(data.substring(start, idx), _SpanType.normal));
       }
       matchIdx++;
-      spans.add(_TextSpan(_data.substring(idx, idx + q.length), _SpanType.match, matchIndex: matchIdx));
+      offsets.add(idx);
+      spans.add(_TextSpan(data.substring(idx, idx + q.length), _SpanType.match, matchIndex: matchIdx));
       start = idx + q.length;
     }
-    if (start < _data.length) {
-      spans.add(_TextSpan(_data.substring(start), _SpanType.normal));
+    if (start < data.length) {
+      spans.add(_TextSpan(data.substring(start), _SpanType.normal));
     }
 
+    return _SpanResult(spans: spans, matchCount: matchIdx, matchOffsets: offsets);
+  }
+
+  Future<void> _buildSpans(String query) async {
+    if (_data.isEmpty) return;
+
+    final result = await compute(_computeSpansStatic, _ComputeArgs(_data, query));
+
+    if (!mounted) return;
+
     setState(() {
-      _spans = spans;
-      _matchCount = matchIdx;
+      _spans = result.spans;
+      _matchCount = result.matchCount;
+      _matchOffsets = result.matchOffsets;
       if (_currentMatch > _matchCount) _currentMatch = _matchCount;
       if (_matchCount > 0 && _currentMatch == 0) _currentMatch = 1;
     });
+
+    if (_matchCount > 0 && _currentMatch >= 1) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToCurrentMatch();
+      });
+    }
+  }
+
+  void _scrollToCurrentMatch() {
+    if (!_scrollController.hasClients || _matchOffsets.isEmpty) return;
+    if (_currentMatch < 1 || _currentMatch > _matchOffsets.length) return;
+
+    final charOffset = _matchOffsets[_currentMatch - 1];
+    final totalLen = _data.length;
+    if (totalLen == 0) return;
+
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final viewport = _scrollController.position.viewportDimension;
+
+    final proportion = charOffset / totalLen;
+    final estimatedY = proportion * maxScroll;
+    final centered = (estimatedY - viewport / 2).clamp(0.0, maxScroll);
+
+    _scrollController.animateTo(
+      centered,
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+    );
   }
 
   void _goToMatch(int index) {
     if (_matchCount == 0) return;
     setState(() => _currentMatch = index);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCurrentMatch();
+    });
   }
 
   void _nextMatch() {
@@ -106,6 +157,10 @@ class _RawDataTabState extends State<RawDataTab> with AutomaticKeepAliveClientMi
     if (_matchCount == 0) return;
     final prev = _currentMatch <= 1 ? _matchCount : _currentMatch - 1;
     _goToMatch(prev);
+  }
+
+  static _SpanResult _computeSpansStatic(_ComputeArgs args) {
+    return _computeSpans(args.data, args.query);
   }
 
   Future<void> _fetch() async {
@@ -221,4 +276,17 @@ class _TextSpan {
   final _SpanType type;
   final int matchIndex;
   const _TextSpan(this.text, this.type, {this.matchIndex = 0});
+}
+
+class _SpanResult {
+  final List<_TextSpan> spans;
+  final int matchCount;
+  final List<int> matchOffsets;
+  const _SpanResult({required this.spans, required this.matchCount, required this.matchOffsets});
+}
+
+class _ComputeArgs {
+  final String data;
+  final String query;
+  const _ComputeArgs(this.data, this.query);
 }

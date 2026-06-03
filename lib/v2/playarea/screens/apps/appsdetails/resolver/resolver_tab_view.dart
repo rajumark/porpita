@@ -183,6 +183,16 @@ class _SectionWidget extends StatelessWidget {
         return Icons.flash_on;
       case 'MIME Typed Actions':
         return Icons.mediation;
+      case 'Domain verification status':
+        return Icons.verified;
+      case 'Registered ContentProviders':
+        return Icons.dataset;
+      case 'ContentProvider Authorities':
+        return Icons.admin_panel_settings;
+      case 'Key Set Manager':
+        return Icons.vpn_key;
+      case 'Packages':
+        return Icons.inventory_2;
       default:
         return Icons.category;
     }

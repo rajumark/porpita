@@ -6,16 +6,16 @@ import '../resolver/resolver_model.dart';
 import '../resolver/resolver_service.dart';
 import '../resolver/resolver_tab_view.dart';
 
-class QueriesTab extends StatefulWidget {
+class ContentProvidersTab extends StatefulWidget {
   final String packageName;
-  const QueriesTab({super.key, required this.packageName});
+  const ContentProvidersTab({super.key, required this.packageName});
 
   @override
-  State<QueriesTab> createState() => _QueriesTabState();
+  State<ContentProvidersTab> createState() => _ContentProvidersTabState();
 }
 
-class _QueriesTabState extends State<QueriesTab> with AutomaticKeepAliveClientMixin {
-  ResolverResult? _result;
+class _ContentProvidersTabState extends State<ContentProvidersTab> with AutomaticKeepAliveClientMixin {
+  List<ResolverResult> _results = [];
   bool _loading = true;
   String? _error;
 
@@ -29,7 +29,7 @@ class _QueriesTabState extends State<QueriesTab> with AutomaticKeepAliveClientMi
   }
 
   @override
-  void didUpdateWidget(covariant QueriesTab oldWidget) {
+  void didUpdateWidget(covariant ContentProvidersTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.packageName != widget.packageName) _fetch();
   }
@@ -42,9 +42,13 @@ class _QueriesTabState extends State<QueriesTab> with AutomaticKeepAliveClientMi
     }
     setState(() { _loading = true; _error = null; });
     try {
-      final result = await ResolverService.fetchQueries(device.id, widget.packageName);
+      final registered = await ResolverService.fetchContentProviders(device.id, widget.packageName);
+      final authorities = await ResolverService.fetchContentProviderAuthorities(device.id, widget.packageName);
       if (!mounted) return;
-      setState(() { _result = result; _loading = false; });
+      setState(() {
+        _results = [registered, authorities].whereType<ResolverResult>().toList();
+        _loading = false;
+      });
     } catch (e) {
       if (!mounted) return;
       setState(() { _error = e.toString(); _loading = false; });
@@ -69,7 +73,10 @@ class _QueriesTabState extends State<QueriesTab> with AutomaticKeepAliveClientMi
         ),
       );
     }
-    final sections = _result?.sections ?? [];
-    return ResolverTabView(sections: sections, emptyMessage: 'No queries data');
+    final sections = _results.expand((r) => r.sections).toList();
+    if (sections.isEmpty) {
+      return const Center(child: Text('No content provider data', style: TextStyle(fontSize: 14)));
+    }
+    return ResolverTabView(sections: sections, emptyMessage: 'No content provider data');
   }
 }

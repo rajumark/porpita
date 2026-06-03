@@ -7,6 +7,11 @@ import 'dexopt/dexopt_tab.dart';
 import 'activities/activities_tab.dart';
 import 'receivers/receivers_tab.dart';
 import 'services/services_tab.dart';
+import 'domain_verification/domain_verification_tab.dart';
+import 'content_providers/content_providers_tab.dart';
+import 'keyset/keyset_tab.dart';
+import 'packages/packages_tab.dart';
+import 'paths/paths_tab.dart';
 import 'rawdata/raw_data_tab.dart';
 
 class AppDetailsScreen extends StatefulWidget {
@@ -24,7 +29,7 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 8, vsync: this);
+    _tabController = TabController(length: 13, vsync: this);
   }
 
   @override
@@ -71,6 +76,11 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerPr
               Tab(text: 'Activities'),
               Tab(text: 'Receivers'),
               Tab(text: 'Services'),
+              Tab(text: 'ContentProviders'),
+              Tab(text: 'Domain Verif'),
+              Tab(text: 'Key Set'),
+              Tab(text: 'Packages'),
+              Tab(text: 'Paths'),
               Tab(text: 'Raw Data'),
             ],
           ),
@@ -85,6 +95,11 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerPr
                 ActivitiesTab(packageName: widget.packageName),
                 ReceiversTab(packageName: widget.packageName),
                 ServicesTab(packageName: widget.packageName),
+                ContentProvidersTab(packageName: widget.packageName),
+                DomainVerificationTab(packageName: widget.packageName),
+                KeySetTab(packageName: widget.packageName),
+                PackagesTab(packageName: widget.packageName),
+                PathsTab(packageName: widget.packageName),
                 RawDataTab(packageName: widget.packageName),
               ],
             ),

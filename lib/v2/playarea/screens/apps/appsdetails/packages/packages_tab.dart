@@ -2,20 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:porpita/services/device_manager.dart';
-import '../resolver/resolver_model.dart';
-import '../resolver/resolver_service.dart';
-import '../resolver/resolver_tab_view.dart';
+import 'package:porpita/services/commands/adb_exec_service.dart';
+import '../resolver/dump_section_parser.dart';
 
-class QueriesTab extends StatefulWidget {
+class PackagesTab extends StatefulWidget {
   final String packageName;
-  const QueriesTab({super.key, required this.packageName});
+  const PackagesTab({super.key, required this.packageName});
 
   @override
-  State<QueriesTab> createState() => _QueriesTabState();
+  State<PackagesTab> createState() => _PackagesTabState();
 }
 
-class _QueriesTabState extends State<QueriesTab> with AutomaticKeepAliveClientMixin {
-  ResolverResult? _result;
+class _PackagesTabState extends State<PackagesTab> with AutomaticKeepAliveClientMixin {
+  String _data = '';
   bool _loading = true;
   String? _error;
 
@@ -29,7 +28,7 @@ class _QueriesTabState extends State<QueriesTab> with AutomaticKeepAliveClientMi
   }
 
   @override
-  void didUpdateWidget(covariant QueriesTab oldWidget) {
+  void didUpdateWidget(covariant PackagesTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.packageName != widget.packageName) _fetch();
   }
@@ -42,9 +41,10 @@ class _QueriesTabState extends State<QueriesTab> with AutomaticKeepAliveClientMi
     }
     setState(() { _loading = true; _error = null; });
     try {
-      final result = await ResolverService.fetchQueries(device.id, widget.packageName);
+      final raw = await AdbExecService.run(device.id, ['dumpsys', 'package', widget.packageName]);
+      final section = DumpSectionParser.extractSection(raw, 'Packages');
       if (!mounted) return;
-      setState(() { _result = result; _loading = false; });
+      setState(() { _data = section; _loading = false; });
     } catch (e) {
       if (!mounted) return;
       setState(() { _error = e.toString(); _loading = false; });
@@ -69,7 +69,15 @@ class _QueriesTabState extends State<QueriesTab> with AutomaticKeepAliveClientMi
         ),
       );
     }
-    final sections = _result?.sections ?? [];
-    return ResolverTabView(sections: sections, emptyMessage: 'No queries data');
+    if (_data.isEmpty) {
+      return const Center(child: Text('No package data'));
+    }
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: SelectableText(
+        _data,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(fontFamily: 'monospace', fontSize: 12),
+      ),
+    );
   }
 }

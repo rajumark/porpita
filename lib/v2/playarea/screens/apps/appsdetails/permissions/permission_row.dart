@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PermissionRow extends StatefulWidget {
@@ -29,21 +28,10 @@ class _PermissionRowState extends State<PermissionRow> {
             ),
             Opacity(
               opacity: _hovering ? 1.0 : 0.0,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _iconButton(Icons.copy, 'Copy', () {
-                    Clipboard.setData(ClipboardData(text: widget.name));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Copied: ${widget.name}'), duration: const Duration(seconds: 1)),
-                    );
-                  }),
-                  _iconButton(Icons.search, 'Search', () {
-                    final query = Uri.encodeComponent('what is ${widget.name} android permission');
-                    launchUrl(Uri.parse('https://www.google.com/search?q=$query'), mode: LaunchMode.externalApplication);
-                  }),
-                ],
-              ),
+              child: _iconButton(Icons.search, 'Search', () {
+                final query = Uri.encodeComponent('what is ${widget.name} android permission');
+                launchUrl(Uri.parse('https://www.google.com/search?q=$query'), mode: LaunchMode.externalApplication);
+              }),
             ),
             if (widget.trailing != null) widget.trailing!,
           ],
