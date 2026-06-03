@@ -6,15 +6,15 @@ import '../resolver/resolver_model.dart';
 import '../resolver/resolver_service.dart';
 import '../resolver/resolver_tab_view.dart';
 
-class ActivitiesTab extends StatefulWidget {
+class ServicesTab extends StatefulWidget {
   final String packageName;
-  const ActivitiesTab({super.key, required this.packageName});
+  const ServicesTab({super.key, required this.packageName});
 
   @override
-  State<ActivitiesTab> createState() => _ActivitiesTabState();
+  State<ServicesTab> createState() => _ServicesTabState();
 }
 
-class _ActivitiesTabState extends State<ActivitiesTab> with AutomaticKeepAliveClientMixin {
+class _ServicesTabState extends State<ServicesTab> with AutomaticKeepAliveClientMixin {
   ResolverResult? _result;
   bool _loading = true;
   String? _error;
@@ -29,7 +29,7 @@ class _ActivitiesTabState extends State<ActivitiesTab> with AutomaticKeepAliveCl
   }
 
   @override
-  void didUpdateWidget(covariant ActivitiesTab oldWidget) {
+  void didUpdateWidget(covariant ServicesTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.packageName != widget.packageName) _fetch();
   }
@@ -42,7 +42,7 @@ class _ActivitiesTabState extends State<ActivitiesTab> with AutomaticKeepAliveCl
     }
     setState(() { _loading = true; _error = null; });
     try {
-      final result = await ResolverService.fetch(device.id, widget.packageName, 'Activity Resolver Table');
+      final result = await ResolverService.fetch(device.id, widget.packageName, 'Service Resolver Table');
       if (!mounted) return;
       setState(() { _result = result; _loading = false; });
     } catch (e) {
@@ -71,6 +71,6 @@ class _ActivitiesTabState extends State<ActivitiesTab> with AutomaticKeepAliveCl
     }
 
     final sections = _result?.sections ?? [];
-    return ResolverTabView(sections: sections, emptyMessage: 'No activity resolver data');
+    return ResolverTabView(sections: sections, emptyMessage: 'No service resolver data');
   }
 }

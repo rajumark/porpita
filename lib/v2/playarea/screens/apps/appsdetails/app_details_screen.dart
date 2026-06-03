@@ -5,6 +5,8 @@ import 'permissions/permissions_tab.dart';
 import 'queries/queries_tab.dart';
 import 'dexopt/dexopt_tab.dart';
 import 'activities/activities_tab.dart';
+import 'receivers/receivers_tab.dart';
+import 'services/services_tab.dart';
 import 'rawdata/raw_data_tab.dart';
 
 class AppDetailsScreen extends StatefulWidget {
@@ -22,7 +24,7 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 6, vsync: this);
+    _tabController = TabController(length: 8, vsync: this);
   }
 
   @override
@@ -67,6 +69,8 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerPr
               Tab(text: 'Queries'),
               Tab(text: 'Dexopt'),
               Tab(text: 'Activities'),
+              Tab(text: 'Receivers'),
+              Tab(text: 'Services'),
               Tab(text: 'Raw Data'),
             ],
           ),
@@ -79,6 +83,8 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerPr
                 QueriesTab(packageName: widget.packageName),
                 DexoptTab(packageName: widget.packageName),
                 ActivitiesTab(packageName: widget.packageName),
+                ReceiversTab(packageName: widget.packageName),
+                ServicesTab(packageName: widget.packageName),
                 RawDataTab(packageName: widget.packageName),
               ],
             ),

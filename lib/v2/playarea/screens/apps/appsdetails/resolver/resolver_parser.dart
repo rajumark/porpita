@@ -1,6 +1,6 @@
-import 'activity_resolver_model.dart';
+import 'resolver_model.dart';
 
-class ActivityResolverParser {
+class ResolverParser {
   static final _sectionNames = {
     'Full MIME Types',
     'Base MIME Types',
@@ -10,12 +10,12 @@ class ActivityResolverParser {
     'MIME Typed Actions',
   };
 
-  static ActivityResolverResult? parse(String rawDump) {
-    final activityStart = rawDump.indexOf('Activity Resolver Table:');
-    if (activityStart == -1) return null;
+  static ResolverResult? parse(String rawDump, String tableName) {
+    final sectionStart = rawDump.indexOf('$tableName:');
+    if (sectionStart == -1) return null;
 
-    final nextSection = _findNextSection(rawDump, activityStart);
-    final section = rawDump.substring(activityStart, nextSection);
+    final nextSection = _findNextSection(rawDump, sectionStart + tableName.length + 1);
+    final section = rawDump.substring(sectionStart, nextSection);
 
     final lines = section.split('\n');
     final sections = <ResolverSection>[];
@@ -30,7 +30,8 @@ class ActivityResolverParser {
 
       if (trimmed.isEmpty) continue;
 
-      if (trimmed == 'Activity Resolver Table:') continue;
+      final tableHeader = '$tableName:';
+      if (trimmed == tableHeader) continue;
 
       final sectionName = _extractSectionName(line);
       if (sectionName != null) {
@@ -54,13 +55,13 @@ class ActivityResolverParser {
         continue;
       }
 
-      final entryMatch = RegExp(r'^\s{4,8}([0-9a-f]+)\s+(\S+)\s+filter\s+([0-9a-f]+)$').firstMatch(line);
+      final entryMatch = RegExp(r'^\s{4,8}([0-9a-f]+)\s+(\S+)\s+filter\s+([0-9a-f]+)').firstMatch(line);
       if (entryMatch != null) {
         _flushEntry(currentEntry, currentDetailBuffer, currentGroup);
         currentDetailBuffer = '';
         currentEntry = ResolverEntry(
           hashClass: entryMatch.group(1)!,
-          activityName: entryMatch.group(2)!,
+          componentName: entryMatch.group(2)!,
           filterHash: entryMatch.group(3)!,
           rawDetail: '',
         );
@@ -80,7 +81,7 @@ class ActivityResolverParser {
     _flushGroup(currentGroup, currentSection);
     _flushSection(currentSection, sections);
 
-    return ActivityResolverResult(sections: sections);
+    return ResolverResult(tableName: tableName, sections: sections);
   }
 
   static String? _extractSectionName(String line) {
@@ -97,12 +98,12 @@ class ActivityResolverParser {
   static String? _extractGroupKey(String line) {
     if (line.startsWith('      ') && line.trim().endsWith(':')) {
       if (_extractSectionName(line) != null) return null;
-      return line.trim().replaceAll(':', '');
+      return line.trim().replaceAll(RegExp(r':$'), '');
     }
     if (line.startsWith('    ') && !line.startsWith('      ') && line.trim().endsWith(':')) {
       if (_extractSectionName(line) != null) return null;
-      if (RegExp(r'^\s{4}[0-9a-f]+\s+\S+\s+filter\s+[0-9a-f]+$').hasMatch(line)) return null;
-      return line.trim().replaceAll(':', '');
+      if (RegExp(r'^\s{4}[0-9a-f]+\s+\S+\s+filter\s+[0-9a-f]+').hasMatch(line)) return null;
+      return line.trim().replaceAll(RegExp(r':$'), '');
     }
     return null;
   }
@@ -111,7 +112,7 @@ class ActivityResolverParser {
     if (entry == null || group == null) return;
     final finalized = ResolverEntry(
       hashClass: entry.hashClass,
-      activityName: entry.activityName,
+      componentName: entry.componentName,
       filterHash: entry.filterHash,
       rawDetail: detail.trimRight(),
     );
@@ -134,13 +135,20 @@ class ActivityResolverParser {
 
   static int _findNextSection(String rawDump, int start) {
     final markers = [
-      'Receiver Resolver Table:',
-      'Service Resolver Table:',
-      'ContentProvider Resolver Table:',
+      '\nReceiver Resolver Table:',
+      '\nService Resolver Table:',
+      '\nContentProvider Resolver Table:',
+      '\nDomain verification status:',
+      '\nPermissions:',
+      '\nRegistered ContentProviders:',
+      '\nContentProvider Authorities:',
+      '\nKey Set Manager:',
+      '\nPackages:',
+      '\nQueries:',
     ];
     int nearest = rawDump.length;
     for (final marker in markers) {
-      final idx = rawDump.indexOf(marker, start + 1);
+      final idx = rawDump.indexOf(marker, start);
       if (idx != -1 && idx < nearest) {
         nearest = idx;
       }

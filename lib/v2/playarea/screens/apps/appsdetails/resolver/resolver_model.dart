@@ -1,12 +1,12 @@
 class ResolverEntry {
   final String hashClass;
-  final String activityName;
+  final String componentName;
   final String filterHash;
   final String rawDetail;
 
   const ResolverEntry({
     required this.hashClass,
-    required this.activityName,
+    required this.componentName,
     required this.filterHash,
     required this.rawDetail,
   });
@@ -26,8 +26,9 @@ class ResolverSection {
   const ResolverSection({required this.name, required this.groups});
 }
 
-class ActivityResolverResult {
+class ResolverResult {
+  final String tableName;
   final List<ResolverSection> sections;
 
-  const ActivityResolverResult({required this.sections});
+  const ResolverResult({required this.tableName, required this.sections});
 }
