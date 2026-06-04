@@ -4,15 +4,18 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:porpita/services/device_manager.dart';
 import 'package:porpita/v2/widgets/search_view.dart';
+import 'package:porpita/v2/playarea/screens/apps/appsdetails/permissions/runtime/runtime_permissions_service.dart';
 import 'apps_list_service.dart';
 import 'apps_item_tile.dart';
 import 'app_actions_service.dart';
 import 'appinstall/app_install_service.dart';
 import 'appinstall/app_install_dialog.dart';
 import 'current_app/current_app_service.dart';
+import 'permission_actions_service.dart';
+import '../../../../topbar/porpita_preferences/screens/alert/alert_screen.dart';
 
 class AppsListScreen extends StatefulWidget {
-  final ValueChanged<String> onAppSelected;
+  final void Function(String packageName, {int tabIndex}) onAppSelected;
   const AppsListScreen({super.key, required this.onAppSelected});
 
   @override
@@ -196,7 +199,19 @@ class _AppsListScreenState extends State<AppsListScreen> {
     }
   }
 
-  void _handleAppAction(AppAction action, String packageName) {
+  Future<void> _handleAppAction(AppAction action, String packageName) async {
+    if (action == AppAction.grantAllPermissions || action == AppAction.revokeAllPermissions) {
+      _handleGrantOrRevokeAll(packageName, action);
+      return;
+    }
+    if (action == AppAction.managePermissions) {
+      widget.onAppSelected(packageName, tabIndex: 1);
+      return;
+    }
+    if (action == AppAction.downloadApks) {
+      widget.onAppSelected(packageName, tabIndex: 13);
+      return;
+    }
     final device = context.read<DeviceManager>().selected;
     if (device == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -204,20 +219,120 @@ class _AppsListScreenState extends State<AppsListScreen> {
       );
       return;
     }
+
+    if (action == AppAction.uninstall || action == AppAction.clearData) {
+      final prefs = await SharedPreferences.getInstance();
+      final key = action == AppAction.uninstall
+          ? AlertScreen.keyUninstall
+          : AlertScreen.keyClearData;
+      final shouldConfirm = prefs.getBool(key) ?? true;
+      if (shouldConfirm) {
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(action.label),
+            content: Text('Are you sure you want to ${action.label.toLowerCase()} $packageName?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx, false),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('Confirm'),
+              ),
+            ],
+          ),
+        );
+        if (confirmed != true || !mounted) return;
+      }
+    }
+
     AppActionsService.run(device.id, action, packageName).then((_) {
       if (!mounted) return;
       final msg = '${action.label}: $packageName';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(msg), duration: const Duration(seconds: 1)),
       );
-      if (action == AppAction.uninstall ||
-          action == AppAction.enable ||
+      if (action == AppAction.uninstall) {
+        Future.delayed(const Duration(seconds: 1), () {
+          if (!mounted) return;
+          final dev = context.read<DeviceManager>().selected;
+          if (dev != null) _fetchData(dev.id);
+        });
+      } else if (action == AppAction.enable ||
           action == AppAction.disable ||
           action == AppAction.clearData) {
         final dev = context.read<DeviceManager>().selected;
         if (dev != null) _fetchData(dev.id);
       }
     });
+  }
+
+  Future<void> _handleGrantOrRevokeAll(String packageName, AppAction action) async {
+    final device = context.read<DeviceManager>().selected;
+    if (device == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No device connected')),
+      );
+      return;
+    }
+
+    List<String> permissionNames;
+    try {
+      final list = await RuntimePermissionsService.fetch(device.id, packageName);
+      permissionNames = list.map((p) => p.name).toList();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to fetch permissions: $e')),
+      );
+      return;
+    }
+
+    if (permissionNames.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No runtime permissions found')),
+      );
+      return;
+    }
+
+    final isGrant = action == AppAction.grantAllPermissions;
+    final progressNotifier = ValueNotifier(PermissionActionProgress(
+      total: permissionNames.length,
+      done: 0,
+      action: isGrant ? 'Granting' : 'Revoking',
+    ));
+
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => PermissionActionProgressDialog(notifier: progressNotifier),
+    );
+
+    if (isGrant) {
+      await PermissionActionsService.grantAll(
+        deviceId: device.id,
+        packageName: packageName,
+        permissions: permissionNames,
+        notifier: progressNotifier,
+      );
+    } else {
+      await PermissionActionsService.revokeAll(
+        deviceId: device.id,
+        packageName: packageName,
+        permissions: permissionNames,
+        notifier: progressNotifier,
+      );
+    }
+
+    if (!mounted) return;
+    Navigator.of(context, rootNavigator: true).pop();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${action.label}: $packageName'), duration: const Duration(seconds: 1)),
+    );
   }
 
   Future<void> _fetchData(String deviceId) async {

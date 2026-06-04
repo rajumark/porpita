@@ -12,6 +12,7 @@ class AppsBaseScreen extends StatefulWidget {
 
 class _AppsBaseScreenState extends State<AppsBaseScreen> {
   String? _selectedPackageName;
+  int _initialTabIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -21,12 +22,16 @@ class _AppsBaseScreenState extends State<AppsBaseScreen> {
         child: Stack(
           children: [
             AppsListScreen(
-              onAppSelected: (name) => setState(() => _selectedPackageName = name),
+              onAppSelected: (packageName, {int tabIndex = 0}) => setState(() {
+                _selectedPackageName = packageName;
+                _initialTabIndex = tabIndex;
+              }),
             ),
             if (_selectedPackageName != null)
               AppDetailsScreen(
                 packageName: _selectedPackageName!,
                 onBack: () => setState(() => _selectedPackageName = null),
+                initialTabIndex: _initialTabIndex,
               ),
           ],
         ),

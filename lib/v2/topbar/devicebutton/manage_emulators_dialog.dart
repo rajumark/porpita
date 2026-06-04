@@ -19,6 +19,17 @@ class ManageEmulatorsDialog extends StatefulWidget {
 }
 
 class _ManageEmulatorsDialogState extends State<ManageEmulatorsDialog> {
+  String? _launchingAvd;
+
+  void _onLaunch(String avdName) {
+    if (_launchingAvd != null) return;
+    setState(() => _launchingAvd = avdName);
+    context.read<EmulatorManager>().launchAvd(avdName);
+    Future.delayed(const Duration(seconds: 5), () {
+      if (mounted) setState(() => _launchingAvd = null);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final em = context.watch<EmulatorManager>();
@@ -85,9 +96,7 @@ class _ManageEmulatorsDialogState extends State<ManageEmulatorsDialog> {
                     leading: const Icon(Icons.phone_android_outlined, size: 20),
                     title: Text(avd.name),
                     trailing: FilledButton.tonal(
-                      onPressed: () {
-                        context.read<EmulatorManager>().launchAvd(avd.name);
-                      },
+                      onPressed: _launchingAvd == avd.name ? null : () => _onLaunch(avd.name),
                       child: const Text('Start'),
                     ),
                     contentPadding: EdgeInsets.zero,

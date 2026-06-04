@@ -14,7 +14,11 @@ enum AppAction {
   copy('Copy'),
   appInfo('App Info'),
   playStore('Play Store'),
-  findOnline('Find Online');
+  findOnline('Find Online'),
+  grantAllPermissions('Grant All Permissions'),
+  revokeAllPermissions('Revoke All Permissions'),
+  managePermissions('Manage Permissions'),
+  downloadApks('Download Apks');
 
   final String label;
   const AppAction(this.label);
@@ -47,6 +51,11 @@ class AppActionsService {
         await _openPlayStore(deviceId, packageName);
       case AppAction.findOnline:
         _findOnline(packageName);
+      case AppAction.grantAllPermissions:
+      case AppAction.revokeAllPermissions:
+      case AppAction.managePermissions:
+      case AppAction.downloadApks:
+        break;
     }
   }
 

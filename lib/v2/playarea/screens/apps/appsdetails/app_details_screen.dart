@@ -13,12 +13,14 @@ import 'keyset/keyset_tab.dart';
 import 'packages/packages_tab.dart';
 import 'paths/paths_tab.dart';
 import 'appfiles/app_files_tab.dart';
+import 'apks_files/apks_files_tab.dart';
 import 'rawdata/raw_data_tab.dart';
 
 class AppDetailsScreen extends StatefulWidget {
   final String packageName;
   final VoidCallback onBack;
-  const AppDetailsScreen({super.key, required this.packageName, required this.onBack});
+  final int initialTabIndex;
+  const AppDetailsScreen({super.key, required this.packageName, required this.onBack, this.initialTabIndex = 0});
 
   @override
   State<AppDetailsScreen> createState() => _AppDetailsScreenState();
@@ -30,7 +32,7 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 14, vsync: this);
+    _tabController = TabController(length: 15, vsync: this, initialIndex: widget.initialTabIndex);
   }
 
   @override
@@ -83,6 +85,7 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerPr
               Tab(text: 'Packages'),
               Tab(text: 'Paths'),
               Tab(text: 'App Files'),
+              Tab(text: 'APKs Files'),
               Tab(text: 'Raw Data'),
             ],
           ),
@@ -103,6 +106,7 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerPr
                 PackagesTab(packageName: widget.packageName),
                 PathsTab(packageName: widget.packageName),
                 AppFilesTab(packageName: widget.packageName),
+                ApksFilesTab(packageName: widget.packageName),
                 RawDataTab(packageName: widget.packageName),
               ],
             ),

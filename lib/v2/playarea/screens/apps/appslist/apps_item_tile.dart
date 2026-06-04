@@ -25,6 +25,10 @@ class AppItemTile extends StatefulWidget {
     AppAction.home,
     AppAction.enable,
     AppAction.disable,
+    AppAction.grantAllPermissions,
+    AppAction.revokeAllPermissions,
+    AppAction.managePermissions,
+    AppAction.downloadApks,
   ];
 
   const AppItemTile({

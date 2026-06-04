@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:porpita/services/device_manager.dart';
 import 'package:porpita/v2/widgets/search_view.dart';
+import 'package:porpita/v2/playarea/screens/apps/appslist/permission_actions_service.dart';
 import '../permission_row.dart';
 import '../permissions_menu_service.dart';
 import 'runtime_permissions_model.dart';
@@ -95,37 +96,32 @@ class RuntimePermissionsPageState extends State<RuntimePermissionsPage> with Aut
     final filtered = _permissions.toList();
     if (filtered.isEmpty) return;
 
-    final progressNotifier = ValueNotifier<_ProgressState>(_ProgressState(total: filtered.length, done: 0, action: grant ? 'Granting' : 'Revoking'));
+    final progressNotifier = ValueNotifier(PermissionActionProgress(
+      total: filtered.length,
+      done: 0,
+      action: grant ? 'Granting' : 'Revoking',
+    ));
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => _ProgressDialogProgress(notifier: progressNotifier),
+      builder: (_) => PermissionActionProgressDialog(notifier: progressNotifier),
     );
 
-    for (int i = 0; i < filtered.length; i++) {
-      try {
-        if (grant) {
-          await RuntimePermissionsService.grant(device.id, widget.packageName, filtered[i].name);
-        } else {
-          await RuntimePermissionsService.revoke(device.id, widget.packageName, filtered[i].name);
-        }
-      } catch (e) {
-        final prev = progressNotifier.value;
-        progressNotifier.value = _ProgressState(
-          total: prev.total,
-          done: prev.done + 1,
-          action: prev.action,
-          errors: [...prev.errors, '${filtered[i].name}: $e'],
-        );
-        continue;
-      }
-      final prev = progressNotifier.value;
-      progressNotifier.value = _ProgressState(
-        total: prev.total,
-        done: prev.done + 1,
-        action: prev.action,
-        errors: prev.errors,
+    final permissionNames = filtered.map((p) => p.name).toList();
+    if (grant) {
+      await PermissionActionsService.grantAll(
+        deviceId: device.id,
+        packageName: widget.packageName,
+        permissions: permissionNames,
+        notifier: progressNotifier,
+      );
+    } else {
+      await PermissionActionsService.revokeAll(
+        deviceId: device.id,
+        packageName: widget.packageName,
+        permissions: permissionNames,
+        notifier: progressNotifier,
       );
     }
 
@@ -199,49 +195,6 @@ class RuntimePermissionsPageState extends State<RuntimePermissionsPage> with Aut
           ),
         ),
       ],
-    );
-  }
-}
-
-class _ProgressState {
-  final int total;
-  final int done;
-  final String action;
-  final List<String> errors;
-
-  const _ProgressState({required this.total, required this.done, required this.action, this.errors = const []});
-}
-
-class _ProgressDialogProgress extends StatelessWidget {
-  final ValueNotifier<_ProgressState> notifier;
-  const _ProgressDialogProgress({required this.notifier});
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<_ProgressState>(
-      valueListenable: notifier,
-      builder: (context, state, _) {
-        return AlertDialog(
-          title: Text('${state.action} permissions...'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              LinearProgressIndicator(value: state.total > 0 ? state.done / state.total : 0),
-              const SizedBox(height: 12),
-              Text('${state.done} / ${state.total}', style: Theme.of(context).textTheme.bodySmall),
-              if (state.errors.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Text('Errors:', style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.error)),
-                const SizedBox(height: 4),
-                ...state.errors.take(5).map((e) => Text(e, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.error))),
-                if (state.errors.length > 5)
-                  Text('...and ${state.errors.length - 5} more', style: Theme.of(context).textTheme.bodySmall),
-              ],
-            ],
-          ),
-        );
-      },
     );
   }
 }
