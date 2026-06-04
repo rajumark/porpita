@@ -53,31 +53,34 @@ class AppSidebar extends StatelessWidget {
               child: InkWell(
                 borderRadius: _borderRadius(index),
                 onTap: () => onItemSelected(index),
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 8, right: 16, top: 6, bottom: 6),
-                  child: Row(
-                    children: [
-                      if (icons != null && index < icons!.length) ...[
-                        Opacity(
-                          opacity: isSelected ? 1.0 : 0.8,
-                          child: Icon(
-                            isSelected && selectedIcons != null && index < selectedIcons!.length
-                                ? selectedIcons![index]
-                                : icons![index],
-                            size: 18,
+child: Padding(
+                    padding: const EdgeInsets.only(left: 8, right: 8, top: 6, bottom: 6),
+                    child: Row(
+                      children: [
+                        if (icons != null && index < icons!.length) ...[
+                          Opacity(
+                            opacity: isSelected ? 1.0 : 0.8,
+                            child: Icon(
+                              isSelected && selectedIcons != null && index < selectedIcons!.length
+                                  ? selectedIcons![index]
+                                  : icons![index],
+                              size: 18,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        Expanded(
+                          child: Text(
+                            items[index],
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: isSelected ? scheme.onSecondaryContainer : scheme.onSurface,
+                            ),
                           ),
                         ),
-                        const SizedBox(width: 8),
                       ],
-                      Text(
-                        items[index],
-                        style: TextStyle(
-                          color: isSelected ? scheme.onSecondaryContainer : scheme.onSurface,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
               ),
             );
           },

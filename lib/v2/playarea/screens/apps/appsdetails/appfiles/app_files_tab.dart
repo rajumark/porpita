@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:porpita/services/device_manager.dart';
 import 'app_files_service.dart';
+import 'app_file_entry_tile.dart';
 
 class AppFilesTab extends StatefulWidget {
   final String packageName;
@@ -261,54 +262,14 @@ class _AppFilesTabState extends State<AppFilesTab> with AutomaticKeepAliveClient
                   itemCount: sorted.length,
                   itemBuilder: (context, index) {
                     final entry = sorted[index];
-                    return _buildEntry(context, entry);
+                    return AppFileEntryTile(
+                      entry: entry,
+                      onDirectoryTap: () => _navigateTo(entry.name, true),
+                    );
                   },
                 ),
         ),
       ],
-    );
-  }
-
-  Widget _buildEntry(BuildContext context, AppFileEntry entry) {
-    final theme = Theme.of(context);
-    return InkWell(
-      onTap: entry.isDirectory ? () => _navigateTo(entry.name, true) : null,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Row(
-          children: [
-            Icon(
-              entry.isDirectory ? Icons.folder : Icons.insert_drive_file_outlined,
-              size: 18,
-              color: entry.isDirectory ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    entry.name,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      fontWeight: entry.isDirectory ? FontWeight.w600 : FontWeight.normal,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    '${entry.permissions}  ${entry.owner}:${entry.group}  ${entry.size}',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                      fontFamily: 'monospace',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (entry.isDirectory)
-              Icon(Icons.chevron_right, size: 16, color: theme.colorScheme.onSurfaceVariant),
-          ],
-        ),
-      ),
     );
   }
 }

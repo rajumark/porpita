@@ -8,6 +8,7 @@ import 'playarea/screens/apps/apps_base_screen.dart';
 import 'playarea/screens/settings/settings_screen.dart';
 import 'playarea/screens/terminal/terminal_screen.dart';
 import 'playarea/screens/debuginfo/debuginfo_screen.dart';
+import 'playarea/screens/ui_inspector/ui_inspector_screen.dart';
 import 'topbar/topbar.dart';
 import 'quickpanel/quick_panel.dart';
 
@@ -33,6 +34,8 @@ class _BaseScreenState extends State<BaseScreen> {
         return const TerminalScreen();
       case 3:
         return const DebugInfoScreen();
+      case 4:
+        return const UiInspectorScreen();
       default:
         return const SizedBox.shrink();
     }
