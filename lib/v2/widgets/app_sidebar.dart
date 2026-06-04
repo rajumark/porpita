@@ -15,7 +15,7 @@ class AppSidebar extends StatelessWidget {
     this.selectedIcons,
     required this.selectedIndex,
     required this.onItemSelected,
-    this.width = 140,
+    this.width = 180,
   });
 
   BorderRadius _borderRadius(int index) {

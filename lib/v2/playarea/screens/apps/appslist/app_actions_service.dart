@@ -18,7 +18,9 @@ enum AppAction {
   grantAllPermissions('Grant All Permissions'),
   revokeAllPermissions('Revoke All Permissions'),
   managePermissions('Manage Permissions'),
-  downloadApks('Download Apks');
+  downloadApks('Download Apks'),
+  pin('Pin it'),
+  unpin('Unpin it');
 
   final String label;
   const AppAction(this.label);
@@ -55,6 +57,8 @@ class AppActionsService {
       case AppAction.revokeAllPermissions:
       case AppAction.managePermissions:
       case AppAction.downloadApks:
+      case AppAction.pin:
+      case AppAction.unpin:
         break;
     }
   }
@@ -134,5 +138,7 @@ class AppActionsService {
     AppAction.appInfo,
     AppAction.playStore,
     AppAction.findOnline,
+    AppAction.pin,
+    AppAction.unpin,
   ];
 }

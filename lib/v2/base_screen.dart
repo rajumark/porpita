@@ -6,6 +6,9 @@ import 'package:porpita/services/device_manager.dart';
 import 'sidebar/sidebar.dart';
 import 'playarea/play_area.dart';
 import 'playarea/screens/apps/apps_base_screen.dart';
+import 'playarea/screens/calllogs/calllogs_base_screen.dart';
+import 'playarea/screens/messages/messages_base_screen.dart';
+import 'playarea/screens/contacts/contacts_base_screen.dart';
 import 'playarea/screens/settings/settings_screen.dart';
 import 'playarea/screens/terminal/terminal_screen.dart';
 import 'playarea/screens/debuginfo/debuginfo_screen.dart';
@@ -51,12 +54,18 @@ class _BaseScreenState extends State<BaseScreen> {
       case 0:
         return const AppsBaseScreen();
       case 1:
-        return const SettingsScreen();
+        return const CallLogsBaseScreen();
       case 2:
-        return const TerminalScreen();
+        return const MessagesBaseScreen();
       case 3:
-        return const DebugInfoScreen();
+        return const ContactsBaseScreen();
       case 4:
+        return const SettingsScreen();
+      case 5:
+        return const TerminalScreen();
+      case 6:
+        return const DebugInfoScreen();
+      case 7:
         return const UiInspectorScreen();
       default:
         return const SizedBox.shrink();
@@ -80,7 +89,7 @@ class _BaseScreenState extends State<BaseScreen> {
             child: Row(
               children: [
                 SizedBox(
-                  width: _showSidebar ? 140 : 0,
+                  width: _showSidebar ? 180 : 0,
                   child: _showSidebar
                       ? Sidebar(
                           selectedIndex: _selectedIndex,

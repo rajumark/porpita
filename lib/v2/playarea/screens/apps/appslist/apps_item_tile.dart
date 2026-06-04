@@ -8,6 +8,7 @@ class AppItemTile extends StatefulWidget {
   final VoidCallback onTap;
   final String packageName;
   final ValueChanged<AppAction>? onMenuItemSelected;
+  final bool isPinned;
 
   static const _mainActions = [
     AppAction.open,
@@ -39,6 +40,7 @@ class AppItemTile extends StatefulWidget {
     required this.onTap,
     required this.packageName,
     this.onMenuItemSelected,
+    this.isPinned = false,
   });
 
   @override
@@ -129,6 +131,14 @@ class _AppItemTileState extends State<AppItemTile> {
                     value: a.name,
                     child: Text(a.label),
                   )),
+                  PopupMenuItem<String>(
+                    value: widget.isPinned ? AppAction.unpin.name : AppAction.pin.name,
+                    child: Row(children: [
+                      Icon(widget.isPinned ? Icons.push_pin : Icons.push_pin_outlined, size: 18),
+                      const SizedBox(width: 8),
+                      Text(widget.isPinned ? 'Unpin it' : 'Pin it'),
+                    ]),
+                  ),
                   const PopupMenuDivider(),
                   const PopupMenuItem<String>(
                     value: '__more__',

@@ -7,6 +7,9 @@ import 'package:provider/provider.dart';
 import 'package:porpita/services/device_manager.dart';
 import 'package:porpita/v2/widgets/rounded_container.dart';
 import 'ui_inspector_service.dart';
+import 'xml_tree_model.dart';
+import 'xml_tree_widget.dart';
+import 'xml_tree_controls.dart';
 
 class UiInspectorScreen extends StatefulWidget {
   const UiInspectorScreen({super.key});
@@ -20,6 +23,13 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
   bool _loading = false;
   String? _lastDeviceId;
 
+  XmlTreeModel? _treeModel;
+  final Set<int> _expandedNodes = {};
+  final Set<int> _highlightedIndices = {};
+  XmlTreeMode _mode = XmlTreeMode.focus;
+  int _layersValue = 0;
+  int _focusValue = 0;
+
   Future<void> _refresh(String deviceId) async {
     if (_loading) return;
     setState(() => _loading = true);
@@ -31,8 +41,98 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
         _result = result;
         _loading = false;
         _lastDeviceId = deviceId;
+        _parseTree();
       });
     }
+  }
+
+  void _parseTree() {
+    final xml = _result?.xmlContent;
+    if (xml == null || xml.isEmpty) {
+      _treeModel = null;
+      return;
+    }
+
+    _treeModel = XmlTreeModel.parse(xml);
+    _expandedNodes.clear();
+    _highlightedIndices.clear();
+    _layersValue = 0;
+    _focusValue = 0;
+
+    if (_treeModel != null) {
+      _expandedNodes.add(_treeModel!.root.flatIndex);
+      _expandToDepth(1);
+    }
+  }
+
+  void _expandToDepth(int depth) {
+    if (_treeModel == null) return;
+    _expandNodeToDepth(_treeModel!.root, depth);
+  }
+
+  void _expandNodeToDepth(XmlNode node, int maxDepth) {
+    if (node.depth >= maxDepth) return;
+    if (node.hasChildren) {
+      _expandedNodes.add(node.flatIndex);
+      for (final child in node.children) {
+        _expandNodeToDepth(child, maxDepth);
+      }
+    }
+  }
+
+  void _onToggleExpand(int flatIndex) {
+    setState(() {
+      if (_expandedNodes.contains(flatIndex)) {
+        _expandedNodes.remove(flatIndex);
+      } else {
+        _expandedNodes.add(flatIndex);
+      }
+    });
+  }
+
+  void _onModeChanged(XmlTreeMode mode) {
+    setState(() {
+      _mode = mode;
+      if (mode == XmlTreeMode.layers) {
+        _applyLayersHighlight();
+      } else {
+        _applyFocusHighlight();
+      }
+    });
+  }
+
+  void _onLayersChanged(int value) {
+    setState(() {
+      _layersValue = value;
+      _applyLayersHighlight();
+    });
+  }
+
+  void _onFocusChanged(int value) {
+    setState(() {
+      _focusValue = value;
+      _applyFocusHighlight();
+    });
+  }
+
+  void _applyLayersHighlight() {
+    if (_treeModel == null) return;
+    _expandToDepth(_layersValue + 1);
+    _highlightedIndices
+      ..clear()
+      ..addAll(_treeModel!.getNodesAtDepth(_layersValue).map((n) => n.flatIndex));
+  }
+
+  void _applyFocusHighlight() {
+    if (_treeModel == null) return;
+    final node = _treeModel!.getNodeAtFlatIndex(_focusValue);
+    if (node == null) return;
+
+    final ancestors = _treeModel!.getAncestorFlatIndices(_focusValue);
+    _expandedNodes.addAll(ancestors);
+    _highlightedIndices
+      ..clear()
+      ..add(_focusValue);
   }
 
   @override
@@ -144,39 +244,55 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
   }
 
   Widget _buildXmlPanel() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final xml = _result?.xmlContent;
 
     if (xml == null || xml.isEmpty) {
       return const Center(child: Text('No XML content'));
     }
 
-    return Stack(
+    if (_treeModel == null) {
+      return const Center(child: Text('Failed to parse XML'));
+    }
+
+    return Column(
       children: [
-        SingleChildScrollView(
-          padding: const EdgeInsets.all(8),
-          child: SelectableText(
-            xml,
-            style: TextStyle(
-              fontFamily: 'monospace',
-              fontSize: 11,
-              color: isDark ? const Color(0xFFCDD6F4) : Colors.black87,
-            ),
-          ),
+        XmlTreeControls(
+          mode: _mode,
+          layersValue: _layersValue,
+          maxDepth: _treeModel!.maxDepth,
+          layersNodeCount: _highlightedIndices.length,
+          focusValue: _focusValue,
+          totalNodes: _treeModel!.totalNodes,
+          focusNodeLabel: _treeModel!.getNodeAtFlatIndex(_focusValue)?.shortTag,
+          onModeChanged: _onModeChanged,
+          onLayersChanged: _onLayersChanged,
+          onFocusChanged: _onFocusChanged,
         ),
-        Positioned(
-          top: 4,
-          right: 4,
-          child: IconButton(
-            icon: const Icon(Icons.copy, size: 18),
-            tooltip: 'Copy XML',
-            visualDensity: VisualDensity.compact,
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: xml));
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('XML copied'), duration: Duration(seconds: 1)),
-              );
-            },
+        Expanded(
+          child: Stack(
+            children: [
+              XmlTreeWidget(
+                treeModel: _treeModel!,
+                expandedNodes: _expandedNodes,
+                highlightedIndices: _highlightedIndices,
+                onToggleExpand: _onToggleExpand,
+              ),
+              Positioned(
+                top: 4,
+                right: 4,
+                child: IconButton(
+                  icon: const Icon(Icons.copy, size: 18),
+                  tooltip: 'Copy XML',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: xml));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('XML copied'), duration: Duration(seconds: 1)),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ),
       ],

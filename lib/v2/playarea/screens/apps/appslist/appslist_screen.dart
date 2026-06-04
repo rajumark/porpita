@@ -11,6 +11,7 @@ import 'appinstall/app_install_service.dart';
 import 'appinstall/app_install_dialog.dart';
 import 'current_app/current_app_service.dart';
 import 'apps_action_handler.dart';
+import 'pinned_apps_service.dart';
 
 class AppsListScreen extends StatefulWidget {
   final void Function(String packageName, {int tabIndex}) onAppSelected;
@@ -31,6 +32,7 @@ class _AppsListScreenState extends State<AppsListScreen> {
   AppFilter _selectedFilter = AppFilter.all;
   final _searchController = TextEditingController();
   static const _filterKey = 'apps_filter_index';
+  Set<String> _pinnedApps = {};
 
   Timer? _appsTimer;
   Timer? _currentAppTimer;
@@ -42,6 +44,7 @@ class _AppsListScreenState extends State<AppsListScreen> {
     super.initState();
     _searchController.addListener(_onSearchChanged);
     _loadFilter();
+    _loadPinnedApps();
   }
 
   @override
@@ -82,6 +85,21 @@ class _AppsListScreenState extends State<AppsListScreen> {
   Future<void> _saveFilter(AppFilter filter) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_filterKey, filter.index);
+  }
+
+  Future<void> _loadPinnedApps() async {
+    final pinnedApps = await PinnedAppsService.loadPinnedApps();
+    if (mounted) {
+      setState(() => _pinnedApps = pinnedApps);
+    }
+  }
+
+  Future<void> _togglePin(String packageName) async {
+    await PinnedAppsService.togglePin(packageName);
+    final pinnedApps = await PinnedAppsService.loadPinnedApps();
+    if (mounted) {
+      setState(() => _pinnedApps = pinnedApps);
+    }
   }
 
   void _onSearchChanged() {
@@ -193,6 +211,10 @@ class _AppsListScreenState extends State<AppsListScreen> {
   }
 
   void _handleAppAction(AppAction action, String packageName) {
+    if (action == AppAction.pin || action == AppAction.unpin) {
+      _togglePin(packageName);
+      return;
+    }
     AppsActionHandler.handleAppAction(
       context: context,
       action: action,
@@ -297,6 +319,7 @@ class _AppsListScreenState extends State<AppsListScreen> {
       userApps: _userApps,
       selectedFilter: _selectedFilter,
       searchQuery: _searchQuery,
+      pinnedApps: _pinnedApps,
       onAppSelected: (packageName) => widget.onAppSelected(packageName),
       onAppAction: _handleAppAction,
     );
