@@ -12,6 +12,7 @@ import 'content_providers/content_providers_tab.dart';
 import 'keyset/keyset_tab.dart';
 import 'packages/packages_tab.dart';
 import 'paths/paths_tab.dart';
+import 'appfiles/app_files_tab.dart';
 import 'rawdata/raw_data_tab.dart';
 
 class AppDetailsScreen extends StatefulWidget {
@@ -29,7 +30,7 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 13, vsync: this);
+    _tabController = TabController(length: 14, vsync: this);
   }
 
   @override
@@ -81,6 +82,7 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerPr
               Tab(text: 'Key Set'),
               Tab(text: 'Packages'),
               Tab(text: 'Paths'),
+              Tab(text: 'App Files'),
               Tab(text: 'Raw Data'),
             ],
           ),
@@ -100,6 +102,7 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerPr
                 KeySetTab(packageName: widget.packageName),
                 PackagesTab(packageName: widget.packageName),
                 PathsTab(packageName: widget.packageName),
+                AppFilesTab(packageName: widget.packageName),
                 RawDataTab(packageName: widget.packageName),
               ],
             ),
