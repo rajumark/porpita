@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:porpita/v2/widgets/rounded_container.dart';
 import 'appslist/appslist_screen.dart';
 import 'appsdetails/app_details_screen.dart';
-
+ 
 class AppsBaseScreen extends StatefulWidget {
   const AppsBaseScreen({super.key});
 
