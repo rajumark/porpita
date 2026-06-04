@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:porpita/services/device_manager.dart';
 import 'sidebar/sidebar.dart';
@@ -20,9 +21,30 @@ class BaseScreen extends StatefulWidget {
 }
 
 class _BaseScreenState extends State<BaseScreen> {
+  static const _selectedIndexKey = 'sidebar_selected_index';
+
   int _selectedIndex = 0;
   bool _showSidebar = true;
   bool _showQuickSettings = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSelectedIndex();
+  }
+
+  Future<void> _loadSelectedIndex() async {
+    final prefs = await SharedPreferences.getInstance();
+    final index = prefs.getInt(_selectedIndexKey) ?? 0;
+    if (mounted) {
+      setState(() => _selectedIndex = index);
+    }
+  }
+
+  Future<void> _saveSelectedIndex(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_selectedIndexKey, index);
+  }
 
   Widget _buildScreen(int index) {
     switch (index) {
@@ -64,6 +86,7 @@ class _BaseScreenState extends State<BaseScreen> {
                           selectedIndex: _selectedIndex,
                           onItemSelected: (index) {
                             setState(() => _selectedIndex = index);
+                            _saveSelectedIndex(index);
                           },
                         )
                       : const SizedBox.shrink(),
