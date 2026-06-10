@@ -48,3 +48,7 @@ class ScreenCaptureService {
     return '/';
   }
 }
+
+class CaptureWindowIntent extends Intent {
+  const CaptureWindowIntent();
+}

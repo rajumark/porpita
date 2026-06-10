@@ -89,16 +89,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
+      - name: Get version from pubspec.yaml
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d'+' -f1)
+          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
       - name: List downloaded artifacts
         run: ls -la porpita-*/*
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN_FLUTTER }}
         run: |
-          TAG="build-${{ github.run_number }}-${{ github.run_attempt }}"
+          TAG="v${{ env.APP_VERSION }}"
           gh release create "$TAG" \
             porpita-macos/porpita-macos.zip \
             porpita-linux/porpita-linux.zip \
             porpita-windows/porpita-windows.zip \
-            --title "Build $TAG" \
-            --notes "Release triggered by commit: ${{ github.event.head_commit.message }}"
+            --title "v${{ env.APP_VERSION }}" \
+            --notes "Release version v${{ env.APP_VERSION }} triggered by commit: ${{ github.event.head_commit.message }}"

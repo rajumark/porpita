@@ -1,7 +1,4 @@
-import 'dart:io' show Platform;
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -97,65 +94,46 @@ class _BaseScreenState extends State<BaseScreen> {
     final dm = context.watch<DeviceManager>();
     final deviceId = dm.selected?.id;
 
-    final bool isMac = Platform.isMacOS;
-
-    return Shortcuts(
-      shortcuts: <ShortcutActivator, Intent>{
-        SingleActivator(
-          LogicalKeyboardKey.keyH,
-          control: !isMac,
-          meta: isMac,
-          shift: true,
-        ): const _CaptureWindowIntent(),
-      },
-      child: Actions(
-        actions: <Type, Action<Intent>>{
-          _CaptureWindowIntent: CallbackAction<_CaptureWindowIntent>(
-            onInvoke: (_) => ScreenCaptureService.captureAndSave(context),
-          ),
-        },
-        child: Screenshot(
-          controller: ScreenCaptureService.controller,
-          child: Scaffold(
-            backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-            body: Column(
-              children: [
-                TopBar(
-                  onMenuTap: () => setState(() => _showSidebar = !_showSidebar),
-                  onQuickSettingsTap: () =>
-                      setState(() => _showQuickSettings = !_showQuickSettings),
-                ),
-                Expanded(
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: _showSidebar ? 180 : 0,
-                        child: _showSidebar
-                            ? Sidebar(
-                                selectedIndex: _selectedIndex,
-                                onItemSelected: (index) {
-                                  setState(() => _selectedIndex = index);
-                                  _saveSelectedIndex(index);
-                                },
-                              )
-                            : const SizedBox.shrink(),
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding:
-                              EdgeInsets.only(left: _showSidebar ? 0 : 8),
-                          child:
-                              PlayArea(child: _buildScreen(_selectedIndex)),
-                        ),
-                      ),
-                      if (_showQuickSettings && deviceId != null)
-                        QuickPanel(deviceId: deviceId),
-                    ],
-                  ),
-                ),
-              ],
+    return Screenshot(
+      controller: ScreenCaptureService.controller,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+        body: Column(
+          children: [
+            TopBar(
+              onMenuTap: () => setState(() => _showSidebar = !_showSidebar),
+              onQuickSettingsTap: () =>
+                  setState(() => _showQuickSettings = !_showQuickSettings),
             ),
-          ),
+            Expanded(
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: _showSidebar ? 180 : 0,
+                    child: _showSidebar
+                        ? Sidebar(
+                            selectedIndex: _selectedIndex,
+                            onItemSelected: (index) {
+                              setState(() => _selectedIndex = index);
+                              _saveSelectedIndex(index);
+                            },
+                          )
+                        : const SizedBox.shrink(),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding:
+                          EdgeInsets.only(left: _showSidebar ? 0 : 8),
+                      child:
+                          PlayArea(child: _buildScreen(_selectedIndex)),
+                    ),
+                  ),
+                  if (_showQuickSettings && deviceId != null)
+                    QuickPanel(deviceId: deviceId),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -163,6 +141,3 @@ class _BaseScreenState extends State<BaseScreen> {
 
 }
 
-class _CaptureWindowIntent extends Intent {
-  const _CaptureWindowIntent();
-}
