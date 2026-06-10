@@ -6,7 +6,7 @@
   <title>Porpita — The Desktop GUI for Android Debug Bridge</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Display:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -14,34 +14,40 @@
     :root {
       --md-sys-color-primary: #006B5E;
       --md-sys-color-on-primary: #FFFFFF;
-      --md-sys-color-primary-container: #7CF8E1;
-      --md-sys-color-on-primary-container: #002019;
+      --md-sys-color-primary-container: #74F8E2;
+      --md-sys-color-on-primary-container: #00201B;
       --md-sys-color-secondary: #4A635C;
       --md-sys-color-on-secondary: #FFFFFF;
-      --md-sys-color-secondary-container: #CCE9DF;
-      --md-sys-color-on-secondary-container: #06201A;
-      --md-sys-color-tertiary: #426277;
+      --md-sys-color-secondary-container: #CCE8DF;
+      --md-sys-color-on-secondary-container: #05201A;
+      --md-sys-color-tertiary: #416278;
       --md-sys-color-on-tertiary: #FFFFFF;
-      --md-sys-color-tertiary-container: #C8E6FF;
-      --md-sys-color-on-tertiary-container: #001E2E;
+      --md-sys-color-tertiary-container: #C7E7FF;
+      --md-sys-color-on-tertiary-container: #001E2F;
       --md-sys-color-error: #BA1A1A;
-      --md-sys-color-background: #FBFDF9;
+      --md-sys-color-background: #FAFDFA;
       --md-sys-color-on-background: #191C1B;
-      --md-sys-color-surface: #FBFDF9;
+      --md-sys-color-surface: #FAFDFA;
       --md-sys-color-on-surface: #191C1B;
-      --md-sys-color-surface-variant: #DBE5DE;
+      --md-sys-color-surface-dim: #D9DDD9;
+      --md-sys-color-surface-bright: #FAFDFA;
+      --md-sys-color-surface-container-lowest: #FFFFFF;
+      --md-sys-color-surface-container-low: #F3F6F3;
+      --md-sys-color-surface-container: #EDEFE9;
+      --md-sys-color-surface-container-high: #E7EAE6;
+      --md-sys-color-surface-container-highest: #E2E5E1;
       --md-sys-color-on-surface-variant: #3F4944;
       --md-sys-color-outline: #6F7974;
       --md-sys-color-outline-variant: #BFC9C2;
       --md-sys-color-shadow: #000000;
-      --md-sys-color-inverse-surface: #2D3130;
+      --md-sys-color-inverse-surface: #2D312F;
       --md-sys-color-inverse-on-surface: #EFF1ED;
       --md-sys-color-inverse-primary: #5EDBC5;
-      --md-elevation-1: 0 1px 3px 1px rgba(0,0,0,0.15), 0 1px 2px 0 rgba(0,0,0,0.30);
-      --md-elevation-2: 0 2px 6px 2px rgba(0,0,0,0.15), 0 1px 2px 0 rgba(0,0,0,0.30);
-      --md-elevation-3: 0 4px 8px 3px rgba(0,0,0,0.15), 0 1px 3px 0 rgba(0,0,0,0.30);
-      --md-elevation-4: 0 6px 10px 4px rgba(0,0,0,0.15), 0 2px 3px 0 rgba(0,0,0,0.30);
-      --md-elevation-5: 0 8px 12px 6px rgba(0,0,0,0.15), 0 4px 4px 0 rgba(0,0,0,0.30);
+      --md-elevation-1: 0 1px 3px 1px rgba(0,0,0,0.08), 0 1px 2px 0 rgba(0,0,0,0.15);
+      --md-elevation-2: 0 2px 6px 2px rgba(0,0,0,0.08), 0 1px 2px 0 rgba(0,0,0,0.15);
+      --md-elevation-3: 0 4px 8px 3px rgba(0,0,0,0.08), 0 1px 3px 0 rgba(0,0,0,0.15);
+      --md-elevation-4: 0 6px 10px 4px rgba(0,0,0,0.08), 0 2px 3px 0 rgba(0,0,0,0.15);
+      --md-elevation-5: 0 8px 12px 6px rgba(0,0,0,0.08), 0 4px 4px 0 rgba(0,0,0,0.15);
       --md-shape-extra-small: 4px;
       --md-shape-small: 8px;
       --md-shape-medium: 12px;
@@ -49,16 +55,19 @@
       --md-shape-extra-large: 28px;
       --md-shape-full: 9999px;
       --max-width: 1200px;
+      --font-display: 'Google Sans Display', 'Google Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-body: 'Google Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: var(--font-body);
       background: var(--md-sys-color-background);
       color: var(--md-sys-color-on-background);
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
 
     .container {
@@ -67,6 +76,59 @@
       padding: 0 24px;
     }
 
+    /* ─── Animations ─── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(32px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-12px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.7; }
+    }
+
+    .animate-on-scroll {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s cubic-bezier(0.2, 0, 0, 1), transform 0.7s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .animate-on-scroll.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .animate-on-scroll.delay-1 { transition-delay: 0.1s; }
+    .animate-on-scroll.delay-2 { transition-delay: 0.2s; }
+    .animate-on-scroll.delay-3 { transition-delay: 0.3s; }
+    .animate-on-scroll.delay-4 { transition-delay: 0.4s; }
+    .animate-on-scroll.delay-5 { transition-delay: 0.5s; }
+
     /* ─── Navbar ─── */
     nav {
       position: fixed;
@@ -74,10 +136,16 @@
       left: 0;
       right: 0;
       z-index: 100;
-      background: rgba(251, 253, 249, 0.80);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+      background: rgba(250, 253, 250, 0.75);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid rgba(191, 201, 194, 0.5);
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+    nav.scrolled {
+      background: rgba(250, 253, 250, 0.92);
+      box-shadow: var(--md-elevation-1);
     }
 
     nav .container {
@@ -91,7 +159,8 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 20px;
+      font-family: var(--font-display);
+      font-size: 22px;
       font-weight: 700;
       color: var(--md-sys-color-primary);
       text-decoration: none;
@@ -105,10 +174,11 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 4px;
     }
 
     .nav-links a {
+      position: relative;
       padding: 8px 16px;
       border-radius: var(--md-shape-full);
       font-size: 14px;
@@ -116,10 +186,28 @@
       color: var(--md-sys-color-on-surface-variant);
       text-decoration: none;
       transition: background 0.2s, color 0.2s;
+      letter-spacing: 0.1px;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%) scaleX(0);
+      width: 24px;
+      height: 3px;
+      border-radius: var(--md-shape-full);
+      background: var(--md-sys-color-primary);
+      transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .nav-links a:hover::after {
+      transform: translateX(-50%) scaleX(1);
     }
 
     .nav-links a:hover {
-      background: var(--md-sys-color-surface-variant);
+      background: var(--md-sys-color-surface-container);
       color: var(--md-sys-color-on-surface);
     }
 
@@ -130,13 +218,14 @@
       gap: 8px;
       padding: 10px 24px;
       border-radius: var(--md-shape-full);
-      font-family: inherit;
+      font-family: var(--font-body);
       font-size: 14px;
       font-weight: 600;
       text-decoration: none;
       border: none;
       cursor: pointer;
-      transition: box-shadow 0.2s, transform 0.15s, background 0.2s;
+      transition: box-shadow 0.25s cubic-bezier(0.2, 0, 0, 1), transform 0.2s, background 0.2s;
+      letter-spacing: 0.1px;
     }
 
     .btn:hover { transform: translateY(-1px); }
@@ -160,6 +249,7 @@
 
     .btn-tonal:hover {
       background: #BBDDD3;
+      box-shadow: var(--md-elevation-1);
     }
 
     .btn-outline {
@@ -176,33 +266,36 @@
 
     /* ─── Hero ─── */
     .hero {
-      padding: 140px 0 80px;
+      padding: 160px 0 100px;
       position: relative;
       overflow: hidden;
+      background: linear-gradient(180deg, #E8F5F0 0%, var(--md-sys-color-background) 100%);
     }
 
     .hero::before {
       content: '';
       position: absolute;
-      top: -30%;
-      right: -20%;
-      width: 700px;
-      height: 700px;
+      top: -40%;
+      right: -15%;
+      width: 800px;
+      height: 800px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(124, 248, 225, 0.3) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(116, 248, 226, 0.35) 0%, transparent 65%);
       pointer-events: none;
+      animation: pulse 6s ease-in-out infinite;
     }
 
     .hero::after {
       content: '';
       position: absolute;
-      bottom: -20%;
+      bottom: -25%;
       left: -10%;
-      width: 500px;
-      height: 500px;
+      width: 600px;
+      height: 600px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(200, 230, 255, 0.25) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(199, 231, 255, 0.3) 0%, transparent 65%);
       pointer-events: none;
+      animation: pulse 8s ease-in-out infinite 2s;
     }
 
     .hero .container {
@@ -214,17 +307,22 @@
       align-items: center;
     }
 
+    .hero-content {
+      animation: slideInLeft 0.9s cubic-bezier(0.2, 0, 0, 1) both;
+    }
+
     .hero-content h1 {
-      font-size: 52px;
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -1.5px;
+      font-family: var(--font-display);
+      font-size: 64px;
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -2px;
       color: var(--md-sys-color-on-background);
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     .hero-content h1 span {
-      background: linear-gradient(135deg, var(--md-sys-color-primary), #009688);
+      background: linear-gradient(135deg, var(--md-sys-color-primary) 0%, #00A88E 50%, #00BFA5 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -234,15 +332,17 @@
       font-size: 18px;
       color: var(--md-sys-color-on-surface-variant);
       line-height: 1.7;
-      margin-bottom: 32px;
+      margin-bottom: 36px;
       max-width: 520px;
+      animation: fadeInUp 0.9s cubic-bezier(0.2, 0, 0, 1) 0.2s both;
     }
 
     .hero-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      margin-bottom: 40px;
+      margin-bottom: 44px;
+      animation: fadeInUp 0.9s cubic-bezier(0.2, 0, 0, 1) 0.35s both;
     }
 
     .hero-badge {
@@ -250,6 +350,7 @@
       align-items: center;
       gap: 24px;
       flex-wrap: wrap;
+      animation: fadeInUp 0.9s cubic-bezier(0.2, 0, 0, 1) 0.5s both;
     }
 
     .hero-badge-item {
@@ -270,16 +371,18 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      animation: scaleIn 0.9s cubic-bezier(0.2, 0, 0, 1) 0.3s both;
     }
 
     .hero-card {
       width: 100%;
       max-width: 520px;
-      background: var(--md-sys-color-surface);
+      background: var(--md-sys-color-surface-container-lowest);
       border-radius: var(--md-shape-extra-large);
-      box-shadow: var(--md-elevation-3);
+      box-shadow: var(--md-elevation-4);
       border: 1px solid var(--md-sys-color-outline-variant);
       overflow: hidden;
+      animation: float 6s ease-in-out infinite;
     }
 
     .hero-card-top {
@@ -300,9 +403,10 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      padding: 4px 12px;
+      padding: 6px 14px;
       border-radius: var(--md-shape-full);
-      background: rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(8px);
       font-size: 12px;
       font-weight: 500;
       color: var(--md-sys-color-on-primary-container);
@@ -311,6 +415,7 @@
     .hero-card-top .chip .icon { font-size: 14px; }
 
     .hero-card-top h3 {
+      font-family: var(--font-display);
       font-size: 22px;
       font-weight: 700;
       color: var(--md-sys-color-on-primary-container);
@@ -333,6 +438,13 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      padding: 12px;
+      border-radius: var(--md-shape-medium);
+      transition: background 0.2s;
+    }
+
+    .hero-card-stat:hover {
+      background: var(--md-sys-color-surface-container);
     }
 
     .hero-card-stat .icon {
@@ -356,97 +468,137 @@
       color: var(--md-sys-color-on-surface-variant);
     }
 
-    /* ─── Section Tabs ─── */
+    /* ─── Wave Divider ─── */
+    .wave-divider {
+      width: 100%;
+      overflow: hidden;
+      line-height: 0;
+      margin-top: -1px;
+    }
+
+    .wave-divider svg {
+      display: block;
+      width: 100%;
+      height: 80px;
+    }
+
+    .wave-divider.flip {
+      transform: rotate(180deg);
+      margin-top: 0;
+      margin-bottom: -1px;
+    }
+
+    /* ─── Section Headers ─── */
     .section-header {
       text-align: center;
-      max-width: 640px;
-      margin: 0 auto 56px;
+      max-width: 680px;
+      margin: 0 auto 64px;
     }
 
     .section-header .overline {
-      font-size: 13px;
-      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 1.5px;
       color: var(--md-sys-color-primary);
-      margin-bottom: 12px;
+      margin-bottom: 16px;
+      padding: 6px 16px;
+      border-radius: var(--md-shape-full);
+      background: var(--md-sys-color-primary-container);
     }
 
     .section-header h2 {
-      font-size: 36px;
+      font-family: var(--font-display);
+      font-size: 44px;
       font-weight: 700;
-      letter-spacing: -0.5px;
-      line-height: 1.2;
+      letter-spacing: -1px;
+      line-height: 1.15;
       margin-bottom: 16px;
       color: var(--md-sys-color-on-background);
     }
 
     .section-header p {
-      font-size: 16px;
+      font-size: 17px;
       color: var(--md-sys-color-on-surface-variant);
       line-height: 1.7;
     }
 
-    section { padding: 80px 0; }
+    section { padding: 96px 0; }
 
-    section.alt-bg {
-      background: var(--md-sys-color-surface-variant);
+    section.dark-section {
+      background: var(--md-sys-color-inverse-surface);
+      color: var(--md-sys-color-inverse-on-surface);
+    }
+
+    section.dark-section .section-header h2 {
+      color: var(--md-sys-color-inverse-on-surface);
+    }
+
+    section.dark-section .section-header p {
+      color: rgba(239, 241, 237, 0.7);
+    }
+
+    section.surface-section {
+      background: var(--md-sys-color-surface-container);
     }
 
     /* ─── Features ─── */
     .features-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      gap: 20px;
     }
 
     .feature-card {
-      background: var(--md-sys-color-surface);
-      border-radius: var(--md-shape-large);
-      padding: 28px;
+      background: var(--md-sys-color-surface-container-lowest);
+      border-radius: var(--md-shape-extra-large);
+      padding: 32px;
       border: 1px solid var(--md-sys-color-outline-variant);
-      box-shadow: var(--md-elevation-1);
-      transition: box-shadow 0.25s, transform 0.25s;
+      transition: box-shadow 0.3s cubic-bezier(0.2, 0, 0, 1), transform 0.3s cubic-bezier(0.2, 0, 0, 1);
     }
 
     .feature-card:hover {
       box-shadow: var(--md-elevation-3);
-      transform: translateY(-4px);
+      transform: translateY(-6px);
     }
 
     .feature-card .icon {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 48px;
-      height: 48px;
-      border-radius: var(--md-shape-medium);
+      width: 56px;
+      height: 56px;
+      border-radius: var(--md-shape-large);
       background: var(--md-sys-color-primary-container);
       color: var(--md-sys-color-on-primary-container);
-      font-size: 24px;
-      margin-bottom: 16px;
+      font-size: 28px;
+      margin-bottom: 20px;
     }
 
     .feature-card h3 {
-      font-size: 18px;
+      font-family: var(--font-display);
+      font-size: 20px;
       font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       color: var(--md-sys-color-on-surface);
     }
 
     .feature-card p {
       font-size: 14px;
       color: var(--md-sys-color-on-surface-variant);
-      line-height: 1.6;
+      line-height: 1.65;
     }
 
     /* ─── Feature highlight ─── */
     .feature-highlight {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 48px;
+      gap: 64px;
       align-items: center;
-      margin-bottom: 80px;
+      margin-bottom: 96px;
     }
 
     .feature-highlight:last-child { margin-bottom: 0; }
@@ -456,48 +608,50 @@
     .feature-text .chip {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 4px 12px;
+      gap: 6px;
+      padding: 6px 16px;
       border-radius: var(--md-shape-full);
       background: var(--md-sys-color-primary-container);
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--md-sys-color-on-primary-container);
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
 
     .feature-text h3 {
-      font-size: 28px;
+      font-family: var(--font-display);
+      font-size: 32px;
       font-weight: 700;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.5px;
       margin-bottom: 16px;
       color: var(--md-sys-color-on-background);
     }
 
     .feature-text p {
-      font-size: 15px;
+      font-size: 16px;
       color: var(--md-sys-color-on-surface-variant);
       line-height: 1.7;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     .feature-text ul {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 12px;
     }
 
     .feature-text ul li {
       display: flex;
       align-items: flex-start;
-      gap: 10px;
-      font-size: 14px;
+      gap: 12px;
+      font-size: 15px;
       color: var(--md-sys-color-on-surface-variant);
+      line-height: 1.5;
     }
 
     .feature-text ul li .icon {
-      font-size: 18px;
+      font-size: 20px;
       color: var(--md-sys-color-primary);
       flex-shrink: 0;
       margin-top: 1px;
@@ -512,11 +666,17 @@
     .feature-visual .mock-card {
       width: 100%;
       max-width: 480px;
-      border-radius: var(--md-shape-large);
-      background: var(--md-sys-color-surface);
+      border-radius: var(--md-shape-extra-large);
+      background: var(--md-sys-color-surface-container-lowest);
       border: 1px solid var(--md-sys-color-outline-variant);
-      box-shadow: var(--md-elevation-2);
+      box-shadow: var(--md-elevation-3);
       overflow: hidden;
+      transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.4s;
+    }
+
+    .feature-visual .mock-card:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: var(--md-elevation-5);
     }
 
     .mock-card-header {
@@ -525,11 +685,12 @@
       gap: 12px;
       padding: 16px 20px;
       border-bottom: 1px solid var(--md-sys-color-outline-variant);
+      background: var(--md-sys-color-surface-container);
     }
 
     .mock-card-header .dot {
-      width: 10px;
-      height: 10px;
+      width: 12px;
+      height: 12px;
       border-radius: 50%;
     }
 
@@ -545,14 +706,14 @@
     }
 
     .mock-card-body {
-      padding: 20px;
+      padding: 24px;
     }
 
     .mock-card-body .row {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 8px 0;
+      padding: 10px 0;
     }
 
     .mock-card-body .row .icon {
@@ -564,7 +725,7 @@
       flex: 1;
       height: 8px;
       border-radius: var(--md-shape-full);
-      background: var(--md-sys-color-surface-variant);
+      background: var(--md-sys-color-surface-container-high);
       overflow: hidden;
     }
 
@@ -572,6 +733,7 @@
       height: 100%;
       border-radius: var(--md-shape-full);
       background: var(--md-sys-color-primary);
+      transition: width 1s cubic-bezier(0.2, 0, 0, 1);
     }
 
     .mock-card-body .row .bar .fill.green { background: #4CAF50; width: 72%; }
@@ -596,7 +758,7 @@
     .mock-card-footer .chip {
       padding: 4px 12px;
       border-radius: var(--md-shape-full);
-      background: var(--md-sys-color-surface-variant);
+      background: var(--md-sys-color-surface-container);
       font-size: 11px;
       font-weight: 500;
       color: var(--md-sys-color-on-surface-variant);
@@ -606,33 +768,42 @@
     .stats-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
+      gap: 20px;
       text-align: center;
     }
 
     .stat-card {
-      padding: 32px 16px;
-      border-radius: var(--md-shape-large);
-      background: var(--md-sys-color-surface);
+      padding: 40px 20px;
+      border-radius: var(--md-shape-extra-large);
+      background: var(--md-sys-color-surface-container-lowest);
       border: 1px solid var(--md-sys-color-outline-variant);
+      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--md-elevation-2);
     }
 
     .stat-card .icon {
-      font-size: 36px;
+      font-size: 40px;
       color: var(--md-sys-color-primary);
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
     .stat-card h4 {
-      font-size: 32px;
+      font-family: var(--font-display);
+      font-size: 36px;
       font-weight: 700;
       color: var(--md-sys-color-on-background);
+      letter-spacing: -0.5px;
     }
 
     .stat-card p {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 500;
       color: var(--md-sys-color-on-surface-variant);
+      margin-top: 4px;
     }
 
     /* ─── Downloads ─── */
@@ -645,31 +816,32 @@
       justify-content: center;
       gap: 16px;
       flex-wrap: wrap;
-      margin-top: 40px;
+      margin-top: 48px;
     }
 
     .download-card {
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 20px 32px;
-      border-radius: var(--md-shape-large);
-      background: var(--md-sys-color-surface);
+      gap: 20px;
+      padding: 24px 36px;
+      border-radius: var(--md-shape-extra-large);
+      background: var(--md-sys-color-surface-container-lowest);
       border: 1px solid var(--md-sys-color-outline-variant);
       box-shadow: var(--md-elevation-1);
       text-decoration: none;
       color: inherit;
-      transition: box-shadow 0.25s, transform 0.25s;
-      min-width: 200px;
+      transition: box-shadow 0.3s cubic-bezier(0.2, 0, 0, 1), transform 0.3s cubic-bezier(0.2, 0, 0, 1), border-color 0.3s;
+      min-width: 220px;
     }
 
     .download-card:hover {
-      box-shadow: var(--md-elevation-3);
-      transform: translateY(-3px);
+      box-shadow: var(--md-elevation-4);
+      transform: translateY(-4px);
+      border-color: var(--md-sys-color-primary);
     }
 
     .download-card .icon {
-      font-size: 32px;
+      font-size: 36px;
       color: var(--md-sys-color-primary);
     }
 
@@ -677,8 +849,9 @@
 
     .download-card div strong {
       display: block;
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 600;
+      font-family: var(--font-display);
     }
 
     .download-card div span {
@@ -690,44 +863,52 @@
     .usecases-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      gap: 20px;
     }
 
     .usecase-card {
       text-align: center;
-      padding: 32px 24px;
-      border-radius: var(--md-shape-large);
-      background: var(--md-sys-color-surface);
+      padding: 40px 28px;
+      border-radius: var(--md-shape-extra-large);
+      background: var(--md-sys-color-surface-container-lowest);
       border: 1px solid var(--md-sys-color-outline-variant);
+      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s;
+    }
+
+    .usecase-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--md-elevation-2);
     }
 
     .usecase-card .icon {
-      font-size: 40px;
+      font-size: 44px;
       color: var(--md-sys-color-tertiary);
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
 
     .usecase-card h3 {
-      font-size: 17px;
+      font-family: var(--font-display);
+      font-size: 18px;
       font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .usecase-card p {
       font-size: 14px;
       color: var(--md-sys-color-on-surface-variant);
-      line-height: 1.6;
+      line-height: 1.65;
     }
 
     /* ─── Footer ─── */
     footer {
-      padding: 40px 0;
+      padding: 48px 0;
       border-top: 1px solid var(--md-sys-color-outline-variant);
       text-align: center;
+      background: var(--md-sys-color-surface-container);
     }
 
     footer p {
-      font-size: 13px;
+      font-size: 14px;
       color: var(--md-sys-color-on-surface-variant);
     }
 
@@ -740,19 +921,25 @@
     @media (max-width: 1024px) {
       .features-grid { grid-template-columns: repeat(2, 1fr); }
       .usecases-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-content h1 { font-size: 48px; }
+      .section-header h2 { font-size: 36px; }
     }
 
     @media (max-width: 900px) {
       .hero .container {
         grid-template-columns: 1fr;
-        gap: 40px;
+        gap: 48px;
+        text-align: center;
       }
 
-      .hero-content h1 { font-size: 38px; }
+      .hero-content h1 { font-size: 42px; }
+      .hero-subtitle { margin-left: auto; margin-right: auto; }
+      .hero-actions { justify-content: center; }
+      .hero-badge { justify-content: center; }
 
       .feature-highlight {
         grid-template-columns: 1fr;
-        gap: 32px;
+        gap: 40px;
       }
 
       .feature-highlight.reverse { direction: ltr; }
@@ -764,22 +951,27 @@
       nav .container { height: 56px; }
       .nav-links a:not(.btn) { display: none; }
 
-      .hero { padding: 100px 0 48px; }
-      .hero-content h1 { font-size: 30px; }
+      .hero { padding: 120px 0 64px; }
+      .hero-content h1 { font-size: 34px; letter-spacing: -1px; }
       .hero-subtitle { font-size: 16px; }
+
+      section { padding: 64px 0; }
 
       .features-grid { grid-template-columns: 1fr; }
       .usecases-grid { grid-template-columns: 1fr; }
       .stats-row { grid-template-columns: 1fr 1fr; }
       .hero-card-body { grid-template-columns: 1fr; }
       .section-header h2 { font-size: 28px; }
+      .section-header { margin-bottom: 40px; }
+
+      .feature-text h3 { font-size: 24px; }
     }
   </style>
 </head>
 <body>
 
   <!-- ═══ Navbar ═══ -->
-  <nav>
+  <nav id="navbar">
     <div class="container">
       <a href="#" class="nav-brand">
         <span class="icon material-symbols-rounded">sound_sampler</span>
@@ -881,26 +1073,33 @@
     </div>
   </section>
 
+  <!-- ═══ Wave Divider ═══ -->
+  <div class="wave-divider">
+    <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+      <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,50 1440,40 L1440,80 L0,80 Z" fill="var(--md-sys-color-surface-container)"/>
+    </svg>
+  </div>
+
   <!-- ═══ Stats ═══ -->
-  <section class="alt-bg">
+  <section class="surface-section">
     <div class="container">
       <div class="stats-row">
-        <div class="stat-card">
+        <div class="stat-card animate-on-scroll">
           <span class="icon material-symbols-rounded">terminal</span>
           <h4>90+</h4>
           <p>Pre-built ADB Commands</p>
         </div>
-        <div class="stat-card">
+        <div class="stat-card animate-on-scroll delay-1">
           <span class="icon material-symbols-rounded">settings</span>
           <h4>170+</h4>
           <p>Android Settings Shortcuts</p>
         </div>
-        <div class="stat-card">
+        <div class="stat-card animate-on-scroll delay-2">
           <span class="icon material-symbols-rounded">important_devices</span>
           <h4>3</h4>
           <p>Desktop Platforms</p>
         </div>
-        <div class="stat-card">
+        <div class="stat-card animate-on-scroll delay-3">
           <span class="icon material-symbols-rounded">lock_open</span>
           <h4>100%</h4>
           <p>Open Source</p>
@@ -909,10 +1108,17 @@
     </div>
   </section>
 
+  <!-- ═══ Wave Divider ═══ -->
+  <div class="wave-divider flip">
+    <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+      <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,50 1440,40 L1440,80 L0,80 Z" fill="var(--md-sys-color-surface-container)"/>
+    </svg>
+  </div>
+
   <!-- ═══ Features ═══ -->
   <section id="features">
     <div class="container">
-      <div class="section-header">
+      <div class="section-header animate-on-scroll">
         <div class="overline">Everything you need</div>
         <h2>Your Android Device, at Your Fingertips</h2>
         <p>Every ADB operation exposed through an intuitive GUI. Powerful enough for engineers, accessible enough for everyone.</p>
@@ -920,7 +1126,7 @@
 
       <!-- Highlight 1 -->
       <div class="feature-highlight">
-        <div class="feature-text">
+        <div class="feature-text animate-on-scroll">
           <div class="chip">
             <span class="icon material-symbols-rounded">grid_view</span>
             8 categories
@@ -946,7 +1152,7 @@
             </li>
           </ul>
         </div>
-        <div class="feature-visual">
+        <div class="feature-visual animate-on-scroll delay-2">
           <div class="mock-card">
             <div class="mock-card-header">
               <span class="dot"></span><span class="dot"></span><span class="dot"></span>
@@ -984,7 +1190,7 @@
 
       <!-- Highlight 2 -->
       <div class="feature-highlight reverse">
-        <div class="feature-text">
+        <div class="feature-text animate-on-scroll">
           <div class="chip">
             <span class="icon material-symbols-rounded">terminal</span>
             Interactive
@@ -1010,13 +1216,13 @@
             </li>
           </ul>
         </div>
-        <div class="feature-visual">
+        <div class="feature-visual animate-on-scroll delay-2">
           <div class="mock-card">
             <div class="mock-card-header">
               <span class="dot"></span><span class="dot"></span><span class="dot"></span>
               <span>adb shell — interactive</span>
             </div>
-            <div class="mock-card-body" style="font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; line-height: 1.8; background: #1a1d1b; color: #cdd6c5; border-radius: 0 0 12px 12px; padding: 16px 20px;">
+            <div class="mock-card-body" style="font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; line-height: 1.8; background: #1a1d1b; color: #cdd6c5; border-radius: 0 0 16px 16px; padding: 20px 24px;">
               <div style="color: #5bc0de;">$&nbsp; dumpsys battery</div>
               <div style="color: #a0f0df;">Current Battery Service state:</div>
               <div>&nbsp;&nbsp;AC powered: true</div>
@@ -1031,7 +1237,7 @@
 
       <!-- Highlight 3 -->
       <div class="feature-highlight">
-        <div class="feature-text">
+        <div class="feature-text animate-on-scroll">
           <div class="chip">
             <span class="icon material-symbols-rounded">qr_code_scanner</span>
             Android 11+
@@ -1057,56 +1263,56 @@
             </li>
           </ul>
         </div>
-        <div class="feature-visual">
+        <div class="feature-visual animate-on-scroll delay-2">
           <div class="mock-card" style="max-width: 360px;">
             <div class="mock-card-header">
               <span class="dot"></span><span class="dot"></span><span class="dot"></span>
               <span>Wireless pairing</span>
             </div>
-            <div class="mock-card-body" style="text-align: center; padding: 32px 20px;">
-              <div style="display: inline-block; padding: 16px; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
-                <div style="width: 120px; height: 120px; background: repeating-linear-gradient(45deg, #000 0px, #000 4px, #fff 4px, #fff 8px); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
-                  <div style="width: 32px; height: 32px; background: #fff; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+            <div class="mock-card-body" style="text-align: center; padding: 36px 24px;">
+              <div style="display: inline-block; padding: 16px; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 20px;">
+                <div style="width: 120px; height: 120px; background: repeating-linear-gradient(45deg, #000 0px, #000 4px, #fff 4px, #fff 8px); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                  <div style="width: 36px; height: 36px; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
                     <span class="icon material-symbols-rounded" style="font-size: 28px; color: var(--md-sys-color-primary);">devices</span>
                   </div>
                 </div>
               </div>
-              <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Scan to pair</div>
-              <div style="font-size: 12px; color: var(--md-sys-color-on-surface-variant);">or enter code <strong style="color: var(--md-sys-color-primary);">382 917</strong></div>
+              <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">Scan to pair</div>
+              <div style="font-size: 13px; color: var(--md-sys-color-on-surface-variant);">or enter code <strong style="color: var(--md-sys-color-primary);">382 917</strong></div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Grid features -->
-      <div style="margin-top: 80px;">
+      <div style="margin-top: 96px;">
         <div class="features-grid">
-          <div class="feature-card">
+          <div class="feature-card animate-on-scroll">
             <span class="icon material-symbols-rounded">touch_app</span>
             <h3>Remote Control</h3>
             <p>Back, Home, Recent Apps, volume, power, screenshot, and quick settings &mdash; all from your desktop.</p>
           </div>
-          <div class="feature-card">
+          <div class="feature-card animate-on-scroll delay-1">
             <span class="icon material-symbols-rounded">settings_accessibility</span>
             <h3>170+ Settings Shortcuts</h3>
             <p>Jump directly to any Android settings screen. Organized by network, accessibility, display, security, apps, and more.</p>
           </div>
-          <div class="feature-card">
+          <div class="feature-card animate-on-scroll delay-2">
             <span class="icon material-symbols-rounded">inventory_2</span>
             <h3>UI Inspector</h3>
             <p>Dump and browse the view hierarchy of any running app via uiautomator. Search, filter, expand/collapse the XML tree.</p>
           </div>
-          <div class="feature-card">
+          <div class="feature-card animate-on-scroll delay-3">
             <span class="icon material-symbols-rounded">battery_saver</span>
             <h3>Battery Simulation</h3>
             <p>Spoof charge levels, AC/USB/wireless states, and temperature &mdash; perfect for testing power-sensitive behavior.</p>
           </div>
-          <div class="feature-card">
+          <div class="feature-card animate-on-scroll delay-4">
             <span class="icon material-symbols-rounded">apps</span>
             <h3>App Manager</h3>
             <p>List, inspect, and manage installed packages. View APK paths, permissions, services, activities, and intent filters.</p>
           </div>
-          <div class="feature-card">
+          <div class="feature-card animate-on-scroll delay-5">
             <span class="icon material-symbols-rounded">favorite</span>
             <h3>Always Free &amp; Open Source</h3>
             <p>No paywalls, no subscriptions. MIT-licensed, community-driven, and built with Flutter for native performance.</p>
@@ -1116,58 +1322,72 @@
     </div>
   </section>
 
+  <!-- ═══ Wave Divider ═══ -->
+  <div class="wave-divider">
+    <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+      <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,50 1440,40 L1440,80 L0,80 Z" fill="var(--md-sys-color-inverse-surface)"/>
+    </svg>
+  </div>
+
   <!-- ═══ Who It's For ═══ -->
-  <section class="alt-bg">
+  <section class="dark-section">
     <div class="container">
-      <div class="section-header">
-        <div class="overline">Who it's for</div>
+      <div class="section-header animate-on-scroll">
+        <div class="overline" style="background: rgba(94, 219, 197, 0.15); color: var(--md-sys-color-inverse-primary);">Who it's for</div>
         <h2>Built for Android Teams</h2>
         <p>Whether you're an indie developer, QA engineer, or manage a device lab&mdash;Porpita fits your workflow.</p>
       </div>
       <div class="usecases-grid">
-        <div class="usecase-card">
-          <span class="icon material-symbols-rounded">code</span>
-          <h3>App Developers</h3>
-          <p>Debug layouts, inspect services, read logs, and test battery scenarios without leaving your IDE flow.</p>
+        <div class="usecase-card animate-on-scroll" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1);">
+          <span class="icon material-symbols-rounded" style="color: var(--md-sys-color-inverse-primary);">code</span>
+          <h3 style="color: var(--md-sys-color-inverse-on-surface);">App Developers</h3>
+          <p style="color: rgba(239, 241, 237, 0.7);">Debug layouts, inspect services, read logs, and test battery scenarios without leaving your IDE flow.</p>
         </div>
-        <div class="usecase-card">
-          <span class="icon material-symbols-rounded">bug_report</span>
-          <h3>QA Engineers</h3>
-          <p>Run diagnostics, capture bugreports, browse device state, and automate testing with the CLI terminal.</p>
+        <div class="usecase-card animate-on-scroll delay-1" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1);">
+          <span class="icon material-symbols-rounded" style="color: var(--md-sys-color-inverse-primary);">bug_report</span>
+          <h3 style="color: var(--md-sys-color-inverse-on-surface);">QA Engineers</h3>
+          <p style="color: rgba(239, 241, 237, 0.7);">Run diagnostics, capture bugreports, browse device state, and automate testing with the CLI terminal.</p>
         </div>
-        <div class="usecase-card">
-          <span class="icon material-symbols-rounded">dns</span>
-          <h3>Device Lab Managers</h3>
-          <p>Monitor multiple devices, take screenshots, pull media, and manage settings across a fleet of Android phones.</p>
+        <div class="usecase-card animate-on-scroll delay-2" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1);">
+          <span class="icon material-symbols-rounded" style="color: var(--md-sys-color-inverse-primary);">dns</span>
+          <h3 style="color: var(--md-sys-color-inverse-on-surface);">Device Lab Managers</h3>
+          <p style="color: rgba(239, 241, 237, 0.7);">Monitor multiple devices, take screenshots, pull media, and manage settings across a fleet of Android phones.</p>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- ═══ Wave Divider ═══ -->
+  <div class="wave-divider flip">
+    <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+      <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,50 1440,40 L1440,80 L0,80 Z" fill="var(--md-sys-color-inverse-surface)"/>
+    </svg>
+  </div>
+
   <!-- ═══ Downloads ═══ -->
   <section id="downloads">
     <div class="container downloads-section">
-      <div class="section-header">
+      <div class="section-header animate-on-scroll">
         <div class="overline">Get started</div>
         <h2>Download Porpita</h2>
         <p>No SDK setup. No Android Studio. Just download and run on your desktop OS.</p>
       </div>
       <div class="download-grid">
-        <a href="#" class="download-card">
+        <a href="#" class="download-card animate-on-scroll">
           <span class="icon material-symbols-rounded">desktop_mac</span>
           <div>
             <strong>macOS</strong>
             <span>Intel &amp; Apple Silicon</span>
           </div>
         </a>
-        <a href="#" class="download-card">
+        <a href="#" class="download-card animate-on-scroll delay-1">
           <span class="icon material-symbols-rounded">window</span>
           <div>
             <strong>Windows</strong>
             <span>64-bit, portable</span>
           </div>
         </a>
-        <a href="#" class="download-card">
+        <a href="#" class="download-card animate-on-scroll delay-2">
           <span class="icon material-symbols-rounded">terminal</span>
           <div>
             <strong>Linux</strong>
@@ -1175,7 +1395,7 @@
           </div>
         </a>
       </div>
-      <p style="margin-top: 32px; font-size: 14px; color: var(--md-sys-color-on-surface-variant);">
+      <p style="margin-top: 40px; font-size: 15px; color: var(--md-sys-color-on-surface-variant);">
         Or build from source &mdash; <a href="https://github.com/anomalyco/porpita" target="_blank" style="color: var(--md-sys-color-primary); font-weight: 500; text-decoration: none;">github.com/anomalyco/porpita</a>
       </p>
     </div>
@@ -1194,6 +1414,24 @@
       </p>
     </div>
   </footer>
+
+  <!-- ═══ Scroll Animation Script ═══ -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 20);
+    }, { passive: true });
+  </script>
 
 </body>
 </html>
