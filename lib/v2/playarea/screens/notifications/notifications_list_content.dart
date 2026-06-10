@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
-import 'contact_model.dart';
-import 'contact_item_tile.dart';
+import 'notification_model.dart';
+import 'notification_item_tile.dart';
 
-class ContactsListContent extends StatelessWidget {
-  final List<ContactEntry> entries;
+class NotificationsListContent extends StatelessWidget {
+  final List<NotificationEntry> entries;
   final String searchQuery;
-  final void Function(ContactEntry entry) onEntrySelected;
+  final void Function(NotificationEntry entry) onEntrySelected;
 
-  const ContactsListContent({
+  const NotificationsListContent({
     super.key,
     required this.entries,
     required this.searchQuery,
     required this.onEntrySelected,
   });
 
-  bool _matchesSearch(ContactEntry e) {
+  bool _matchesSearch(NotificationEntry e) {
     if (searchQuery.isEmpty) return true;
     final q = searchQuery.toLowerCase();
-    return e.name.toLowerCase().contains(q) ||
-        e.displayNameAlt.toLowerCase().contains(q) ||
-        e.lookup.toLowerCase().contains(q);
+    return e.packageName.toLowerCase().contains(q) ||
+        e.title.toLowerCase().contains(q) ||
+        e.text.toLowerCase().contains(q) ||
+        e.substName.toLowerCase().contains(q) ||
+        e.channelName.toLowerCase().contains(q) ||
+        e.channelId.toLowerCase().contains(q) ||
+        e.importanceLabel.toLowerCase().contains(q);
   }
 
   BorderRadius _borderRadius(int index, int total) {
@@ -46,7 +50,7 @@ class ContactsListContent extends StatelessWidget {
     if (filtered.isEmpty) {
       return Center(
         child: Text(
-          searchQuery.isEmpty ? 'No contacts' : 'No matching contacts',
+          searchQuery.isEmpty ? 'No notifications' : 'No matching notifications',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
       );
@@ -57,7 +61,7 @@ class ContactsListContent extends StatelessWidget {
       itemCount: filtered.length,
       itemBuilder: (context, index) {
         final entry = filtered[index];
-        return ContactItemTile(
+        return NotificationItemTile(
           entry: entry,
           borderRadius: _borderRadius(index, filtered.length),
           onTap: () => onEntrySelected(entry),

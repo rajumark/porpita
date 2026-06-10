@@ -1,25 +1,31 @@
 import 'package:flutter/material.dart';
-import 'contact_model.dart';
-import 'contact_item_tile.dart';
+import 'media_model.dart';
+import 'media_item_tile.dart';
 
-class ContactsListContent extends StatelessWidget {
-  final List<ContactEntry> entries;
+enum MediaViewMode { list, grid }
+
+class MediaListContent extends StatelessWidget {
+  final List<MediaEntry> entries;
   final String searchQuery;
-  final void Function(ContactEntry entry) onEntrySelected;
+  final MediaViewMode viewMode;
+  final void Function(MediaEntry entry) onEntrySelected;
 
-  const ContactsListContent({
+  const MediaListContent({
     super.key,
     required this.entries,
     required this.searchQuery,
+    required this.viewMode,
     required this.onEntrySelected,
   });
 
-  bool _matchesSearch(ContactEntry e) {
+  bool _matchesSearch(MediaEntry e) {
     if (searchQuery.isEmpty) return true;
     final q = searchQuery.toLowerCase();
-    return e.name.toLowerCase().contains(q) ||
-        e.displayNameAlt.toLowerCase().contains(q) ||
-        e.lookup.toLowerCase().contains(q);
+    return e.displayName.toLowerCase().contains(q) ||
+        e.path.toLowerCase().contains(q) ||
+        e.bucketDisplayName.toLowerCase().contains(q) ||
+        e.category.label.toLowerCase().contains(q) ||
+        e.extension.toLowerCase().contains(q);
   }
 
   BorderRadius _borderRadius(int index, int total) {
@@ -46,9 +52,29 @@ class ContactsListContent extends StatelessWidget {
     if (filtered.isEmpty) {
       return Center(
         child: Text(
-          searchQuery.isEmpty ? 'No contacts' : 'No matching contacts',
+          searchQuery.isEmpty ? 'No files' : 'No matching files',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
+      );
+    }
+
+    if (viewMode == MediaViewMode.grid) {
+      return GridView.builder(
+        padding: const EdgeInsets.all(8),
+        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+          maxCrossAxisExtent: 140,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
+          childAspectRatio: 0.85,
+        ),
+        itemCount: filtered.length,
+        itemBuilder: (context, index) {
+          final entry = filtered[index];
+          return MediaGridCard(
+            entry: entry,
+            onTap: () => onEntrySelected(entry),
+          );
+        },
       );
     }
 
@@ -57,7 +83,7 @@ class ContactsListContent extends StatelessWidget {
       itemCount: filtered.length,
       itemBuilder: (context, index) {
         final entry = filtered[index];
-        return ContactItemTile(
+        return MediaListTile(
           entry: entry,
           borderRadius: _borderRadius(index, filtered.length),
           onTap: () => onEntrySelected(entry),

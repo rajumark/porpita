@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Porpita — The Desktop GUI for Android Debug Bridge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --md-sys-color-primary: #006B5E;
+      --md-sys-color-on-primary: #FFFFFF;
+      --md-sys-color-primary-container: #7CF8E1;
+      --md-sys-color-on-primary-container: #002019;
+      --md-sys-color-secondary: #4A635C;
+      --md-sys-color-on-secondary: #FFFFFF;
+      --md-sys-color-secondary-container: #CCE9DF;
+      --md-sys-color-on-secondary-container: #06201A;
+      --md-sys-color-tertiary: #426277;
+      --md-sys-color-on-tertiary: #FFFFFF;
+      --md-sys-color-tertiary-container: #C8E6FF;
+      --md-sys-color-on-tertiary-container: #001E2E;
+      --md-sys-color-error: #BA1A1A;
+      --md-sys-color-background: #FBFDF9;
+      --md-sys-color-on-background: #191C1B;
+      --md-sys-color-surface: #FBFDF9;
+      --md-sys-color-on-surface: #191C1B;
+      --md-sys-color-surface-variant: #DBE5DE;
+      --md-sys-color-on-surface-variant: #3F4944;
+      --md-sys-color-outline: #6F7974;
+      --md-sys-color-outline-variant: #BFC9C2;
+      --md-sys-color-shadow: #000000;
+      --md-sys-color-inverse-surface: #2D3130;
+      --md-sys-color-inverse-on-surface: #EFF1ED;
+      --md-sys-color-inverse-primary: #5EDBC5;
+      --md-elevation-1: 0 1px 3px 1px rgba(0,0,0,0.15), 0 1px 2px 0 rgba(0,0,0,0.30);
+      --md-elevation-2: 0 2px 6px 2px rgba(0,0,0,0.15), 0 1px 2px 0 rgba(0,0,0,0.30);
+      --md-elevation-3: 0 4px 8px 3px rgba(0,0,0,0.15), 0 1px 3px 0 rgba(0,0,0,0.30);
+      --md-elevation-4: 0 6px 10px 4px rgba(0,0,0,0.15), 0 2px 3px 0 rgba(0,0,0,0.30);
+      --md-elevation-5: 0 8px 12px 6px rgba(0,0,0,0.15), 0 4px 4px 0 rgba(0,0,0,0.30);
+      --md-shape-extra-small: 4px;
+      --md-shape-small: 8px;
+      --md-shape-medium: 12px;
+      --md-shape-large: 16px;
+      --md-shape-extra-large: 28px;
+      --md-shape-full: 9999px;
+      --max-width: 1200px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--md-sys-color-background);
+      color: var(--md-sys-color-on-background);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ─── Navbar ─── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(251, 253, 249, 0.80);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--md-sys-color-primary);
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+
+    .nav-brand .icon {
+      font-size: 28px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-links a {
+      padding: 8px 16px;
+      border-radius: var(--md-shape-full);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--md-sys-color-on-surface-variant);
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .nav-links a:hover {
+      background: var(--md-sys-color-surface-variant);
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 24px;
+      border-radius: var(--md-shape-full);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: box-shadow 0.2s, transform 0.15s, background 0.2s;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-filled {
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: var(--md-elevation-1);
+    }
+
+    .btn-filled:hover {
+      box-shadow: var(--md-elevation-2);
+      background: #005C50;
+    }
+
+    .btn-tonal {
+      background: var(--md-sys-color-secondary-container);
+      color: var(--md-sys-color-on-secondary-container);
+    }
+
+    .btn-tonal:hover {
+      background: #BBDDD3;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--md-sys-color-primary);
+      border: 1px solid var(--md-sys-color-outline);
+    }
+
+    .btn-outline:hover {
+      background: rgba(0, 107, 94, 0.08);
+    }
+
+    .btn .icon { font-size: 20px; }
+
+    /* ─── Hero ─── */
+    .hero {
+      padding: 140px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -20%;
+      width: 700px;
+      height: 700px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124, 248, 225, 0.3) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -20%;
+      left: -10%;
+      width: 500px;
+      height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200, 230, 255, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero .container {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .hero-content h1 {
+      font-size: 52px;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      color: var(--md-sys-color-on-background);
+      margin-bottom: 20px;
+    }
+
+    .hero-content h1 span {
+      background: linear-gradient(135deg, var(--md-sys-color-primary), #009688);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      color: var(--md-sys-color-on-surface-variant);
+      line-height: 1.7;
+      margin-bottom: 32px;
+      max-width: 520px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .hero-badge {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .hero-badge-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .hero-badge-item .icon {
+      font-size: 18px;
+      color: var(--md-sys-color-primary);
+    }
+
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hero-card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--md-sys-color-surface);
+      border-radius: var(--md-shape-extra-large);
+      box-shadow: var(--md-elevation-3);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      overflow: hidden;
+    }
+
+    .hero-card-top {
+      background: linear-gradient(135deg, var(--md-sys-color-primary-container), #A0F0DF);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .hero-card-top .badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .hero-card-top .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 12px;
+      border-radius: var(--md-shape-full);
+      background: rgba(255,255,255,0.5);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--md-sys-color-on-primary-container);
+    }
+
+    .hero-card-top .chip .icon { font-size: 14px; }
+
+    .hero-card-top h3 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--md-sys-color-on-primary-container);
+    }
+
+    .hero-card-top p {
+      font-size: 14px;
+      color: var(--md-sys-color-on-primary-container);
+      opacity: 0.8;
+    }
+
+    .hero-card-body {
+      padding: 24px 32px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .hero-card-stat {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hero-card-stat .icon {
+      font-size: 24px;
+      color: var(--md-sys-color-primary);
+    }
+
+    .hero-card-stat div {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero-card-stat strong {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .hero-card-stat span {
+      font-size: 12px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    /* ─── Section Tabs ─── */
+    .section-header {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto 56px;
+    }
+
+    .section-header .overline {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--md-sys-color-primary);
+      margin-bottom: 12px;
+    }
+
+    .section-header h2 {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      color: var(--md-sys-color-on-background);
+    }
+
+    .section-header p {
+      font-size: 16px;
+      color: var(--md-sys-color-on-surface-variant);
+      line-height: 1.7;
+    }
+
+    section { padding: 80px 0; }
+
+    section.alt-bg {
+      background: var(--md-sys-color-surface-variant);
+    }
+
+    /* ─── Features ─── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--md-sys-color-surface);
+      border-radius: var(--md-shape-large);
+      padding: 28px;
+      border: 1px solid var(--md-sys-color-outline-variant);
+      box-shadow: var(--md-elevation-1);
+      transition: box-shadow 0.25s, transform 0.25s;
+    }
+
+    .feature-card:hover {
+      box-shadow: var(--md-elevation-3);
+      transform: translateY(-4px);
+    }
+
+    .feature-card .icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--md-shape-medium);
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    .feature-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      color: var(--md-sys-color-on-surface-variant);
+      line-height: 1.6;
+    }
+
+    /* ─── Feature highlight ─── */
+    .feature-highlight {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+      margin-bottom: 80px;
+    }
+
+    .feature-highlight:last-child { margin-bottom: 0; }
+    .feature-highlight.reverse { direction: rtl; }
+    .feature-highlight.reverse > * { direction: ltr; }
+
+    .feature-text .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 12px;
+      border-radius: var(--md-shape-full);
+      background: var(--md-sys-color-primary-container);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--md-sys-color-on-primary-container);
+      margin-bottom: 16px;
+    }
+
+    .feature-text h3 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 16px;
+      color: var(--md-sys-color-on-background);
+    }
+
+    .feature-text p {
+      font-size: 15px;
+      color: var(--md-sys-color-on-surface-variant);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .feature-text ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .feature-text ul li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .feature-text ul li .icon {
+      font-size: 18px;
+      color: var(--md-sys-color-primary);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .feature-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .feature-visual .mock-card {
+      width: 100%;
+      max-width: 480px;
+      border-radius: var(--md-shape-large);
+      background: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      box-shadow: var(--md-elevation-2);
+      overflow: hidden;
+    }
+
+    .mock-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .mock-card-header .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .mock-card-header .dot:nth-child(1) { background: #FF5F56; }
+    .mock-card-header .dot:nth-child(2) { background: #FFBD2E; }
+    .mock-card-header .dot:nth-child(3) { background: #27C93F; }
+
+    .mock-card-header span {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--md-sys-color-on-surface-variant);
+      margin-left: 8px;
+    }
+
+    .mock-card-body {
+      padding: 20px;
+    }
+
+    .mock-card-body .row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+    }
+
+    .mock-card-body .row .icon {
+      font-size: 20px;
+      color: var(--md-sys-color-primary);
+    }
+
+    .mock-card-body .row .bar {
+      flex: 1;
+      height: 8px;
+      border-radius: var(--md-shape-full);
+      background: var(--md-sys-color-surface-variant);
+      overflow: hidden;
+    }
+
+    .mock-card-body .row .bar .fill {
+      height: 100%;
+      border-radius: var(--md-shape-full);
+      background: var(--md-sys-color-primary);
+    }
+
+    .mock-card-body .row .bar .fill.green { background: #4CAF50; width: 72%; }
+    .mock-card-body .row .bar .fill.blue { background: #2196F3; width: 55%; }
+    .mock-card-body .row .bar .fill.orange { background: #FF9800; width: 38%; }
+    .mock-card-body .row .bar .fill.teal { background: #009688; width: 88%; }
+
+    .mock-card-body .row .value {
+      font-size: 13px;
+      font-weight: 600;
+      min-width: 40px;
+      text-align: right;
+    }
+
+    .mock-card-footer {
+      display: flex;
+      gap: 8px;
+      padding: 16px 20px;
+      border-top: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .mock-card-footer .chip {
+      padding: 4px 12px;
+      border-radius: var(--md-shape-full);
+      background: var(--md-sys-color-surface-variant);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    /* ─── Stats ─── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      text-align: center;
+    }
+
+    .stat-card {
+      padding: 32px 16px;
+      border-radius: var(--md-shape-large);
+      background: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .stat-card .icon {
+      font-size: 36px;
+      color: var(--md-sys-color-primary);
+      margin-bottom: 12px;
+    }
+
+    .stat-card h4 {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--md-sys-color-on-background);
+    }
+
+    .stat-card p {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    /* ─── Downloads ─── */
+    .downloads-section {
+      text-align: center;
+    }
+
+    .download-grid {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+
+    .download-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 32px;
+      border-radius: var(--md-shape-large);
+      background: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      box-shadow: var(--md-elevation-1);
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.25s, transform 0.25s;
+      min-width: 200px;
+    }
+
+    .download-card:hover {
+      box-shadow: var(--md-elevation-3);
+      transform: translateY(-3px);
+    }
+
+    .download-card .icon {
+      font-size: 32px;
+      color: var(--md-sys-color-primary);
+    }
+
+    .download-card div { text-align: left; }
+
+    .download-card div strong {
+      display: block;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .download-card div span {
+      font-size: 13px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    /* ─── Use cases ─── */
+    .usecases-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .usecase-card {
+      text-align: center;
+      padding: 32px 24px;
+      border-radius: var(--md-shape-large);
+      background: var(--md-sys-color-surface);
+      border: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .usecase-card .icon {
+      font-size: 40px;
+      color: var(--md-sys-color-tertiary);
+      margin-bottom: 16px;
+    }
+
+    .usecase-card h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .usecase-card p {
+      font-size: 14px;
+      color: var(--md-sys-color-on-surface-variant);
+      line-height: 1.6;
+    }
+
+    /* ─── Footer ─── */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--md-sys-color-outline-variant);
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 13px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    footer .brand {
+      font-weight: 600;
+      color: var(--md-sys-color-primary);
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 1024px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .usecases-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 900px) {
+      .hero .container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .hero-content h1 { font-size: 38px; }
+
+      .feature-highlight {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .feature-highlight.reverse { direction: ltr; }
+
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+      nav .container { height: 56px; }
+      .nav-links a:not(.btn) { display: none; }
+
+      .hero { padding: 100px 0 48px; }
+      .hero-content h1 { font-size: 30px; }
+      .hero-subtitle { font-size: 16px; }
+
+      .features-grid { grid-template-columns: 1fr; }
+      .usecases-grid { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .hero-card-body { grid-template-columns: 1fr; }
+      .section-header h2 { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ Navbar ═══ -->
+  <nav>
+    <div class="container">
+      <a href="#" class="nav-brand">
+        <span class="icon material-symbols-rounded">sound_sampler</span>
+        Porpita
+      </a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#downloads">Download</a>
+        <a href="https://github.com/anomalyco/porpita" target="_blank">GitHub</a>
+        <a href="#downloads" class="btn btn-filled">
+          <span class="icon material-symbols-rounded">download</span>
+          Get Started
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ Hero ═══ -->
+  <section class="hero" id="home">
+    <div class="container">
+      <div class="hero-content">
+        <h1>ADB, <span>Reimagined.</span></h1>
+        <p class="hero-subtitle">
+          A native desktop GUI for Android Debug Bridge. Stop memorizing commands&mdash;control, inspect, and debug your Android devices with a polished visual interface.
+        </p>
+        <div class="hero-actions">
+          <a href="#downloads" class="btn btn-filled">
+            <span class="icon material-symbols-rounded">download</span>
+            Download Free
+          </a>
+          <a href="#features" class="btn btn-outline">
+            <span class="icon material-symbols-rounded">explore</span>
+            Explore Features
+          </a>
+        </div>
+        <div class="hero-badge">
+          <span class="hero-badge-item">
+            <span class="icon material-symbols-rounded">check_circle</span>
+            macOS · Windows · Linux
+          </span>
+          <span class="hero-badge-item">
+            <span class="icon material-symbols-rounded">check_circle</span>
+            No SDK Required
+          </span>
+          <span class="hero-badge-item">
+            <span class="icon material-symbols-rounded">check_circle</span>
+            Open Source
+          </span>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-card">
+          <div class="hero-card-top">
+            <div class="badge-row">
+              <span class="chip">
+                <span class="icon material-symbols-rounded">devices</span>
+                2 devices connected
+              </span>
+              <span class="chip">
+                <span class="icon material-symbols-rounded">bolt</span>
+                Android 14
+              </span>
+            </div>
+            <h3>Device Dashboard</h3>
+            <p>Battery, memory, CPU, storage &mdash; live at a glance.</p>
+          </div>
+          <div class="hero-card-body">
+            <div class="hero-card-stat">
+              <span class="icon material-symbols-rounded">battery_full</span>
+              <div>
+                <strong>87%</strong>
+                <span>Battery</span>
+              </div>
+            </div>
+            <div class="hero-card-stat">
+              <span class="icon material-symbols-rounded">memory</span>
+              <div>
+                <strong>3.2 GB</strong>
+                <span>RAM used</span>
+              </div>
+            </div>
+            <div class="hero-card-stat">
+              <span class="icon material-symbols-rounded">speed</span>
+              <div>
+                <strong>2.4 GHz</strong>
+                <span>CPU freq</span>
+              </div>
+            </div>
+            <div class="hero-card-stat">
+              <span class="icon material-symbols-rounded">storage</span>
+              <div>
+                <strong>46%</strong>
+                <span>Storage</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Stats ═══ -->
+  <section class="alt-bg">
+    <div class="container">
+      <div class="stats-row">
+        <div class="stat-card">
+          <span class="icon material-symbols-rounded">terminal</span>
+          <h4>90+</h4>
+          <p>Pre-built ADB Commands</p>
+        </div>
+        <div class="stat-card">
+          <span class="icon material-symbols-rounded">settings</span>
+          <h4>170+</h4>
+          <p>Android Settings Shortcuts</p>
+        </div>
+        <div class="stat-card">
+          <span class="icon material-symbols-rounded">important_devices</span>
+          <h4>3</h4>
+          <p>Desktop Platforms</p>
+        </div>
+        <div class="stat-card">
+          <span class="icon material-symbols-rounded">lock_open</span>
+          <h4>100%</h4>
+          <p>Open Source</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Features ═══ -->
+  <section id="features">
+    <div class="container">
+      <div class="section-header">
+        <div class="overline">Everything you need</div>
+        <h2>Your Android Device, at Your Fingertips</h2>
+        <p>Every ADB operation exposed through an intuitive GUI. Powerful enough for engineers, accessible enough for everyone.</p>
+      </div>
+
+      <!-- Highlight 1 -->
+      <div class="feature-highlight">
+        <div class="feature-text">
+          <div class="chip">
+            <span class="icon material-symbols-rounded">grid_view</span>
+            8 categories
+          </div>
+          <h3>90+ Pre-built Commands</h3>
+          <p>Battery, memory, CPU, display, input, sensors, audio, WiFi, Bluetooth, connectivity, telephony, location, power, alarms, procfs, and more&mdash;all organized into intuitive categories.</p>
+          <ul>
+            <li>
+              <span class="icon material-symbols-rounded">check</span>
+              <span><strong>dumpsys</strong> &mdash; battery, meminfo, cpuinfo, gfxinfo, and 60+ more subsystems</span>
+            </li>
+            <li>
+              <span class="icon material-symbols-rounded">check</span>
+              <span><strong>procfs</strong> &mdash; cpuinfo, meminfo, partitions, modules, uptime, net/dev</span>
+            </li>
+            <li>
+              <span class="icon material-symbols-rounded">check</span>
+              <span><strong>Device data</strong> &mdash; call logs, SMS, contacts, calendar, media, notifications</span>
+            </li>
+            <li>
+              <span class="icon material-symbols-rounded">check</span>
+              <span><strong>logcat</strong>, <strong>dmesg</strong>, <strong>bugreport</strong> &mdash; full system diagnostics</span>
+            </li>
+          </ul>
+        </div>
+        <div class="feature-visual">
+          <div class="mock-card">
+            <div class="mock-card-header">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span>dumpsys battery</span>
+            </div>
+            <div class="mock-card-body">
+              <div class="row">
+                <span class="icon material-symbols-rounded">battery_full</span>
+                <span style="flex:1; font-size:13px;">Battery level</span>
+                <div class="bar"><div class="fill" style="width:87%"></div></div>
+                <span class="value">87%</span>
+              </div>
+              <div class="row">
+                <span class="icon material-symbols-rounded">power</span>
+                <span style="flex:1; font-size:13px;">Power source</span>
+                <span style="font-size:13px; color:var(--md-sys-color-on-surface-variant);">USB</span>
+                <span class="value" style="min-width:auto;"></span>
+              </div>
+              <div class="row">
+                <span class="icon material-symbols-rounded">thermostat</span>
+                <span style="flex:1; font-size:13px;">Temperature</span>
+                <span style="font-size:13px; color:var(--md-sys-color-on-surface-variant);">36.2 °C</span>
+                <span class="value" style="min-width:auto;"></span>
+              </div>
+              <div class="row">
+                <span class="icon material-symbols-rounded">battery_charging_full</span>
+                <span style="flex:1; font-size:13px;">Charging</span>
+                <span style="font-size:13px; color:var(--md-sys-color-primary); font-weight:600;">AC</span>
+                <span class="value" style="min-width:auto;"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Highlight 2 -->
+      <div class="feature-highlight reverse">
+        <div class="feature-text">
+          <div class="chip">
+            <span class="icon material-symbols-rounded">terminal</span>
+            Interactive
+          </div>
+          <h3>Built-in Terminal</h3>
+          <p>An interactive <strong>adb shell</strong> session right inside the app. Command history, auto-complete, search, copy, and save to file&mdash;no separate terminal needed.</p>
+          <ul>
+            <li>
+              <span class="icon material-symbols-rounded">check</span>
+              <span>Command history persisted across sessions (up to 200 entries)</span>
+            </li>
+            <li>
+              <span class="icon material-symbols-rounded">check</span>
+              <span>Auto-complete from history &amp; command catalog</span>
+            </li>
+            <li>
+              <span class="icon material-symbols-rounded">check</span>
+              <span>Search within output, copy to clipboard, save to file</span>
+            </li>
+            <li>
+              <span class="icon material-symbols-rounded">check</span>
+              <span>10+ quick commands pre-loaded</span>
+            </li>
+          </ul>
+        </div>
+        <div class="feature-visual">
+          <div class="mock-card">
+            <div class="mock-card-header">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span>adb shell — interactive</span>
+            </div>
+            <div class="mock-card-body" style="font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; line-height: 1.8; background: #1a1d1b; color: #cdd6c5; border-radius: 0 0 12px 12px; padding: 16px 20px;">
+              <div style="color: #5bc0de;">$&nbsp; dumpsys battery</div>
+              <div style="color: #a0f0df;">Current Battery Service state:</div>
+              <div>&nbsp;&nbsp;AC powered: true</div>
+              <div>&nbsp;&nbsp;USB powered: false</div>
+              <div>&nbsp;&nbsp;level: 87</div>
+              <div>&nbsp;&nbsp;temperature: 362</div>
+              <div style="color: #5bc0de; margin-top: 6px;">$&nbsp; <span style="background: rgba(255,255,255,0.08); padding: 0 2px;">▌</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Highlight 3 -->
+      <div class="feature-highlight">
+        <div class="feature-text">
+          <div class="chip">
+            <span class="icon material-symbols-rounded">qr_code_scanner</span>
+            Android 11+
+          </div>
+          <h3>Wireless ADB Pairing</h3>
+          <p>Connect to devices over WiFi with zero cables. Generate a QR code or 6-digit pairing code directly from the app&mdash;no more typing IP addresses.</p>
+          <ul>
+            <li>
+              <span class="icon material-symbols-rounded">check</span>
+              <span>QR code pairing for Android 11+ devices</span>
+            </li>
+            <li>
+              <span class="icon material-symbols-rounded">check</span>
+              <span>6-digit pairing code fallback</span>
+            </li>
+            <li>
+              <span class="icon material-symbols-rounded">check</span>
+              <span>Auto-detection of USB and emulator devices</span>
+            </li>
+            <li>
+              <span class="icon material-symbols-rounded">check</span>
+              <span>Launch AVDs directly from the app</span>
+            </li>
+          </ul>
+        </div>
+        <div class="feature-visual">
+          <div class="mock-card" style="max-width: 360px;">
+            <div class="mock-card-header">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span>Wireless pairing</span>
+            </div>
+            <div class="mock-card-body" style="text-align: center; padding: 32px 20px;">
+              <div style="display: inline-block; padding: 16px; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px;">
+                <div style="width: 120px; height: 120px; background: repeating-linear-gradient(45deg, #000 0px, #000 4px, #fff 4px, #fff 8px); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                  <div style="width: 32px; height: 32px; background: #fff; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                    <span class="icon material-symbols-rounded" style="font-size: 28px; color: var(--md-sys-color-primary);">devices</span>
+                  </div>
+                </div>
+              </div>
+              <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Scan to pair</div>
+              <div style="font-size: 12px; color: var(--md-sys-color-on-surface-variant);">or enter code <strong style="color: var(--md-sys-color-primary);">382 917</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid features -->
+      <div style="margin-top: 80px;">
+        <div class="features-grid">
+          <div class="feature-card">
+            <span class="icon material-symbols-rounded">touch_app</span>
+            <h3>Remote Control</h3>
+            <p>Back, Home, Recent Apps, volume, power, screenshot, and quick settings &mdash; all from your desktop.</p>
+          </div>
+          <div class="feature-card">
+            <span class="icon material-symbols-rounded">settings_accessibility</span>
+            <h3>170+ Settings Shortcuts</h3>
+            <p>Jump directly to any Android settings screen. Organized by network, accessibility, display, security, apps, and more.</p>
+          </div>
+          <div class="feature-card">
+            <span class="icon material-symbols-rounded">inventory_2</span>
+            <h3>UI Inspector</h3>
+            <p>Dump and browse the view hierarchy of any running app via uiautomator. Search, filter, expand/collapse the XML tree.</p>
+          </div>
+          <div class="feature-card">
+            <span class="icon material-symbols-rounded">battery_saver</span>
+            <h3>Battery Simulation</h3>
+            <p>Spoof charge levels, AC/USB/wireless states, and temperature &mdash; perfect for testing power-sensitive behavior.</p>
+          </div>
+          <div class="feature-card">
+            <span class="icon material-symbols-rounded">apps</span>
+            <h3>App Manager</h3>
+            <p>List, inspect, and manage installed packages. View APK paths, permissions, services, activities, and intent filters.</p>
+          </div>
+          <div class="feature-card">
+            <span class="icon material-symbols-rounded">favorite</span>
+            <h3>Always Free &amp; Open Source</h3>
+            <p>No paywalls, no subscriptions. MIT-licensed, community-driven, and built with Flutter for native performance.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Who It's For ═══ -->
+  <section class="alt-bg">
+    <div class="container">
+      <div class="section-header">
+        <div class="overline">Who it's for</div>
+        <h2>Built for Android Teams</h2>
+        <p>Whether you're an indie developer, QA engineer, or manage a device lab&mdash;Porpita fits your workflow.</p>
+      </div>
+      <div class="usecases-grid">
+        <div class="usecase-card">
+          <span class="icon material-symbols-rounded">code</span>
+          <h3>App Developers</h3>
+          <p>Debug layouts, inspect services, read logs, and test battery scenarios without leaving your IDE flow.</p>
+        </div>
+        <div class="usecase-card">
+          <span class="icon material-symbols-rounded">bug_report</span>
+          <h3>QA Engineers</h3>
+          <p>Run diagnostics, capture bugreports, browse device state, and automate testing with the CLI terminal.</p>
+        </div>
+        <div class="usecase-card">
+          <span class="icon material-symbols-rounded">dns</span>
+          <h3>Device Lab Managers</h3>
+          <p>Monitor multiple devices, take screenshots, pull media, and manage settings across a fleet of Android phones.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ Downloads ═══ -->
+  <section id="downloads">
+    <div class="container downloads-section">
+      <div class="section-header">
+        <div class="overline">Get started</div>
+        <h2>Download Porpita</h2>
+        <p>No SDK setup. No Android Studio. Just download and run on your desktop OS.</p>
+      </div>
+      <div class="download-grid">
+        <a href="#" class="download-card">
+          <span class="icon material-symbols-rounded">desktop_mac</span>
+          <div>
+            <strong>macOS</strong>
+            <span>Intel &amp; Apple Silicon</span>
+          </div>
+        </a>
+        <a href="#" class="download-card">
+          <span class="icon material-symbols-rounded">window</span>
+          <div>
+            <strong>Windows</strong>
+            <span>64-bit, portable</span>
+          </div>
+        </a>
+        <a href="#" class="download-card">
+          <span class="icon material-symbols-rounded">terminal</span>
+          <div>
+            <strong>Linux</strong>
+            <span>.deb &amp; AppImage</span>
+          </div>
+        </a>
+      </div>
+      <p style="margin-top: 32px; font-size: 14px; color: var(--md-sys-color-on-surface-variant);">
+        Or build from source &mdash; <a href="https://github.com/anomalyco/porpita" target="_blank" style="color: var(--md-sys-color-primary); font-weight: 500; text-decoration: none;">github.com/anomalyco/porpita</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ Footer ═══ -->
+  <footer>
+    <div class="container">
+      <p>
+        Made with
+        <span class="icon material-symbols-rounded" style="font-size: 14px; vertical-align: middle; color: var(--md-sys-color-error);">favorite</span>
+        by <span class="brand">Porpita</span> &mdash; an open-source ADB GUI built with Flutter.
+      </p>
+      <p style="margin-top: 8px;">
+        Not affiliated with Google or Android. ADB is a trademark of Google LLC.
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>

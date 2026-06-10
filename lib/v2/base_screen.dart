@@ -9,6 +9,11 @@ import 'playarea/screens/apps/apps_base_screen.dart';
 import 'playarea/screens/calllogs/calllogs_base_screen.dart';
 import 'playarea/screens/messages/messages_base_screen.dart';
 import 'playarea/screens/contacts/contacts_base_screen.dart';
+import 'playarea/screens/notifications/notifications_base_screen.dart';
+import 'playarea/screens/battery/battery_screen.dart';
+import 'playarea/screens/lifecycle/lifecycle_base_screen.dart';
+import 'playarea/screens/alarms/alarms_base_screen.dart';
+import 'playarea/screens/media/media_base_screen.dart';
 import 'playarea/screens/settings/settings_screen.dart';
 import 'playarea/screens/terminal/terminal_screen.dart';
 import 'playarea/screens/debuginfo/debuginfo_screen.dart';
@@ -60,12 +65,22 @@ class _BaseScreenState extends State<BaseScreen> {
       case 3:
         return const ContactsBaseScreen();
       case 4:
-        return const SettingsScreen();
+        return const NotificationsBaseScreen();
       case 5:
-        return const TerminalScreen();
+        return const BatteryScreen();
       case 6:
-        return const DebugInfoScreen();
+        return const LifecycleBaseScreen();
       case 7:
+        return const AlarmsBaseScreen();
+      case 8:
+        return const MediaBaseScreen();
+      case 9:
+        return const SettingsScreen();
+      case 10:
+        return const TerminalScreen();
+      case 11:
+        return const DebugInfoScreen();
+      case 12:
         return const UiInspectorScreen();
       default:
         return const SizedBox.shrink();

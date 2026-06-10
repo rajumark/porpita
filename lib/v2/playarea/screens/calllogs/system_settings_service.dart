@@ -30,4 +30,12 @@ class SystemSettingsService {
       '-t', 'vnd.android-dir/mms-sms',
     ]);
   }
+
+  static Future<String> openFilesApp(String deviceId) {
+    return AdbExecService.run(deviceId, [
+      'am', 'start',
+      '-a', 'android.intent.action.OPEN_DOCUMENT',
+      '-t', '*/*',
+    ]);
+  }
 }

@@ -20,40 +20,6 @@ class _ContactsBaseScreenState extends State<ContactsBaseScreen> {
     setState(() => _selectedContact = e);
   }
 
-  void _handleDataRowSelected(ContactDataEntry e) {
-    if (e.contactId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No contact_id for this data row')),
-      );
-      return;
-    }
-    setState(() {
-      _selectedContact = ContactEntry(
-        id: e.contactId,
-        displayName: '',
-        displayNameAlt: '',
-        sortKey: '',
-        lookup: '',
-        photoUri: '',
-        photoThumbUri: '',
-        phonebookLabel: '',
-        phonebookLabelAlt: '',
-        hasPhoneNumber: '',
-        starred: '',
-        timesContacted: '',
-        lastTimeContacted: '',
-        sendToVoicemail: '',
-        pinned: '',
-        contactLastUpdatedTimestamp: '',
-        inVisibleGroup: '',
-        isUserProfile: '',
-        phoneticName: '',
-        customRingtone: '',
-        raw: e.raw,
-      );
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -61,10 +27,7 @@ class _ContactsBaseScreenState extends State<ContactsBaseScreen> {
       child: RoundedContainer(
         child: Stack(
           children: [
-            ContactsListScreen(
-              onContactSelected: _handleContactSelected,
-              onDataRowSelected: _handleDataRowSelected,
-            ),
+            ContactsListScreen(onContactSelected: _handleContactSelected),
             if (_selectedContact != null)
               _ContactOverlay(
                 entry: _selectedContact!,
