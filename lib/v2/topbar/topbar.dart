@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:porpita/services/screen_capture_service.dart';
 import 'devicebutton/device_button.dart';
 import 'porpita_preferences/porpita_preferences_dialog.dart';
 
@@ -25,6 +26,14 @@ class TopBar extends StatelessWidget {
           const SizedBox(width: 16),
           const DeviceButton(),
           const Spacer(),
+          IconButton(
+            icon: const Icon(Icons.camera_alt_outlined),
+            iconSize: 24,
+            tooltip: 'Capture window screenshot',
+            onPressed: () => ScreenCaptureService.captureAndSave(context),
+            padding: EdgeInsets.zero,
+            constraints: BoxConstraints.tight(const Size(36, 36)),
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             iconSize: 24,

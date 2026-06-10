@@ -41,6 +41,7 @@ dependencies:
   qr_flutter: ^4.1.0
   network_info_plus: ^6.0.2
   xml: ^6.5.0
+  screenshot: ^3.0.0
 
 dev_dependencies:
   flutter_test:

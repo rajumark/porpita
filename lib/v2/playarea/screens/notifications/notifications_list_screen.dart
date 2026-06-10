@@ -27,7 +27,7 @@ class _NotificationsListScreenState extends State<NotificationsListScreen> {
   String? _lastDeviceId;
   final _searchController = TextEditingController();
   Timer? _refreshTimer;
-  static const _refreshInterval = Duration(seconds: 10);
+  static const _refreshInterval = Duration(seconds: 60);
 
   @override
   void initState() {
