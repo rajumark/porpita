@@ -9,39 +9,16 @@ class AdbSetupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final adb = context.watch<AdbManager>();
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return Scaffold(
       body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.phone_android,
-                  size: 72,
-                  color: colorScheme.primary,
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'Porpita',
-                  style: theme.textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.primary,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Android Debug Bridge Tool',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 40),
                 _buildStatusSection(context, adb),
                 const SizedBox(height: 32),
                 _buildProgressBar(context, adb),

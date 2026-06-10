@@ -13,9 +13,11 @@ import 'playarea/screens/messages/messages_base_screen.dart';
 import 'playarea/screens/contacts/contacts_base_screen.dart';
 import 'playarea/screens/notifications/notifications_base_screen.dart';
 import 'playarea/screens/battery/battery_screen.dart';
+import 'playarea/screens/deviceinfo/deviceinfo_screen.dart';
 import 'playarea/screens/lifecycle/lifecycle_base_screen.dart';
 import 'playarea/screens/alarms/alarms_base_screen.dart';
 import 'playarea/screens/media/media_base_screen.dart';
+import 'playarea/screens/files/files_base_screen.dart';
 import 'playarea/screens/settings/settings_screen.dart';
 import 'playarea/screens/terminal/terminal_screen.dart';
 import 'playarea/screens/debuginfo/debuginfo_screen.dart';
@@ -71,18 +73,22 @@ class _BaseScreenState extends State<BaseScreen> {
       case 5:
         return const BatteryScreen();
       case 6:
-        return const LifecycleBaseScreen();
+        return const DeviceInfoScreen();
       case 7:
-        return const AlarmsBaseScreen();
+        return const LifecycleBaseScreen();
       case 8:
-        return const MediaBaseScreen();
+        return const AlarmsBaseScreen();
       case 9:
-        return const SettingsScreen();
+        return const MediaBaseScreen();
       case 10:
-        return const TerminalScreen();
+        return const FilesBaseScreen();
       case 11:
-        return const DebugInfoScreen();
+        return const SettingsScreen();
       case 12:
+        return const TerminalScreen();
+      case 13:
+        return const DebugInfoScreen();
+      case 14:
         return const UiInspectorScreen();
       default:
         return const SizedBox.shrink();

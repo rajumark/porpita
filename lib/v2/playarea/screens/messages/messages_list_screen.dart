@@ -361,21 +361,19 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
                 showSelectedIcon: false,
               ),
               const SizedBox(width: 12),
-              Expanded(
-                child: _UriDropdown(
-                  uris: uris,
-                  currentUri: currentUri,
-                  onChanged: (uri) {
-                    setState(() {
-                      if (_tab == MessageTab.sms) {
-                        _smsUri = uri;
-                      } else {
-                        _mmsUri = uri;
-                      }
-                    });
-                    _handleUriChange();
-                  },
-                ),
+              _UriDropdown(
+                uris: uris,
+                currentUri: currentUri,
+                onChanged: (uri) {
+                  setState(() {
+                    if (_tab == MessageTab.sms) {
+                      _smsUri = uri;
+                    } else {
+                      _mmsUri = uri;
+                    }
+                  });
+                  _handleUriChange();
+                },
               ),
             ],
           ),
@@ -461,31 +459,29 @@ class _UriDropdown extends StatelessWidget {
         border: Border.all(color: scheme.outline),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.folder_outlined, size: 16, color: scheme.onSurfaceVariant),
           const SizedBox(width: 8),
-          Expanded(
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<MessageUri>(
-                value: currentUri,
-                isExpanded: true,
-                isDense: true,
-                icon: const Icon(Icons.arrow_drop_down, size: 20),
-                style: Theme.of(context).textTheme.bodySmall,
-                items: [
-                  for (final u in uris)
-                    DropdownMenuItem(
-                      value: u,
-                      child: Text(
-                        u.label,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+          DropdownButtonHideUnderline(
+            child: DropdownButton<MessageUri>(
+              value: currentUri,
+              isDense: true,
+              icon: const Icon(Icons.arrow_drop_down, size: 20),
+              style: Theme.of(context).textTheme.bodySmall,
+              items: [
+                for (final u in uris)
+                  DropdownMenuItem(
+                    value: u,
+                    child: Text(
+                      u.label,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                ],
-                onChanged: (v) {
-                  if (v != null) onChanged(v);
-                },
-              ),
+                  ),
+              ],
+              onChanged: (v) {
+                if (v != null) onChanged(v);
+              },
             ),
           ),
         ],

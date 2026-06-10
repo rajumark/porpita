@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/app_sidebar.dart';
 
-const menuItems = ['Apps', 'Call Logs', 'Messages', 'Contacts', 'Notifications', 'Battery', 'Lifecycle', 'Alarms', 'Media', 'Settings', 'Terminal', 'DebugInfo', 'UI Inspector'];
+const menuItems = ['Apps', 'Call Logs', 'Messages', 'Contacts', 'Notifications', 'Battery', 'Device Info', 'Lifecycle', 'Alarms', 'Media', 'Files', 'Settings', 'Terminal', 'DebugInfo', 'UI Inspector'];
 const menuIcons = [
   Icons.widgets_outlined,
   Icons.history_outlined,
@@ -9,9 +9,11 @@ const menuIcons = [
   Icons.contacts_outlined,
   Icons.notifications_outlined,
   Icons.battery_std_outlined,
+  Icons.device_hub_outlined,
   Icons.autorenew_outlined,
   Icons.alarm_outlined,
   Icons.perm_media_outlined,
+  Icons.folder_outlined,
   Icons.settings_outlined,
   Icons.terminal_outlined,
   Icons.bug_report_outlined,
@@ -24,9 +26,11 @@ const menuIconsSelected = [
   Icons.contacts,
   Icons.notifications,
   Icons.battery_std,
+  Icons.device_hub,
   Icons.autorenew,
   Icons.alarm,
   Icons.perm_media,
+  Icons.folder,
   Icons.settings,
   Icons.terminal,
   Icons.bug_report,

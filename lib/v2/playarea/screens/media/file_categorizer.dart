@@ -11,7 +11,8 @@ enum FileCategory {
   text('Text', Icons.text_snippet_outlined),
   font('Font', Icons.font_download_outlined),
   apk('APK', Icons.android),
-  other('File', Icons.insert_drive_file_outlined);
+  other('File', Icons.insert_drive_file_outlined),
+  folder('Folder', Icons.folder_outlined);
 
   final String label;
   final IconData icon;
@@ -200,6 +201,12 @@ class FileCategorizer {
           background: Color(0xFF757575),
           foreground: Colors.white,
           category: FileCategory.other,
+        );
+      case FileCategory.folder:
+        return const FileTypeStyle(
+          background: Color(0xFFF9A825),
+          foreground: Colors.white,
+          category: FileCategory.folder,
         );
     }
   }

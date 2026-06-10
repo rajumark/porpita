@@ -91,15 +91,38 @@ class _AppGateState extends State<_AppGate> {
   Widget build(BuildContext context) {
     final adb = context.watch<AdbManager>();
 
+    if (adb.status == AdbSetupStatus.idle) {
+      return const _MinimalSplash();
+    }
+
     if (adb.isReady && !_deviceManagerStarted) {
       _deviceManagerStarted = true;
       context.read<DeviceManager>().start();
     }
 
-    if (!adb.isReady) {
-      return const AdbSetupScreen();
+    if (adb.isReady) {
+      return const BaseScreen();
     }
 
-    return const BaseScreen();
+    return const AdbSetupScreen();
+  }
+}
+
+class _MinimalSplash extends StatelessWidget {
+  const _MinimalSplash();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Text(
+          'Porpita',
+          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+        ),
+      ),
+    );
   }
 }
