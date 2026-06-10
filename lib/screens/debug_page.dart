@@ -12,7 +12,8 @@ class DebugPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AdbManager>(
       builder: (context, adb, _) {
-        if (adb.isInitializing) {
+        if (adb.status == AdbSetupStatus.downloading ||
+            adb.status == AdbSetupStatus.extracting) {
           return const Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -46,7 +47,7 @@ class DebugPage extends StatelessWidget {
           );
         }
 
-        if (!adb.isInitialized) {
+        if (!adb.isReady) {
           return const SizedBox.shrink();
         }
 

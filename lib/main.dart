@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'v2/base_screen.dart';
+import 'screens/adb_setup_screen.dart';
 import 'services/adb_manager.dart';
 import 'services/device_manager.dart';
 import 'services/emulator_manager.dart';
@@ -19,8 +20,6 @@ void main() async {
   adb.initialize();
 
   final deviceManager = DeviceManager();
-  deviceManager.start();
-
   final emulatorManager = EmulatorManager();
 
   runApp(
@@ -71,9 +70,36 @@ class MyApp extends StatelessWidget {
             ),
             useMaterial3: true,
           ),
-          home: const BaseScreen(),
+          home: const _AppGate(),
         ),
       ),
     );
+  }
+}
+
+class _AppGate extends StatefulWidget {
+  const _AppGate();
+
+  @override
+  State<_AppGate> createState() => _AppGateState();
+}
+
+class _AppGateState extends State<_AppGate> {
+  bool _deviceManagerStarted = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final adb = context.watch<AdbManager>();
+
+    if (adb.isReady && !_deviceManagerStarted) {
+      _deviceManagerStarted = true;
+      context.read<DeviceManager>().start();
+    }
+
+    if (!adb.isReady) {
+      return const AdbSetupScreen();
+    }
+
+    return const BaseScreen();
   }
 }
