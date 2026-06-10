@@ -9,7 +9,7 @@ class AppsBaseScreen extends StatefulWidget {
   @override
   State<AppsBaseScreen> createState() => _AppsBaseScreenState();
 }
-
+ 
 class _AppsBaseScreenState extends State<AppsBaseScreen> {
   String? _selectedPackageName;
   int _initialTabIndex = 0;
