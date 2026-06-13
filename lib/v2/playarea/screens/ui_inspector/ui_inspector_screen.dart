@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:provider/provider.dart';
 
 import 'package:porpita/services/device_manager.dart';
@@ -34,6 +37,11 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
     setState(() => _loading = true);
 
     final result = await UiInspectorService.fetch(deviceId);
+
+    if (result.screenshotPath != null) {
+      PaintingBinding.instance.imageCache
+          .evict(FileImage(File(result.screenshotPath!)));
+    }
 
     if (mounted) {
       setState(() {
