@@ -1,0 +1,2 @@
+-keep class io.porpita.server.* { *; }
+-keep class fi.iki.elonen.** { *; }

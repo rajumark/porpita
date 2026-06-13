@@ -5,6 +5,7 @@ import 'package:porpita/services/screen_capture_service.dart';
 import 'devicebutton/device_button.dart';
 import 'porpita_preferences/porpita_preferences_dialog.dart';
 import '../notification_shade/pill_view/pill_view.dart';
+import 'time_chip/time_chip.dart';
 
 class TopBar extends StatelessWidget {
   final VoidCallback onMenuTap;
@@ -28,6 +29,8 @@ class TopBar extends StatelessWidget {
           const Text('Porpita'),
           const SizedBox(width: 16),
           const DeviceButton(),
+          const SizedBox(width: 8),
+          const TimeChip(),
           const Expanded(child: Center(child: PillView())),
           if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
             IconButton(

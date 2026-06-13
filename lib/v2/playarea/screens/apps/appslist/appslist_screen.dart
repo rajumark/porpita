@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:porpita/services/device_manager.dart';
 import 'package:porpita/v2/widgets/search_view.dart';
+import 'package:porpita/v2/playarea/screens/apps/icons/app_icon_service.dart';
 import 'apps_list_service.dart';
 import 'apps_list_content.dart';
 import 'app_actions_service.dart';
@@ -33,6 +34,7 @@ class _AppsListScreenState extends State<AppsListScreen> {
   final _searchController = TextEditingController();
   static const _filterKey = 'apps_filter_index';
   Set<String> _pinnedApps = {};
+  Map<String, String> _iconPaths = {};
 
   Timer? _appsTimer;
   Timer? _currentAppTimer;
@@ -70,6 +72,7 @@ class _AppsListScreenState extends State<AppsListScreen> {
 
   void _handleDeviceSwitch(String deviceId) {
     _lastDeviceId = deviceId;
+    _iconPaths = Map.from(AppIconService.instance.getIconCacheForDevice(deviceId));
     _cancelTimers();
     _fetchData(deviceId);
   }
@@ -104,6 +107,21 @@ class _AppsListScreenState extends State<AppsListScreen> {
 
   void _onSearchChanged() {
     setState(() => _searchQuery = _searchController.text.toLowerCase());
+  }
+
+  Future<void> _fetchIcons(String deviceId) async {
+    try {
+      final allApps = [..._systemApps, ..._userApps];
+      if (_foregroundApp != null) {
+        allApps.add(_foregroundApp!.packageName);
+      }
+      await AppIconService.instance.fetchIcons(deviceId, allApps);
+      if (mounted) {
+        setState(() {
+          _iconPaths = Map.from(AppIconService.instance.getIconCacheForDevice(deviceId));
+        });
+      }
+    } catch (_) {}
   }
 
   @override
@@ -251,6 +269,7 @@ class _AppsListScreenState extends State<AppsListScreen> {
         _isLoading = false;
       });
 
+      _fetchIcons(deviceId);
       _startTimers(deviceId);
     } catch (e) {
       if (!mounted) return;
@@ -274,6 +293,7 @@ class _AppsListScreenState extends State<AppsListScreen> {
           _systemApps = categorized.system;
           _userApps = categorized.user;
         });
+        _fetchIcons(deviceId);
       }
     } catch (_) {
     }
@@ -322,6 +342,7 @@ class _AppsListScreenState extends State<AppsListScreen> {
       pinnedApps: _pinnedApps,
       onAppSelected: (packageName) => widget.onAppSelected(packageName),
       onAppAction: _handleAppAction,
+      iconPaths: _iconPaths,
     );
   }
 }

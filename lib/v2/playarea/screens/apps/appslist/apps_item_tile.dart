@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'app_actions_service.dart';
 
@@ -9,6 +10,7 @@ class AppItemTile extends StatefulWidget {
   final String packageName;
   final ValueChanged<AppAction>? onMenuItemSelected;
   final bool isPinned;
+  final String? iconPath;
 
   static const _mainActions = [
     AppAction.open,
@@ -41,6 +43,7 @@ class AppItemTile extends StatefulWidget {
     required this.packageName,
     this.onMenuItemSelected,
     this.isPinned = false,
+    this.iconPath,
   });
 
   @override
@@ -90,6 +93,38 @@ class _AppItemTileState extends State<AppItemTile> {
     });
   }
 
+  Widget _buildIcon() {
+    if (widget.iconPath != null && widget.iconPath!.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(6),
+        child: Image.file(
+          File(widget.iconPath!),
+          width: 32,
+          height: 32,
+          fit: BoxFit.cover,
+          errorBuilder: (_, e, _) => _buildDefaultIcon(),
+        ),
+      );
+    }
+    return _buildDefaultIcon();
+  }
+
+  Widget _buildDefaultIcon() {
+    return Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Icon(
+        Icons.android,
+        size: 18,
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -106,6 +141,9 @@ class _AppItemTileState extends State<AppItemTile> {
             children: [
               if (widget.leading != null) ...[
                 widget.leading!,
+                const SizedBox(width: 10),
+              ] else ...[
+                _buildIcon(),
                 const SizedBox(width: 10),
               ],
               Expanded(
@@ -139,13 +177,13 @@ class _AppItemTileState extends State<AppItemTile> {
                       Text(widget.isPinned ? 'Unpin it' : 'Pin it'),
                     ]),
                   ),
-                  const PopupMenuDivider(),
-                  const PopupMenuItem<String>(
+                  PopupMenuDivider(),
+                  PopupMenuItem<String>(
                     value: '__more__',
                     child: Row(children: [
                       Icon(Icons.more_horiz, size: 18),
-                      const SizedBox(width: 8),
-                      const Text('More'),
+                      SizedBox(width: 8),
+                      Text('More'),
                     ]),
                   ),
                 ],

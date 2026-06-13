@@ -1,0 +1,65 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+dependencies {
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
+}
+
+android {
+    namespace 'io.porpita.server'
+
+    compileSdk = 35
+
+    defaultConfig {
+        minSdk 23
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+tasks.register('extractDex') {
+    dependsOn 'assembleRelease'
+    doLast {
+        def apkDir = file("${buildDir}/outputs/apk/release/")
+        def apkFile = apkDir.listFiles()?.find { it.name.endsWith('.apk') }
+        if (apkFile != null) {
+            ant.unzip(src: apkFile.absolutePath, dest: "${rootProject.rootDir}/dex_temp") {
+                patternset {
+                    include(name: 'classes*.dex')
+                }
+            }
+            def dexDir = file("${rootProject.rootDir}/dex_temp")
+            def dexFiles = dexDir.listFiles()?.findAll { it.name.startsWith('classes') && it.name.endsWith('.dex') }
+            if (dexFiles != null && dexFiles.size() > 0) {
+                def target = file("${rootProject.rootDir}/porpita.dex")
+                if (target.exists()) target.delete()
+                dexFiles[0].renameTo(target)
+                dexFiles.each { if (it.exists()) it.delete() }
+                dexDir.deleteDir()
+                println "DEX extracted to ${target.absolutePath}"
+            } else {
+                println "No DEX files found in APK"
+            }
+        } else {
+            println "APK not found in ${apkDir}"
+        }
+    }
+}

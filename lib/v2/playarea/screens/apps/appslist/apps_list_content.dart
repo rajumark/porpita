@@ -13,6 +13,7 @@ class AppsListContent extends StatelessWidget {
   final Set<String> pinnedApps;
   final void Function(String packageName) onAppSelected;
   final void Function(AppAction action, String packageName) onAppAction;
+  final Map<String, String> iconPaths;
 
   const AppsListContent({
     super.key,
@@ -24,6 +25,7 @@ class AppsListContent extends StatelessWidget {
     required this.pinnedApps,
     required this.onAppSelected,
     required this.onAppAction,
+    required this.iconPaths,
   });
 
   bool _matchesSearch(String package) {
@@ -99,6 +101,7 @@ class AppsListContent extends StatelessWidget {
             packageName: foregroundApp!.packageName,
             isPinned: pinnedApps.contains(foregroundApp!.packageName),
             onMenuItemSelected: (action) => onAppAction(action, foregroundApp!.packageName),
+            iconPath: iconPaths[foregroundApp!.packageName],
           ),
           const SizedBox(height: 8),
         ],
@@ -119,6 +122,7 @@ class AppsListContent extends StatelessWidget {
             packageName: e.value,
             isPinned: true,
             onMenuItemSelected: (action) => onAppAction(action, e.value),
+            iconPath: iconPaths[e.value],
           )),
           const SizedBox(height: 8),
         ],
@@ -139,6 +143,7 @@ class AppsListContent extends StatelessWidget {
             packageName: e.value,
             isPinned: pinnedApps.contains(e.value),
             onMenuItemSelected: (action) => onAppAction(action, e.value),
+            iconPath: iconPaths[e.value],
           )),
           const SizedBox(height: 8),
         ],
@@ -159,6 +164,7 @@ class AppsListContent extends StatelessWidget {
             packageName: e.value,
             isPinned: pinnedApps.contains(e.value),
             onMenuItemSelected: (action) => onAppAction(action, e.value),
+            iconPath: iconPaths[e.value],
           )),
         ],
       ],
