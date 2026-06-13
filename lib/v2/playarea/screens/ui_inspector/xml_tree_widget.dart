@@ -132,9 +132,10 @@ class _XmlNodeRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: isHighlighted ? colorScheme.secondaryContainer : Colors.transparent,
         borderRadius: BorderRadius.circular(4),
-        border: isHighlighted
-            ? Border.all(color: colorScheme.secondary, width: 1.5)
-            : null,
+        border: Border.all(
+          color: isHighlighted ? colorScheme.secondary : Colors.transparent,
+          width: 1.5,
+        ),
       ),
       child: InkWell(
         onTap: hasChildren ? onToggleExpand : null,

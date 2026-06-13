@@ -314,42 +314,35 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
           onLayersChanged: _onLayersChanged,
           onFocusChanged: _onFocusChanged,
         ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            IconButton(
+              icon: Icon(_isAllExpanded ? Icons.unfold_less : Icons.unfold_more, size: 18),
+              tooltip: _isAllExpanded ? 'Collapse all' : 'Expand all',
+              visualDensity: VisualDensity.compact,
+              onPressed: _toggleExpandAll,
+            ),
+            IconButton(
+              icon: const Icon(Icons.copy, size: 18),
+              tooltip: 'Copy XML',
+              visualDensity: VisualDensity.compact,
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: xml));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('XML copied'), duration: Duration(seconds: 1)),
+                );
+              },
+            ),
+          ],
+        ),
+        const Divider(height: 1),
         Expanded(
-          child: Stack(
-            children: [
-              XmlTreeWidget(
-                treeModel: _treeModel!,
-                expandedNodes: _expandedNodes,
-                highlightedIndices: _highlightedIndices,
-                onToggleExpand: _onToggleExpand,
-              ),
-              Positioned(
-                top: 4,
-                right: 4,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: Icon(_isAllExpanded ? Icons.unfold_less : Icons.unfold_more, size: 18),
-                      tooltip: _isAllExpanded ? 'Collapse all' : 'Expand all',
-                      visualDensity: VisualDensity.compact,
-                      onPressed: _toggleExpandAll,
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.copy, size: 18),
-                      tooltip: 'Copy XML',
-                      visualDensity: VisualDensity.compact,
-                      onPressed: () {
-                        Clipboard.setData(ClipboardData(text: xml));
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('XML copied'), duration: Duration(seconds: 1)),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          child: XmlTreeWidget(
+            treeModel: _treeModel!,
+            expandedNodes: _expandedNodes,
+            highlightedIndices: _highlightedIndices,
+            onToggleExpand: _onToggleExpand,
           ),
         ),
       ],
