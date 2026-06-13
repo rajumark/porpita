@@ -16,6 +16,7 @@ class UiInspectorController extends ChangeNotifier {
   String _searchQuery = '';
   List<XmlNode> _searchResults = [];
   Set<int> _searchResultIndices = {};
+  int? _selectedFlatIndex;
 
   XmlTreeModel? get treeModel => _treeModel;
   Set<int> get expandedNodes => _expandedNodes;
@@ -27,15 +28,16 @@ class UiInspectorController extends ChangeNotifier {
   String get searchQuery => _searchQuery;
   List<XmlNode> get searchResults => _searchResults;
   Set<int> get searchResultIndices => _searchResultIndices;
+  int? get selectedFlatIndex => _selectedFlatIndex;
 
   XmlNode? get selectedNode {
-    if (_treeModel == null || _highlightedIndices.isEmpty) return null;
-    return _treeModel!.getNodeAtFlatIndex(_highlightedIndices.first);
+    if (_treeModel == null || _selectedFlatIndex == null) return null;
+    return _treeModel!.getNodeAtFlatIndex(_selectedFlatIndex!);
   }
 
   Rect? get selectedBounds {
-    if (_treeModel == null || _highlightedIndices.isEmpty) return null;
-    final node = _treeModel!.getNodeAtFlatIndex(_highlightedIndices.first);
+    if (_treeModel == null || _selectedFlatIndex == null) return null;
+    final node = _treeModel!.getNodeAtFlatIndex(_selectedFlatIndex!);
     return node?.boundsRect;
   }
 
@@ -92,6 +94,7 @@ class UiInspectorController extends ChangeNotifier {
     if (_treeModel == null || _highlightedIndices.isEmpty) return [];
     final list = <Rect>[];
     for (final index in _highlightedIndices) {
+      if (index == _selectedFlatIndex) continue;
       final node = _treeModel!.getNodeAtFlatIndex(index);
       final rect = node?.boundsRect;
       if (rect != null) list.add(rect);
@@ -113,6 +116,7 @@ class UiInspectorController extends ChangeNotifier {
     _treeModel = XmlTreeModel.parse(xmlContent);
     _expandedNodes.clear();
     _highlightedIndices.clear();
+    _selectedFlatIndex = null;
     _layersValue = 0;
     _focusValue = 0;
     _isSearchMode = false;
@@ -155,9 +159,8 @@ class UiInspectorController extends ChangeNotifier {
   // --- Selection ---
 
   void selectNode(int flatIndex) {
-    _highlightedIndices
-      ..clear()
-      ..add(flatIndex);
+    if (_selectedFlatIndex == flatIndex) return;
+    _selectedFlatIndex = flatIndex;
     notifyListeners();
   }
 
@@ -176,6 +179,7 @@ class UiInspectorController extends ChangeNotifier {
     _searchQuery = '';
     _searchResults = [];
     _searchResultIndices = {};
+    _selectedFlatIndex = null;
     notifyListeners();
   }
 
@@ -195,9 +199,8 @@ class UiInspectorController extends ChangeNotifier {
   }
 
   void selectSearchResult(int flatIndex) {
-    _highlightedIndices
-      ..clear()
-      ..add(flatIndex);
+    if (_selectedFlatIndex == flatIndex) return;
+    _selectedFlatIndex = flatIndex;
     notifyListeners();
   }
 

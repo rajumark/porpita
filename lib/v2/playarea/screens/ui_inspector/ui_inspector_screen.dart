@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'package:porpita/services/device_manager.dart';
@@ -95,54 +96,105 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Row(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (foregroundApp != null) ...[
-            Icon(Icons.open_in_browser, size: 16, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                foregroundApp.activityName.split('.').last,
-                style: TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 12,
-                  color: Theme.of(context).colorScheme.primary,
+          Row(
+            children: [
+              if (foregroundApp != null) ...[
+                Icon(Icons.open_in_browser, size: 16, color: Theme.of(context).colorScheme.primary),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    foregroundApp.activityName.split('.').last,
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                overflow: TextOverflow.ellipsis,
+              ] else
+                const Expanded(child: SizedBox.shrink()),
+              if (_loading)
+                const Padding(
+                  padding: EdgeInsets.only(right: 8),
+                  child: SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+              ListenableBuilder(
+                listenable: _controller,
+                builder: (context, _) {
+                  if (_showProperties) return const SizedBox.shrink();
+                  return IconButton(
+                    icon: const Icon(Icons.list_alt, size: 20),
+                    onPressed: _controller.selectedNode != null
+                        ? () => setState(() => _showProperties = true)
+                        : null,
+                    tooltip: 'Properties',
+                    visualDensity: VisualDensity.compact,
+                  );
+                },
               ),
-            ),
-          ] else
-            const Expanded(child: SizedBox.shrink()),
-          if (_loading)
-            const Padding(
-              padding: EdgeInsets.only(right: 8),
-              child: SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            ),
-          ListenableBuilder(
-            listenable: _controller,
-            builder: (context, _) {
-              if (_showProperties) return const SizedBox.shrink();
-              return IconButton(
-                icon: const Icon(Icons.list_alt, size: 20),
-                onPressed: _controller.selectedNode != null
-                    ? () => setState(() => _showProperties = true)
-                    : null,
-                tooltip: 'Properties',
+              IconButton(
+                icon: const Icon(Icons.refresh, size: 20),
+                onPressed: _loading || deviceId == null ? null : () => _refresh(deviceId),
+                tooltip: 'Refresh',
                 visualDensity: VisualDensity.compact,
+              ),
+            ],
+          ),
+          if (foregroundApp != null && foregroundApp.fragments.isNotEmpty)
+            _buildFragmentChips(foregroundApp.fragments),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFragmentChips(List<String> fragments) {
+    return SizedBox(
+      height: 28,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: fragments.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 4),
+        itemBuilder: (context, index) {
+          final name = fragments[index];
+          return InkWell(
+            onTap: () {
+              Clipboard.setData(ClipboardData(text: name));
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Copied: $name'),
+                  duration: const Duration(seconds: 1),
+                  behavior: SnackBarBehavior.floating,
+                ),
               );
             },
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh, size: 20),
-            onPressed: _loading || deviceId == null ? null : () => _refresh(deviceId),
-            tooltip: 'Refresh',
-            visualDensity: VisualDensity.compact,
-          ),
-        ],
+            borderRadius: BorderRadius.circular(6),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondaryContainer,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                name,
+                style: TextStyle(
+                  fontFamily: 'monospace',
+                  fontSize: 11,
+                  color: Theme.of(context).colorScheme.onSecondaryContainer,
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -183,6 +235,7 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
               error: _result?.error,
               screenshotVersion: _screenshotVersion,
               boundsOverlays: _controller.highlightedBounds,
+              selectedBoundsOverlay: _controller.selectedBounds,
               controller: _controller,
               onNodeTap: () {
                 if (!_showProperties && _controller.selectedNode != null) {

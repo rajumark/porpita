@@ -9,6 +9,7 @@ class XmlTreeWidget extends StatefulWidget {
   final ValueChanged<int> onToggleExpand;
   final ValueChanged<int>? onNodeSelected;
   final int? focusedFlatIndex;
+  final int? selectedFlatIndex;
 
   const XmlTreeWidget({
     super.key,
@@ -18,6 +19,7 @@ class XmlTreeWidget extends StatefulWidget {
     required this.onToggleExpand,
     this.onNodeSelected,
     this.focusedFlatIndex,
+    this.selectedFlatIndex,
   });
 
   @override
@@ -83,16 +85,17 @@ class _XmlTreeWidgetState extends State<XmlTreeWidget> {
 
             _nodeKeys.putIfAbsent(node.flatIndex, () => GlobalKey());
 
-            return _XmlNodeRow(
-              key: _nodeKeys[node.flatIndex],
-              node: node,
-              isHighlighted: isHighlighted,
-              isExpanded: isExpanded,
-              isBlinking: isBlinking,
-              colorScheme: colorScheme,
-              onToggleExpand: () => widget.onToggleExpand(node.flatIndex),
-              onTap: () => widget.onNodeSelected?.call(node.flatIndex),
-            );
+return _XmlNodeRow(
+          key: _nodeKeys[node.flatIndex],
+          node: node,
+          isHighlighted: isHighlighted,
+          isExpanded: isExpanded,
+          isBlinking: isBlinking,
+          isSelected: widget.selectedFlatIndex == node.flatIndex,
+          colorScheme: colorScheme,
+          onToggleExpand: () => widget.onToggleExpand(node.flatIndex),
+          onTap: () => widget.onNodeSelected?.call(node.flatIndex),
+        );
           },
         ),
       ),
@@ -120,6 +123,7 @@ class _XmlNodeRow extends StatefulWidget {
   final bool isHighlighted;
   final bool isExpanded;
   final bool isBlinking;
+  final bool isSelected;
   final ColorScheme colorScheme;
   final VoidCallback onToggleExpand;
   final VoidCallback? onTap;
@@ -133,6 +137,7 @@ class _XmlNodeRow extends StatefulWidget {
     required this.isHighlighted,
     required this.isExpanded,
     required this.isBlinking,
+    required this.isSelected,
     required this.colorScheme,
     required this.onToggleExpand,
     this.onTap,
@@ -203,18 +208,22 @@ class _XmlNodeRowState extends State<_XmlNodeRow> with SingleTickerProviderState
           duration: const Duration(milliseconds: 150),
           margin: EdgeInsets.only(left: indent * _XmlNodeRow._indentWidth),
           decoration: BoxDecoration(
-            color: widget.isHighlighted
-                ? widget.colorScheme.secondaryContainer
-                : (widget.isBlinking
-                    ? Colors.orange.withValues(alpha: 0.3 * blinkAlpha)
-                    : Colors.transparent),
+            color: widget.isSelected
+                ? Colors.green.withValues(alpha: 0.2)
+                : (widget.isHighlighted
+                    ? widget.colorScheme.secondaryContainer
+                    : (widget.isBlinking
+                        ? Colors.orange.withValues(alpha: 0.3 * blinkAlpha)
+                        : Colors.transparent)),
             borderRadius: BorderRadius.circular(4),
             border: Border.all(
-              color: widget.isHighlighted
-                  ? widget.colorScheme.secondary
-                  : (widget.isBlinking
-                      ? Colors.orange.withValues(alpha: blinkAlpha)
-                      : Colors.transparent),
+              color: widget.isSelected
+                  ? Colors.green
+                  : (widget.isHighlighted
+                      ? widget.colorScheme.secondary
+                      : (widget.isBlinking
+                          ? Colors.orange.withValues(alpha: blinkAlpha)
+                          : Colors.transparent)),
               width: 1.5,
             ),
           ),
@@ -273,9 +282,11 @@ class _XmlNodeRowState extends State<_XmlNodeRow> with SingleTickerProviderState
   }
 
   Widget _buildLabel() {
-    final textColor = widget.isHighlighted
-        ? widget.colorScheme.onSecondaryContainer
-        : widget.colorScheme.onSurface;
+    final textColor = widget.isSelected
+        ? Colors.green.shade900
+        : (widget.isHighlighted
+            ? widget.colorScheme.onSecondaryContainer
+            : widget.colorScheme.onSurface);
 
     return Text.rich(
       TextSpan(
@@ -286,9 +297,11 @@ class _XmlNodeRowState extends State<_XmlNodeRow> with SingleTickerProviderState
               fontFamily: 'monospace',
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: widget.isHighlighted
-                  ? widget.colorScheme.onSecondaryContainer
-                  : widget.colorScheme.primary,
+              color: widget.isSelected
+                  ? Colors.green.shade700
+                  : (widget.isHighlighted
+                      ? widget.colorScheme.onSecondaryContainer
+                      : widget.colorScheme.primary),
             ),
           ),
           if (widget.node.text != null && widget.node.text!.isNotEmpty)

@@ -3,10 +3,12 @@ import 'package:porpita/services/commands/adb_exec_service.dart';
 class ForegroundApp {
   final String packageName;
   final String activityName;
+  final List<String> fragments;
 
   const ForegroundApp({
     required this.packageName,
     required this.activityName,
+    this.fragments = const [],
   });
 }
 
@@ -16,13 +18,60 @@ class CurrentAppService {
       'dumpsys', 'window',
     ]);
 
-    final app = _parseForegroundApp(result);
-    if (app != null) return app;
+    ForegroundApp? app = _parseForegroundApp(result);
+    if (app == null) {
+      final fallback = await AdbExecService.run(deviceId, [
+        'dumpsys', 'activity', 'activities',
+      ]);
+      app = _parseResumedActivity(fallback);
+    }
 
-    final fallback = await AdbExecService.run(deviceId, [
-      'dumpsys', 'activity', 'activities',
-    ]);
-    return _parseResumedActivity(fallback);
+    if (app != null) {
+      final fragments = await _fetchFragments(deviceId, app);
+      app = ForegroundApp(
+        packageName: app.packageName,
+        activityName: app.activityName,
+        fragments: fragments,
+      );
+    }
+
+    return app;
+  }
+
+  static Future<List<String>> _fetchFragments(
+      String deviceId, ForegroundApp app) async {
+    try {
+      final output = await AdbExecService.run(deviceId, [
+        'dumpsys',
+        'activity',
+        '${app.packageName}/${app.activityName}',
+      ]);
+      return _parseFragments(output);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  static List<String> _parseFragments(String output) {
+    final fragments = <String>[];
+    final lines = output.split('\n');
+    var inActiveFragments = false;
+    for (final line in lines) {
+      if (line.contains('Active Fragments:')) {
+        inActiveFragments = true;
+        continue;
+      }
+      if (inActiveFragments) {
+        if (line.trim().isEmpty) continue;
+        final match = RegExp(r'^\s*(\w+)\{').firstMatch(line);
+        if (match != null) {
+          fragments.add(match.group(1)!);
+          continue;
+        }
+        if (line.contains('Added Fragments:')) break;
+      }
+    }
+    return fragments;
   }
 
   static ForegroundApp? _parseForegroundApp(String output) {

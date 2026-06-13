@@ -11,6 +11,7 @@ class UiInspectorScreenshotPanel extends StatefulWidget {
   final String? error;
   final int screenshotVersion;
   final List<Rect> boundsOverlays;
+  final Rect? selectedBoundsOverlay;
   final UiInspectorController controller;
   final VoidCallback? onNodeTap;
 
@@ -21,6 +22,7 @@ class UiInspectorScreenshotPanel extends StatefulWidget {
     this.error,
     this.screenshotVersion = 0,
     this.boundsOverlays = const [],
+    this.selectedBoundsOverlay,
     this.onNodeTap,
   });
 
@@ -143,12 +145,13 @@ class _UiInspectorScreenshotPanelState extends State<UiInspectorScreenshotPanel>
                     },
                   ),
                 ),
-                if (_rawImage != null && widget.boundsOverlays.isNotEmpty)
+                if (_rawImage != null && (widget.boundsOverlays.isNotEmpty || widget.selectedBoundsOverlay != null))
                   CustomPaint(
                     size: Size(constraints.maxWidth, constraints.maxHeight),
                     painter: _BoundsOverlayPainter(
                       rawImage: _rawImage!,
                       boundsList: widget.boundsOverlays,
+                      selectedBounds: widget.selectedBoundsOverlay,
                     ),
                   ),
                 if (_rawImage != null)
@@ -210,12 +213,13 @@ class _UiInspectorScreenshotPanelState extends State<UiInspectorScreenshotPanel>
 class _BoundsOverlayPainter extends CustomPainter {
   final ui.Image rawImage;
   final List<Rect> boundsList;
+  final Rect? selectedBounds;
 
-  _BoundsOverlayPainter({required this.rawImage, required this.boundsList});
+  _BoundsOverlayPainter({required this.rawImage, required this.boundsList, this.selectedBounds});
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (boundsList.isEmpty) return;
+    if (boundsList.isEmpty && selectedBounds == null) return;
 
     final imgW = rawImage.width.toDouble();
     final imgH = rawImage.height.toDouble();
@@ -229,29 +233,50 @@ class _BoundsOverlayPainter extends CustomPainter {
     final offsetX = (size.width - displayW) / 2;
     final offsetY = (size.height - displayH) / 2;
 
-    final fillPaint = Paint()
+    final orangeFill = Paint()
       ..color = Colors.orange.withValues(alpha: 0.15)
       ..style = PaintingStyle.fill;
 
-    final strokePaint = Paint()
+    final orangeStroke = Paint()
       ..color = Colors.orange
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 
     for (final bounds in boundsList) {
-      final left = offsetX + bounds.left * scale;
-      final top = offsetY + bounds.top * scale;
-      final right = offsetX + bounds.right * scale;
-      final bottom = offsetY + bounds.bottom * scale;
-
-      final rect = Rect.fromLTRB(left, top, right, bottom);
-      canvas.drawRect(rect, fillPaint);
-      canvas.drawRect(rect, strokePaint);
+      final rect = _mapRect(bounds, scale, offsetX, offsetY);
+      canvas.drawRect(rect, orangeFill);
+      canvas.drawRect(rect, orangeStroke);
     }
+
+    if (selectedBounds != null) {
+      final greenFill = Paint()
+        ..color = Colors.green.withValues(alpha: 0.2)
+        ..style = PaintingStyle.fill;
+
+      final greenStroke = Paint()
+        ..color = Colors.green
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.5;
+
+      final rect = _mapRect(selectedBounds!, scale, offsetX, offsetY);
+      canvas.drawRect(rect, greenFill);
+      canvas.drawRect(rect, greenStroke);
+    }
+  }
+
+  Rect _mapRect(Rect bounds, double scale, double offsetX, double offsetY) {
+    return Rect.fromLTRB(
+      offsetX + bounds.left * scale,
+      offsetY + bounds.top * scale,
+      offsetX + bounds.right * scale,
+      offsetY + bounds.bottom * scale,
+    );
   }
 
   @override
   bool shouldRepaint(_BoundsOverlayPainter oldDelegate) {
-    return oldDelegate.boundsList != boundsList || oldDelegate.rawImage != rawImage;
+    return oldDelegate.boundsList != boundsList ||
+        oldDelegate.selectedBounds != selectedBounds ||
+        oldDelegate.rawImage != rawImage;
   }
 }

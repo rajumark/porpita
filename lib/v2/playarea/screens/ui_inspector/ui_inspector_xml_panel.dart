@@ -160,6 +160,7 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
                 onToggleExpand: widget.controller.toggleExpand,
                 onNodeSelected: widget.controller.selectNode,
                 focusedFlatIndex: _blinkFlatIndex,
+                selectedFlatIndex: widget.controller.selectedFlatIndex,
               );
             },
           ),
@@ -218,10 +219,11 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
     );
   }
 
-  Widget _buildSearchResults(XmlTreeModel treeModel) {
+Widget _buildSearchResults(XmlTreeModel treeModel) {
     final results = widget.controller.searchResults;
     final colorScheme = Theme.of(context).colorScheme;
     final highlightedIndices = widget.controller.highlightedIndices;
+    final selectedIndex = widget.controller.selectedFlatIndex;
 
     if (results.isEmpty) {
       return Center(
@@ -235,16 +237,25 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
       itemBuilder: (context, index) {
         final node = results[index];
         final isHighlighted = highlightedIndices.contains(node.flatIndex);
+        final isSelected = selectedIndex == node.flatIndex;
         final indent = node.depth;
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           margin: EdgeInsets.only(left: indent * 18.0),
           decoration: BoxDecoration(
-            color: isHighlighted ? colorScheme.secondaryContainer : Colors.transparent,
+            color: isSelected
+                ? Colors.green.withValues(alpha: 0.2)
+                : (isHighlighted
+                    ? colorScheme.secondaryContainer
+                    : Colors.transparent),
             borderRadius: BorderRadius.circular(4),
             border: Border.all(
-              color: isHighlighted ? colorScheme.secondary : Colors.transparent,
+              color: isSelected
+                  ? Colors.green
+                  : (isHighlighted
+                      ? colorScheme.secondary
+                      : Colors.transparent),
               width: 1.5,
             ),
           ),
@@ -258,7 +269,11 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
                   Icon(
                     node.hasChildren ? Icons.subdirectory_arrow_right : Icons.label,
                     size: 14,
-                    color: isHighlighted ? colorScheme.onSecondaryContainer : colorScheme.primary,
+                    color: isSelected
+                        ? Colors.green.shade700
+                        : (isHighlighted
+                            ? colorScheme.onSecondaryContainer
+                            : colorScheme.primary),
                   ),
                   const SizedBox(width: 4),
                   Expanded(
@@ -267,7 +282,11 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
                       style: TextStyle(
                         fontFamily: 'monospace',
                         fontSize: 11,
-                        color: isHighlighted ? colorScheme.onSecondaryContainer : colorScheme.onSurface,
+                        color: isSelected
+                            ? Colors.green.shade900
+                            : (isHighlighted
+                                ? colorScheme.onSecondaryContainer
+                                : colorScheme.onSurface),
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
