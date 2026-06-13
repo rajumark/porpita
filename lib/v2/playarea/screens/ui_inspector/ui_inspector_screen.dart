@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:provider/provider.dart';
 
 import 'package:porpita/services/device_manager.dart';
 import 'package:porpita/v2/widgets/rounded_container.dart';
 import 'ui_inspector_controller.dart';
 import 'ui_inspector_error_view.dart';
+import 'ui_inspector_properties_panel.dart';
 import 'ui_inspector_screenshot_panel.dart';
 import 'ui_inspector_service.dart';
 import 'ui_inspector_xml_panel.dart';
@@ -25,6 +25,19 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
   bool _loading = false;
   String? _lastDeviceId;
   int _screenshotVersion = 0;
+  bool _showProperties = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_onControllerChanged);
+  }
+
+  void _onControllerChanged() {
+    if (_controller.selectedNode != null && !_showProperties) {
+      setState(() => _showProperties = true);
+    }
+  }
 
   @override
   void dispose() {
@@ -109,6 +122,20 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
                 child: CircularProgressIndicator(strokeWidth: 2),
               ),
             ),
+          ListenableBuilder(
+            listenable: _controller,
+            builder: (context, _) {
+              if (_showProperties) return const SizedBox.shrink();
+              return IconButton(
+                icon: const Icon(Icons.list_alt, size: 20),
+                onPressed: _controller.selectedNode != null
+                    ? () => setState(() => _showProperties = true)
+                    : null,
+                tooltip: 'Properties',
+                visualDensity: VisualDensity.compact,
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.refresh, size: 20),
             onPressed: _loading || deviceId == null ? null : () => _refresh(deviceId),
@@ -160,12 +187,26 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
           },
         );
 
+        final propertiesPanel = ListenableBuilder(
+          listenable: _controller,
+          builder: (context, _) {
+            return UiInspectorPropertiesPanel(
+              node: _controller.selectedNode,
+              onClose: () => setState(() => _showProperties = false),
+            );
+          },
+        );
+
         if (isWide) {
           return Row(
             children: [
               Expanded(child: xmlPanel),
               const VerticalDivider(width: 1),
               Expanded(child: screenshotPanel),
+              if (_showProperties) ...[
+                const VerticalDivider(width: 1),
+                SizedBox(width: 260, child: propertiesPanel),
+              ],
             ],
           );
         }
@@ -175,6 +216,10 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
             Expanded(child: screenshotPanel),
             const Divider(height: 1),
             Expanded(child: xmlPanel),
+            if (_showProperties) ...[
+              const Divider(height: 1),
+              SizedBox(height: 200, child: propertiesPanel),
+            ],
           ],
         );
       },

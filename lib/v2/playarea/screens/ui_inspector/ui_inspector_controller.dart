@@ -28,6 +28,11 @@ class UiInspectorController extends ChangeNotifier {
   List<XmlNode> get searchResults => _searchResults;
   Set<int> get searchResultIndices => _searchResultIndices;
 
+  XmlNode? get selectedNode {
+    if (_treeModel == null || _highlightedIndices.isEmpty) return null;
+    return _treeModel!.getNodeAtFlatIndex(_highlightedIndices.first);
+  }
+
   Rect? get selectedBounds {
     if (_treeModel == null || _highlightedIndices.isEmpty) return null;
     final node = _treeModel!.getNodeAtFlatIndex(_highlightedIndices.first);
