@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/app_sidebar.dart';
 
-const menuItems = ['Apps', 'Call Logs', 'Messages', 'Contacts', 'Notifications', 'Battery', 'Device Info', 'Lifecycle', 'Alarms', 'Media', 'Files', 'Settings', 'Terminal', 'DebugInfo', 'UI Inspector'];
+const menuItems = ['Apps', 'Call Logs', 'Messages', 'Contacts', 'Notifications', 'Battery', 'Device Info', 'Lifecycle', 'Alarms', 'Media', 'Files', 'Settings', 'Terminal', 'DebugInfo', 'UI Inspector', 'SystemUI'];
 const menuIcons = [
   Icons.widgets_outlined,
   Icons.history_outlined,
@@ -18,6 +18,7 @@ const menuIcons = [
   Icons.terminal_outlined,
   Icons.bug_report_outlined,
   Icons.phone_android_outlined,
+  Icons.dashboard_outlined,
 ];
 const menuIconsSelected = [
   Icons.widgets,
@@ -35,6 +36,7 @@ const menuIconsSelected = [
   Icons.terminal,
   Icons.bug_report,
   Icons.phone_android,
+  Icons.dashboard,
 ];
 
 class Sidebar extends StatelessWidget {
