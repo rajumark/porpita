@@ -79,6 +79,7 @@ class UiInspectorXmlPanel extends StatelessWidget {
                 expandedNodes: controller.expandedNodes,
                 highlightedIndices: controller.highlightedIndices,
                 onToggleExpand: controller.toggleExpand,
+                onNodeSelected: controller.selectNode,
               );
             },
           ),

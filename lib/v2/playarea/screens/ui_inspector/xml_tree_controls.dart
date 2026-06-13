@@ -40,12 +40,11 @@ class XmlTreeControls extends StatelessWidget {
           bottom: BorderSide(color: colorScheme.outlineVariant, width: 0.5),
         ),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Row(
         children: [
           _buildToggle(colorScheme),
-          const SizedBox(height: 8),
-          _buildSlider(colorScheme),
+          const SizedBox(width: 12),
+          Expanded(child: _buildSlider(colorScheme)),
         ],
       ),
     );
@@ -138,40 +137,37 @@ class XmlTreeControls extends StatelessWidget {
   Widget _buildLayersSlider(ColorScheme colorScheme) {
     final effectiveMax = maxDepth > 0 ? maxDepth.toDouble() : 1.0;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    return Row(
       children: [
-        Row(
-          children: [
-            Icon(Icons.layers_outlined, size: 14, color: colorScheme.primary),
-            const SizedBox(width: 6),
-            Text(
-              'Depth: $layersValue / $maxDepth  ($layersNodeCount nodes)',
-              style: TextStyle(
-                fontSize: 11,
-                fontFamily: 'monospace',
-                fontWeight: FontWeight.w500,
-                color: colorScheme.onSurface,
-              ),
-            ),
-          ],
-        ),
-        SliderTheme(
-          data: SliderThemeData(
-            activeTrackColor: colorScheme.primary,
-            inactiveTrackColor: colorScheme.surfaceContainerHighest,
-            thumbColor: colorScheme.primary,
-            overlayColor: colorScheme.primary.withValues(alpha: 0.12),
-            trackHeight: 3,
-            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
-            tickMarkShape: SliderTickMarkShape.noTickMark,
+        Icon(Icons.layers_outlined, size: 14, color: colorScheme.primary),
+        const SizedBox(width: 6),
+        Text(
+          '$layersValue/$maxDepth ($layersNodeCount)',
+          style: TextStyle(
+            fontSize: 11,
+            fontFamily: 'monospace',
+            fontWeight: FontWeight.w500,
+            color: colorScheme.onSurface,
           ),
-          child: Slider(
-            value: layersValue.toDouble().clamp(0, effectiveMax),
-            min: 0,
-            max: effectiveMax,
-            divisions: maxDepth > 0 ? maxDepth : 1,
-            onChanged: (v) => onLayersChanged(v.round()),
+        ),
+        Expanded(
+          child: SliderTheme(
+            data: SliderThemeData(
+              activeTrackColor: colorScheme.primary,
+              inactiveTrackColor: colorScheme.surfaceContainerHighest,
+              thumbColor: colorScheme.primary,
+              overlayColor: colorScheme.primary.withValues(alpha: 0.12),
+              trackHeight: 3,
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+              tickMarkShape: SliderTickMarkShape.noTickMark,
+            ),
+            child: Slider(
+              value: layersValue.toDouble().clamp(0, effectiveMax),
+              min: 0,
+              max: effectiveMax,
+              divisions: maxDepth > 0 ? maxDepth : 1,
+              onChanged: (v) => onLayersChanged(v.round()),
+            ),
           ),
         ),
       ],
@@ -181,40 +177,37 @@ class XmlTreeControls extends StatelessWidget {
   Widget _buildFocusSlider(ColorScheme colorScheme) {
     final effectiveMax = totalNodes > 1 ? (totalNodes - 1).toDouble() : 1.0;
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    return Row(
       children: [
-        Row(
-          children: [
-            Icon(Icons.center_focus_strong_outlined, size: 14, color: colorScheme.primary),
-            const SizedBox(width: 6),
-            Text(
-              'Node: $focusValue / ${totalNodes - 1}${focusNodeLabel != null ? '  $focusNodeLabel' : ''}',
-              style: TextStyle(
-                fontSize: 11,
-                fontFamily: 'monospace',
-                fontWeight: FontWeight.w500,
-                color: colorScheme.onSurface,
-              ),
-            ),
-          ],
-        ),
-        SliderTheme(
-          data: SliderThemeData(
-            activeTrackColor: colorScheme.primary,
-            inactiveTrackColor: colorScheme.surfaceContainerHighest,
-            thumbColor: colorScheme.primary,
-            overlayColor: colorScheme.primary.withValues(alpha: 0.12),
-            trackHeight: 3,
-            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
-            tickMarkShape: SliderTickMarkShape.noTickMark,
+        Icon(Icons.center_focus_strong_outlined, size: 14, color: colorScheme.primary),
+        const SizedBox(width: 6),
+        Text(
+          '$focusValue/${totalNodes - 1}${focusNodeLabel != null ? ' $focusNodeLabel' : ''}',
+          style: TextStyle(
+            fontSize: 11,
+            fontFamily: 'monospace',
+            fontWeight: FontWeight.w500,
+            color: colorScheme.onSurface,
           ),
-          child: Slider(
-            value: focusValue.toDouble().clamp(0, effectiveMax),
-            min: 0,
-            max: effectiveMax,
-            divisions: totalNodes > 1 ? totalNodes - 1 : 1,
-            onChanged: (v) => onFocusChanged(v.round()),
+        ),
+        Expanded(
+          child: SliderTheme(
+            data: SliderThemeData(
+              activeTrackColor: colorScheme.primary,
+              inactiveTrackColor: colorScheme.surfaceContainerHighest,
+              thumbColor: colorScheme.primary,
+              overlayColor: colorScheme.primary.withValues(alpha: 0.12),
+              trackHeight: 3,
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 7),
+              tickMarkShape: SliderTickMarkShape.noTickMark,
+            ),
+            child: Slider(
+              value: focusValue.toDouble().clamp(0, effectiveMax),
+              min: 0,
+              max: effectiveMax,
+              divisions: totalNodes > 1 ? totalNodes - 1 : 1,
+              onChanged: (v) => onFocusChanged(v.round()),
+            ),
           ),
         ),
       ],

@@ -140,10 +140,16 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
             ? UiInspectorXmlPanel(controller: _controller, xmlContent: xmlContent)
             : const Center(child: Text('No XML content'));
 
-        final screenshotPanel = UiInspectorScreenshotPanel(
-          screenshotPath: _result?.screenshotPath,
-          error: _result?.error,
-          screenshotVersion: _screenshotVersion,
+        final screenshotPanel = ListenableBuilder(
+          listenable: _controller,
+          builder: (context, _) {
+            return UiInspectorScreenshotPanel(
+              screenshotPath: _result?.screenshotPath,
+              error: _result?.error,
+              screenshotVersion: _screenshotVersion,
+              boundsOverlays: _controller.highlightedBounds,
+            );
+          },
         );
 
         if (isWide) {

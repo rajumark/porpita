@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 
 import 'xml_tree_controls.dart';
@@ -17,6 +19,23 @@ class UiInspectorController extends ChangeNotifier {
   XmlTreeMode get mode => _mode;
   int get layersValue => _layersValue;
   int get focusValue => _focusValue;
+
+  Rect? get selectedBounds {
+    if (_treeModel == null || _highlightedIndices.isEmpty) return null;
+    final node = _treeModel!.getNodeAtFlatIndex(_highlightedIndices.first);
+    return node?.boundsRect;
+  }
+
+  List<Rect> get highlightedBounds {
+    if (_treeModel == null || _highlightedIndices.isEmpty) return [];
+    final list = <Rect>[];
+    for (final index in _highlightedIndices) {
+      final node = _treeModel!.getNodeAtFlatIndex(index);
+      final rect = node?.boundsRect;
+      if (rect != null) list.add(rect);
+    }
+    return list;
+  }
 
   bool get isAllExpanded {
     if (_treeModel == null) return false;
@@ -65,6 +84,15 @@ class UiInspectorController extends ChangeNotifier {
   void expandToDepth(int depth) {
     if (_treeModel == null) return;
     _expandNodeToDepth(_treeModel!.root, depth);
+  }
+
+  // --- Selection ---
+
+  void selectNode(int flatIndex) {
+    _highlightedIndices
+      ..clear()
+      ..add(flatIndex);
+    notifyListeners();
   }
 
   // --- Mode / Highlight ---

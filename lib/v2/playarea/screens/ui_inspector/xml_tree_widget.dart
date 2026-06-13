@@ -7,6 +7,7 @@ class XmlTreeWidget extends StatefulWidget {
   final Set<int> expandedNodes;
   final Set<int> highlightedIndices;
   final ValueChanged<int> onToggleExpand;
+  final ValueChanged<int>? onNodeSelected;
 
   const XmlTreeWidget({
     super.key,
@@ -14,6 +15,7 @@ class XmlTreeWidget extends StatefulWidget {
     required this.expandedNodes,
     this.highlightedIndices = const {},
     required this.onToggleExpand,
+    this.onNodeSelected,
   });
 
   @override
@@ -81,6 +83,7 @@ class _XmlTreeWidgetState extends State<XmlTreeWidget> {
           isExpanded: isExpanded,
           colorScheme: colorScheme,
           onToggleExpand: () => widget.onToggleExpand(node.flatIndex),
+          onTap: () => widget.onNodeSelected?.call(node.flatIndex),
         );
       },
     );
@@ -108,6 +111,7 @@ class _XmlNodeRow extends StatelessWidget {
   final bool isExpanded;
   final ColorScheme colorScheme;
   final VoidCallback onToggleExpand;
+  final VoidCallback? onTap;
 
   static const double _indentWidth = 18.0;
   static const double _iconSize = 16.0;
@@ -119,6 +123,7 @@ class _XmlNodeRow extends StatelessWidget {
     required this.isExpanded,
     required this.colorScheme,
     required this.onToggleExpand,
+    this.onTap,
   });
 
   @override
@@ -138,7 +143,10 @@ class _XmlNodeRow extends StatelessWidget {
         ),
       ),
       child: InkWell(
-        onTap: hasChildren ? onToggleExpand : null,
+        onTap: () {
+          onTap?.call();
+          if (hasChildren) onToggleExpand();
+        },
         borderRadius: BorderRadius.circular(4),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
@@ -203,7 +211,7 @@ class _XmlNodeRow extends StatelessWidget {
             ),
           if (node.resourceId != null && node.resourceId!.isNotEmpty)
             TextSpan(
-              text: ' ${node.resourceId}',
+              text: ' ${_shortResourceId(node.resourceId!)}',
               style: TextStyle(
                 fontFamily: 'monospace',
                 fontSize: 10,
@@ -216,4 +224,9 @@ class _XmlNodeRow extends StatelessWidget {
       overflow: TextOverflow.ellipsis,
     );
   }
+}
+
+String _shortResourceId(String fullId) {
+  final slashIndex = fullId.lastIndexOf('/');
+  return slashIndex >= 0 ? fullId.substring(slashIndex + 1) : fullId;
 }

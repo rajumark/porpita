@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:xml/xml.dart';
 
 class XmlNode {
@@ -25,6 +27,20 @@ class XmlNode {
   String? get className => attributes['class'];
   String? get bounds => attributes['bounds'];
   String? get packageName => attributes['package'];
+
+  static final _boundsPattern = RegExp(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]');
+
+  Rect? get boundsRect {
+    final b = bounds;
+    if (b == null) return null;
+    final match = _boundsPattern.firstMatch(b);
+    if (match == null) return null;
+    final left = double.parse(match.group(1)!);
+    final top = double.parse(match.group(2)!);
+    final right = double.parse(match.group(3)!);
+    final bottom = double.parse(match.group(4)!);
+    return Rect.fromLTRB(left, top, right, bottom);
+  }
 
   String get displayLabel {
     final parts = <String>[shortTag];
