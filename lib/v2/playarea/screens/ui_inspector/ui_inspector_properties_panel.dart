@@ -125,7 +125,6 @@ class _UiInspectorPropertiesPanelState extends State<UiInspectorPropertiesPanel>
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                _buildBreadcrumb(node, theme),
                 if (node.boundsRect != null && _rawImage != null) ...[
                   _BoundsPreview(
                     bounds: node.boundsRect!,
@@ -148,6 +147,7 @@ class _UiInspectorPropertiesPanelState extends State<UiInspectorPropertiesPanel>
                     isResourceId: attr.key == 'resource-id',
                   );
                 }),
+                _buildBreadcrumb(node, theme),
               ],
             ),
           ),
