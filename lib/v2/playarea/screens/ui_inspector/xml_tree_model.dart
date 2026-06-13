@@ -130,6 +130,36 @@ class XmlTreeModel {
     return result;
   }
 
+  List<XmlNode> searchNodes(String query) {
+    if (query.isEmpty) return [];
+    final lowerQuery = query.toLowerCase();
+    final results = <XmlNode>[];
+    _searchNode(root, lowerQuery, results);
+    return results;
+  }
+
+  void _searchNode(XmlNode node, String query, List<XmlNode> results) {
+    if (_nodeMatches(node, query)) {
+      results.add(node);
+    }
+    for (final child in node.children) {
+      _searchNode(child, query, results);
+    }
+  }
+
+  bool _nodeMatches(XmlNode node, String query) {
+    if (node.shortTag.toLowerCase().contains(query)) return true;
+    if (node.text != null && node.text!.toLowerCase().contains(query)) return true;
+    if (node.resourceId != null && node.resourceId!.toLowerCase().contains(query)) return true;
+    if (node.contentDesc != null && node.contentDesc!.toLowerCase().contains(query)) return true;
+    if (node.className != null && node.className!.toLowerCase().contains(query)) return true;
+    if (node.bounds != null && node.bounds!.toLowerCase().contains(query)) return true;
+    for (final value in node.attributes.values) {
+      if (value.toLowerCase().contains(query)) return true;
+    }
+    return false;
+  }
+
   void _collectAtDepth(XmlNode node, int targetDepth, List<XmlNode> result) {
     if (node.depth == targetDepth) {
       result.add(node);
