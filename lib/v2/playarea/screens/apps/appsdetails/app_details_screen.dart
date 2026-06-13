@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:porpita/services/device_manager.dart';
 import 'package:porpita/v2/widgets/rounded_container.dart';
+import 'package:porpita/v2/widgets/app_icon.dart';
+import 'package:porpita/v2/playarea/screens/apps/icons/app_icon_service.dart';
 import 'overview/overview_tab.dart';
 import 'permissions/permissions_tab.dart';
 import 'queries/queries_tab.dart';
@@ -57,6 +61,12 @@ class _AppDetailsScreenState extends State<AppDetailsScreen> with SingleTickerPr
                   padding: EdgeInsets.zero,
                   constraints: BoxConstraints.tight(const Size(36, 36)),
                 ),
+                AppIcon(
+                  packageName: widget.packageName,
+                  deviceId: context.watch<DeviceManager>().selected?.id ?? '',
+                  size: 28,
+                ),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     widget.packageName,

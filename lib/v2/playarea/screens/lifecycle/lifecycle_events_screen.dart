@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:porpita/services/device_manager.dart';
 import 'package:porpita/v2/widgets/search_view.dart';
+import 'package:porpita/v2/widgets/app_icon.dart';
+import 'package:porpita/v2/playarea/screens/apps/icons/app_icon_service.dart';
 import 'lifecycle_model.dart';
 import 'lifecycle_service.dart';
 
@@ -64,11 +66,19 @@ class _LifecycleEventsScreenState extends State<LifecycleEventsScreen> {
       final events = await LifecycleService.fetchEvents(deviceId);
       if (!mounted) return;
       setState(() { _events = events; _isLoading = false; });
+      _fetchIcons(deviceId);
       _startTimer(deviceId);
     } catch (e) {
       if (!mounted) return;
       setState(() { _error = e.toString(); _isLoading = false; });
     }
+  }
+
+  Future<void> _fetchIcons(String deviceId) async {
+    if (_events.isEmpty) return;
+    final packages = _events.map((e) => e.packageName).toSet().toList();
+    await AppIconService.instance.fetchIcons(deviceId, packages);
+    if (mounted) setState(() {});
   }
 
   Future<void> _manualRefresh(String deviceId) async {
@@ -138,12 +148,12 @@ class _LifecycleEventsScreenState extends State<LifecycleEventsScreen> {
             ],
           ),
         ),
-        Expanded(child: _buildContent(filtered)),
+        Expanded(child: _buildContent(filtered, _lastDeviceId ?? '')),
       ],
     );
   }
 
-  Widget _buildContent(List<UsageEvent> events) {
+  Widget _buildContent(List<UsageEvent> events, String deviceId) {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
     if (_error != null) {
       return Center(
@@ -178,7 +188,11 @@ class _LifecycleEventsScreenState extends State<LifecycleEventsScreen> {
             padding: const EdgeInsets.only(left: 12, right: 8, top: 6, bottom: 6),
             child: Row(
               children: [
-                Icon(e.type.icon, size: 18, color: scheme.primary),
+                AppIcon(
+                  packageName: e.packageName,
+                  deviceId: deviceId,
+                  size: 28,
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(

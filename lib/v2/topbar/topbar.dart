@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:porpita/services/screen_capture_service.dart';
 import 'devicebutton/device_button.dart';
 import 'porpita_preferences/porpita_preferences_dialog.dart';
-import '../notification_shade/pill_view/pill_view.dart';
 import 'time_chip/time_chip.dart';
 
 class TopBar extends StatelessWidget {
@@ -30,32 +29,39 @@ class TopBar extends StatelessWidget {
           const SizedBox(width: 16),
           const DeviceButton(),
           const SizedBox(width: 8),
-          const TimeChip(),
-          const Expanded(child: Center(child: PillView())),
-          if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
-            IconButton(
-              icon: const Icon(Icons.camera_alt_outlined),
-              iconSize: 24,
-              tooltip: 'Capture window screenshot',
-              onPressed: () => ScreenCaptureService.captureAndSave(context),
-              padding: EdgeInsets.zero,
-              constraints: BoxConstraints.tight(const Size(36, 36)),
-            ),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            iconSize: 24,
-            onPressed: () => PorpitaPreferencesDialog.show(context),
-            padding: EdgeInsets.zero,
-            constraints: BoxConstraints.tight(const Size(36, 36)),
+          const Spacer(),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const TimeChip(),
+              const SizedBox(width: 8),
+              if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
+                IconButton(
+                  icon: const Icon(Icons.camera_alt_outlined),
+                  iconSize: 24,
+                  tooltip: 'Capture window screenshot',
+                  onPressed: () => ScreenCaptureService.captureAndSave(context),
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints.tight(const Size(36, 36)),
+                ),
+              IconButton(
+                icon: const Icon(Icons.settings),
+                iconSize: 24,
+                onPressed: () => PorpitaPreferencesDialog.show(context),
+                padding: EdgeInsets.zero,
+                constraints: BoxConstraints.tight(const Size(36, 36)),
+              ),
+              IconButton(
+                icon: const Icon(Icons.menu),
+                iconSize: 24,
+                onPressed: onQuickSettingsTap,
+                padding: EdgeInsets.zero,
+                constraints: BoxConstraints.tight(const Size(36, 36)),
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.menu),
-            iconSize: 24,
-            onPressed: onQuickSettingsTap,
-            padding: EdgeInsets.zero,
-            constraints: BoxConstraints.tight(const Size(36, 36)),
-          ),
+          const Spacer(),
           const SizedBox(width: 8),
         ],
       ),

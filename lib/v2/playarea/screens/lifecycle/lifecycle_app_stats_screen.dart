@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:porpita/services/device_manager.dart';
 import 'package:porpita/v2/widgets/search_view.dart';
+import 'package:porpita/v2/widgets/app_icon.dart';
+import 'package:porpita/v2/playarea/screens/apps/icons/app_icon_service.dart';
 import 'lifecycle_model.dart';
 import 'lifecycle_service.dart';
 
@@ -64,11 +66,19 @@ class _LifecycleAppStatsScreenState extends State<LifecycleAppStatsScreen> {
       final stats = await LifecycleService.fetchAppStats(deviceId);
       if (!mounted) return;
       setState(() { _stats = stats; _isLoading = false; });
+      _fetchIcons(deviceId);
       _startTimer(deviceId);
     } catch (e) {
       if (!mounted) return;
       setState(() { _error = e.toString(); _isLoading = false; });
     }
+  }
+
+  Future<void> _fetchIcons(String deviceId) async {
+    if (_stats.isEmpty) return;
+    final packages = _stats.map((s) => s.packageName).toSet().toList();
+    await AppIconService.instance.fetchIcons(deviceId, packages);
+    if (mounted) setState(() {});
   }
 
   Future<void> _manualRefresh(String deviceId) async {
@@ -130,12 +140,12 @@ class _LifecycleAppStatsScreenState extends State<LifecycleAppStatsScreen> {
             ],
           ),
         ),
-        Expanded(child: _buildContent(filtered)),
+        Expanded(child: _buildContent(filtered, _lastDeviceId ?? '')),
       ],
     );
   }
 
-  Widget _buildContent(List<AppUsageStats> stats) {
+  Widget _buildContent(List<AppUsageStats> stats, String deviceId) {
     if (_isLoading) return const Center(child: CircularProgressIndicator());
     if (_error != null) {
       return Center(
@@ -170,20 +180,10 @@ class _LifecycleAppStatsScreenState extends State<LifecycleAppStatsScreen> {
             padding: const EdgeInsets.only(left: 12, right: 8, top: 6, bottom: 6),
             child: Row(
               children: [
-                Container(
-                  width: 32, height: 32,
-                  decoration: BoxDecoration(
-                    color: (s.appLaunchCount > 0 ? scheme.primary : scheme.outline).withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Center(
-                    child: Text('${s.appLaunchCount}',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: s.appLaunchCount > 0 ? scheme.primary : scheme.outline,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
+                AppIcon(
+                  packageName: s.packageName,
+                  deviceId: context.watch<DeviceManager>().selected?.id ?? '',
+                  size: 32,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
