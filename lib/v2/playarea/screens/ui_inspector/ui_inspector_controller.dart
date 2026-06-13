@@ -161,6 +161,7 @@ class UiInspectorController extends ChangeNotifier {
   void selectNode(int flatIndex) {
     if (_selectedFlatIndex == flatIndex) return;
     _selectedFlatIndex = flatIndex;
+    _highlightedIndices.clear();
     notifyListeners();
   }
 
@@ -218,12 +219,14 @@ class UiInspectorController extends ChangeNotifier {
 
   void setLayersValue(int value) {
     _layersValue = value;
+    _selectedFlatIndex = null;
     _applyLayersHighlight();
     notifyListeners();
   }
 
   void setFocusValue(int value) {
     _focusValue = value;
+    _selectedFlatIndex = null;
     _applyFocusHighlight();
     notifyListeners();
   }

@@ -8,12 +8,14 @@ class UiInspectorResult {
   final String? xmlContent;
   final String? screenshotPath;
   final ForegroundApp? foregroundApp;
+  final double? density;
   final String? error;
 
   const UiInspectorResult({
     this.xmlContent,
     this.screenshotPath,
     this.foregroundApp,
+    this.density,
     this.error,
   });
 }
@@ -38,11 +40,13 @@ class UiInspectorService {
       _fetchXml(adb, deviceId, xmlPath),
       _fetchScreenshot(adb, deviceId, screenshotPath),
       CurrentAppService.fetch(deviceId),
+      _fetchDensity(adb, deviceId),
     ]);
 
     final xmlResult = results[0] as _FetchResult;
     final screenshotResult = results[1] as _FetchResult;
     final foregroundApp = results[2] as ForegroundApp?;
+    final density = results[3] as double?;
 
     final errors = <String>[];
     if (xmlResult.error != null) errors.add('XML: ${xmlResult.error}');
@@ -52,6 +56,7 @@ class UiInspectorService {
       xmlContent: xmlResult.content,
       screenshotPath: screenshotResult.path,
       foregroundApp: foregroundApp,
+      density: density,
       error: errors.isNotEmpty ? errors.join('\n') : null,
     );
   }
@@ -84,6 +89,23 @@ class UiInspectorService {
       return const _FetchResult(error: 'Failed to pull screenshot');
     } catch (e) {
       return _FetchResult(error: e.toString());
+    }
+  }
+
+  static Future<double?> _fetchDensity(String adb, String deviceId) async {
+    try {
+      final result = await Process.run(adb, ['-s', deviceId, 'shell', 'wm', 'density']);
+      final output = result.stdout.toString().trim();
+      final match = RegExp(r'(\d+)').firstMatch(output);
+      if (match != null) {
+        final dpi = double.tryParse(match.group(1)!);
+        if (dpi != null && dpi > 0) {
+          return dpi / 160.0;
+        }
+      }
+      return null;
+    } catch (_) {
+      return null;
     }
   }
 }

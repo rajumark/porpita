@@ -98,7 +98,23 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Row(
         children: [
+          IconButton(
+            icon: const Icon(Icons.refresh, size: 20),
+            onPressed: _loading || deviceId == null ? null : () => _refresh(deviceId),
+            tooltip: 'Refresh',
+            visualDensity: VisualDensity.compact,
+          ),
+          if (_loading)
+            const Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
           if (foregroundApp != null) ...[
+            const SizedBox(width: 4),
             Icon(Icons.open_in_browser, size: 16, color: Theme.of(context).colorScheme.primary),
             const SizedBox(width: 6),
             Flexible(
@@ -124,15 +140,6 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
             ],
           ] else
             const Expanded(child: SizedBox.shrink()),
-          if (_loading)
-            const Padding(
-              padding: EdgeInsets.only(right: 8),
-              child: SizedBox(
-                width: 16,
-                height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
-            ),
           ListenableBuilder(
             listenable: _controller,
             builder: (context, _) {
@@ -146,12 +153,6 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
                 visualDensity: VisualDensity.compact,
               );
             },
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh, size: 20),
-            onPressed: _loading || deviceId == null ? null : () => _refresh(deviceId),
-            tooltip: 'Refresh',
-            visualDensity: VisualDensity.compact,
           ),
         ],
       ),
@@ -249,6 +250,7 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
               controller: _controller,
               screenshotPath: _result?.screenshotPath,
               screenshotVersion: _screenshotVersion,
+              density: _result?.density,
             );
           },
         );

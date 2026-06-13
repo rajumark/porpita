@@ -12,6 +12,7 @@ class UiInspectorPropertiesPanel extends StatefulWidget {
   final UiInspectorController controller;
   final String? screenshotPath;
   final int screenshotVersion;
+  final double? density;
 
   const UiInspectorPropertiesPanel({
     super.key,
@@ -20,6 +21,7 @@ class UiInspectorPropertiesPanel extends StatefulWidget {
     required this.controller,
     required this.screenshotPath,
     this.screenshotVersion = 0,
+    this.density,
   });
 
   @override
@@ -130,7 +132,7 @@ class _UiInspectorPropertiesPanelState extends State<UiInspectorPropertiesPanel>
                   const Divider(height: 1),
                 ],
                 if (node.boundsRect != null)
-                  _SizeRow(bounds: node.boundsRect!, theme: theme),
+                  _SizeRow(bounds: node.boundsRect!, theme: theme, density: widget.density),
                 ...node.attributes.entries.toList().asMap().entries.map((entry) {
                   final index = entry.key;
                   final attr = entry.value;
@@ -217,13 +219,20 @@ class _BoundsPreviewPainter extends CustomPainter {
 class _SizeRow extends StatelessWidget {
   final Rect bounds;
   final ThemeData theme;
+  final double? density;
 
-  const _SizeRow({required this.bounds, required this.theme});
+  const _SizeRow({required this.bounds, required this.theme, this.density});
 
   @override
   Widget build(BuildContext context) {
     final width = (bounds.right - bounds.left).round();
     final height = (bounds.bottom - bounds.top).round();
+    String sizeText = '$width × $height px';
+    if (density != null && density! > 0) {
+      final dpWidth = (width / density!).round();
+      final dpHeight = (height / density!).round();
+      sizeText += '  •  $dpWidth × $dpHeight dp';
+    }
     return Container(
       color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -232,7 +241,7 @@ class _SizeRow extends StatelessWidget {
           Icon(Icons.straighten, size: 14, color: theme.colorScheme.primary),
           const SizedBox(width: 6),
           Text(
-            '$width × $height',
+            sizeText,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,

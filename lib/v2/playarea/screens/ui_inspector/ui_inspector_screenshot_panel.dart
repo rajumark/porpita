@@ -246,7 +246,7 @@ class _BoundsOverlayPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (boundsList.isEmpty && selectedBounds == null) return;
+    if (selectedBounds == null && boundsList.isEmpty) return;
 
     final imgW = rawImage.width.toDouble();
     final imgH = rawImage.height.toDouble();
@@ -259,6 +259,22 @@ class _BoundsOverlayPainter extends CustomPainter {
     final displayH = imgH * scale;
     final offsetX = (size.width - displayW) / 2;
     final offsetY = (size.height - displayH) / 2;
+
+    final greenFill = Paint()
+      ..color = Colors.green.withValues(alpha: 0.2)
+      ..style = PaintingStyle.fill;
+
+    final greenStroke = Paint()
+      ..color = Colors.green
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5;
+
+    if (selectedBounds != null) {
+      final rect = _mapRect(selectedBounds!, scale, offsetX, offsetY);
+      canvas.drawRect(rect, greenFill);
+      canvas.drawRect(rect, greenStroke);
+      return;
+    }
 
     final orangeFill = Paint()
       ..color = Colors.orange.withValues(alpha: 0.15)
@@ -273,21 +289,6 @@ class _BoundsOverlayPainter extends CustomPainter {
       final rect = _mapRect(bounds, scale, offsetX, offsetY);
       canvas.drawRect(rect, orangeFill);
       canvas.drawRect(rect, orangeStroke);
-    }
-
-    if (selectedBounds != null) {
-      final greenFill = Paint()
-        ..color = Colors.green.withValues(alpha: 0.2)
-        ..style = PaintingStyle.fill;
-
-      final greenStroke = Paint()
-        ..color = Colors.green
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.5;
-
-      final rect = _mapRect(selectedBounds!, scale, offsetX, offsetY);
-      canvas.drawRect(rect, greenFill);
-      canvas.drawRect(rect, greenStroke);
     }
   }
 
