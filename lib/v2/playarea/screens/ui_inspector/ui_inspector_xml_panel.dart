@@ -94,53 +94,42 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
         ListenableBuilder(
           listenable: widget.controller,
           builder: (context, _) {
+            if (widget.controller.isSearchMode) return const SizedBox.shrink();
             return Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if (widget.controller.isSearchMode) ...[
-                  IconButton(
-                    icon: const Icon(Icons.close, size: 18),
-                    tooltip: 'Close search',
-                    visualDensity: VisualDensity.compact,
-                    onPressed: () {
-                      _searchController.clear();
-                      widget.controller.exitSearchMode();
-                    },
-                  ),
-                ] else ...[
-                  IconButton(
-                    icon: Icon(widget.controller.isAllExpanded ? Icons.unfold_less : Icons.unfold_more, size: 18),
-                    tooltip: widget.controller.isAllExpanded ? 'Collapse all' : 'Expand all',
-                    visualDensity: VisualDensity.compact,
-                    onPressed: widget.controller.toggleExpandAll,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.copy, size: 18),
-                    tooltip: 'Copy XML',
-                    visualDensity: VisualDensity.compact,
-                    onPressed: () {
-                      Clipboard.setData(ClipboardData(text: widget.xmlContent));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('XML copied'), duration: Duration(seconds: 1)),
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.center_focus_strong, size: 18),
-                    tooltip: 'Jump to focused element',
-                    visualDensity: VisualDensity.compact,
-                    onPressed: widget.controller.focusedNode != null ? _jumpToFocused : null,
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.search, size: 18),
-                    tooltip: 'Search',
-                    visualDensity: VisualDensity.compact,
-                    onPressed: () {
-                      widget.controller.enterSearchMode();
-                      _searchFocusNode.requestFocus();
-                    },
-                  ),
-                ],
+                IconButton(
+                  icon: Icon(widget.controller.isAllExpanded ? Icons.unfold_less : Icons.unfold_more, size: 18),
+                  tooltip: widget.controller.isAllExpanded ? 'Collapse all' : 'Expand all',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: widget.controller.toggleExpandAll,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.copy, size: 18),
+                  tooltip: 'Copy XML',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () {
+                    Clipboard.setData(ClipboardData(text: widget.xmlContent));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('XML copied'), duration: Duration(seconds: 1)),
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.center_focus_strong, size: 18),
+                  tooltip: 'Jump to focused element',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: widget.controller.focusedNode != null ? _jumpToFocused : null,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.search, size: 18),
+                  tooltip: 'Search',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () {
+                    widget.controller.enterSearchMode();
+                    _searchFocusNode.requestFocus();
+                  },
+                ),
               ],
             );
           },
@@ -183,6 +172,7 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
       ),
       child: Row(
         children: [
+          const SizedBox(width: 4),
           Icon(Icons.search, size: 16, color: colorScheme.onSurfaceVariant),
           const SizedBox(width: 8),
           Expanded(
@@ -214,6 +204,15 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
               ),
             ),
           ],
+          IconButton(
+            icon: const Icon(Icons.close, size: 18),
+            tooltip: 'Close search',
+            visualDensity: VisualDensity.compact,
+            onPressed: () {
+              _searchController.clear();
+              widget.controller.exitSearchMode();
+            },
+          ),
         ],
       ),
     );

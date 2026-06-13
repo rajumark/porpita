@@ -51,76 +51,23 @@ class XmlTreeControls extends StatelessWidget {
   }
 
   Widget _buildToggle(ColorScheme colorScheme) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: colorScheme.surfaceContainerHighest,
-      ),
-      child: IntrinsicHeight(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildToggleButton(
-              colorScheme,
-              label: 'Layers',
-              icon: Icons.layers_outlined,
-              isSelected: mode == XmlTreeMode.layers,
-              onTap: () => onModeChanged(XmlTreeMode.layers),
-              borderRadius: const BorderRadius.horizontal(left: Radius.circular(7)),
-            ),
-            _buildToggleButton(
-              colorScheme,
-              label: 'Focus',
-              icon: Icons.center_focus_strong_outlined,
-              isSelected: mode == XmlTreeMode.focus,
-              onTap: () => onModeChanged(XmlTreeMode.focus),
-              borderRadius: const BorderRadius.horizontal(right: Radius.circular(7)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildToggleButton(
-    ColorScheme colorScheme, {
-    required String label,
-    required IconData icon,
-    required bool isSelected,
-    required VoidCallback onTap,
-    required BorderRadius borderRadius,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          borderRadius: borderRadius,
-          color: isSelected ? colorScheme.primary : Colors.transparent,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 14,
-              color: isSelected
-                  ? colorScheme.onPrimary
-                  : colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected
-                    ? colorScheme.onPrimary
-                    : colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
+    final isLayers = mode == XmlTreeMode.layers;
+    return Tooltip(
+      message: isLayers ? 'Switch to Focus' : 'Switch to Layers',
+      child: InkWell(
+        onTap: () => onModeChanged(isLayers ? XmlTreeMode.focus : XmlTreeMode.layers),
+        borderRadius: BorderRadius.circular(6),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(6),
+            color: colorScheme.primary,
+          ),
+          child: Icon(
+            isLayers ? Icons.layers : Icons.center_focus_strong,
+            size: 14,
+            color: colorScheme.onPrimary,
+          ),
         ),
       ),
     );
