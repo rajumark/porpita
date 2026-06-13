@@ -24,6 +24,14 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
   final _searchFocusNode = FocusNode();
   int? _blinkFlatIndex;
 
+  static const _filters = [
+    ('clickable', Icons.touch_app),
+    ('scrollable', Icons.swipe),
+    ('enabled', Icons.check_circle_outline),
+    ('focused', Icons.center_focus_strong),
+    ('checked', Icons.check_box),
+  ];
+
   void _jumpToFocused() {
     final focused = widget.controller.focusedNode;
     if (focused == null) return;
@@ -72,46 +80,12 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
             if (widget.controller.isSearchMode) {
               return _buildSearchBar();
             }
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  icon: Icon(widget.controller.isAllExpanded ? Icons.unfold_less : Icons.unfold_more, size: 18),
-                  tooltip: widget.controller.isAllExpanded ? 'Collapse all' : 'Expand all',
-                  visualDensity: VisualDensity.compact,
-                  onPressed: widget.controller.toggleExpandAll,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.copy, size: 18),
-                  tooltip: 'Copy XML',
-                  visualDensity: VisualDensity.compact,
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(text: widget.xmlContent));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('XML copied'), duration: Duration(seconds: 1)),
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.center_focus_strong, size: 18),
-                  tooltip: widget.controller.focusedNode != null
-                      ? 'Jump to focused element'
-                      : 'No focused element found',
-                  visualDensity: VisualDensity.compact,
-                  onPressed: widget.controller.focusedNode != null ? _jumpToFocused : null,
-                ),
-                IconButton(
-                  icon: const Icon(Icons.search, size: 18),
-                  tooltip: 'Search',
-                  visualDensity: VisualDensity.compact,
-                  onPressed: () {
-                    widget.controller.enterSearchMode();
-                    _searchFocusNode.requestFocus();
-                  },
-                ),
-              ],
-            );
+            return _buildActionRow(context, treeModel);
           },
+        ),
+        ListenableBuilder(
+          listenable: widget.controller,
+          builder: (context, _) => _buildFilterChips(context),
         ),
         const Divider(height: 1),
         Expanded(
@@ -133,7 +107,126 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
             },
           ),
         ),
+        ListenableBuilder(
+          listenable: widget.controller,
+          builder: (context, _) => _buildViewSummary(treeModel),
+        ),
       ],
+    );
+  }
+
+  Widget _buildActionRow(BuildContext context, XmlTreeModel treeModel) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.search, size: 18),
+          tooltip: 'Search',
+          visualDensity: VisualDensity.compact,
+          onPressed: () {
+            widget.controller.enterSearchMode();
+            _searchFocusNode.requestFocus();
+          },
+        ),
+        PopupMenuButton<String>(
+          icon: const Icon(Icons.more_vert, size: 18),
+          tooltip: 'More actions',
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 'expand',
+              child: Text(widget.controller.isAllExpanded ? 'Collapse all' : 'Expand all'),
+            ),
+            const PopupMenuItem(value: 'copy', child: Text('Copy XML')),
+            PopupMenuItem(
+              value: 'jump_focus',
+              enabled: widget.controller.focusedNode != null,
+              child: const Text('Jump to focused element'),
+            ),
+          ],
+          onSelected: (value) {
+            switch (value) {
+              case 'expand':
+                widget.controller.toggleExpandAll();
+                break;
+              case 'copy':
+                Clipboard.setData(ClipboardData(text: widget.xmlContent));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('XML copied'), duration: Duration(seconds: 1)),
+                );
+                break;
+              case 'jump_focus':
+                _jumpToFocused();
+                break;
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFilterChips(BuildContext context) {
+    final controller = widget.controller;
+    final hasActive = controller.activeFilters.isNotEmpty;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return SizedBox(
+      height: 32,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        children: [
+          for (final (filter, icon) in _filters)
+            Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: FilterChip(
+                label: Text(filter, style: const TextStyle(fontSize: 11)),
+                avatar: Icon(icon, size: 12),
+                selected: controller.isFilterActive(filter),
+                onSelected: (_) => controller.toggleFilter(filter),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                selectedColor: colorScheme.primaryContainer,
+              ),
+            ),
+          if (hasActive)
+            Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: ActionChip(
+                label: const Text('Clear', style: TextStyle(fontSize: 11)),
+                avatar: const Icon(Icons.close, size: 12),
+                onPressed: () {
+                  controller.toggleFilter(controller.activeFilters.first);
+                },
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildViewSummary(XmlTreeModel treeModel) {
+    final counts = treeModel.getViewTypeCounts();
+    final sorted = counts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    final top = sorted.take(5).toList();
+    if (top.isEmpty) return const SizedBox.shrink();
+
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow,
+        border: Border(top: BorderSide(color: colorScheme.outlineVariant, width: 0.5)),
+      ),
+      child: Row(
+        children: top.map((e) => Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: Text(
+            '${e.value} ${e.key}',
+            style: TextStyle(fontSize: 10, fontFamily: 'monospace', color: colorScheme.onSurfaceVariant),
+          ),
+        )).toList(),
+      ),
     );
   }
 
@@ -162,7 +255,7 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
               decoration: InputDecoration(
                 isDense: true,
                 contentPadding: const EdgeInsets.symmetric(vertical: 4),
-                hintText: 'Search nodes...',
+                hintText: 'Search id, text, class...',
                 hintStyle: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
                 border: InputBorder.none,
               ),
@@ -197,7 +290,7 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
     );
   }
 
-Widget _buildSearchResults(XmlTreeModel treeModel) {
+  Widget _buildSearchResults(XmlTreeModel treeModel) {
     final results = widget.controller.searchResults;
     final colorScheme = Theme.of(context).colorScheme;
     final highlightedIndices = widget.controller.highlightedIndices;

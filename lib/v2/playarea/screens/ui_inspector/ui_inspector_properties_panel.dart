@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'ui_inspector_controller.dart';
 import 'xml_tree_model.dart';
@@ -124,6 +125,7 @@ class _UiInspectorPropertiesPanelState extends State<UiInspectorPropertiesPanel>
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
+                _buildBreadcrumb(node, theme),
                 if (node.boundsRect != null && _rawImage != null) ...[
                   _BoundsPreview(
                     bounds: node.boundsRect!,
@@ -133,6 +135,8 @@ class _UiInspectorPropertiesPanelState extends State<UiInspectorPropertiesPanel>
                 ],
                 if (node.boundsRect != null)
                   _SizeRow(bounds: node.boundsRect!, theme: theme, density: widget.density),
+                if (node.hasMissingContentDesc)
+                  _A11yWarningBar(message: 'Missing content-desc'),
                 ...node.attributes.entries.toList().asMap().entries.map((entry) {
                   final index = entry.key;
                   final attr = entry.value;
@@ -141,12 +145,56 @@ class _UiInspectorPropertiesPanelState extends State<UiInspectorPropertiesPanel>
                     propValue: attr.value,
                     isEven: index.isEven,
                     theme: theme,
+                    isResourceId: attr.key == 'resource-id',
                   );
                 }),
               ],
             ),
           ),
       ],
+    );
+  }
+
+  Widget _buildBreadcrumb(XmlNode node, ThemeData theme) {
+    final treeModel = widget.controller.treeModel;
+    if (treeModel == null) return const SizedBox.shrink();
+    final ancestors = treeModel.getAncestorFlatIndices(node.flatIndex);
+    final path = <XmlNode>[...ancestors.reversed.map((i) => treeModel.getNodeAtFlatIndex(i)!).whereType<XmlNode>(), node];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLow,
+        border: Border(bottom: BorderSide(color: theme.colorScheme.outlineVariant, width: 0.5)),
+      ),
+      child: Wrap(
+        spacing: 0,
+        runSpacing: 2,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          for (int i = 0; i < path.length; i++) ...[
+            if (i > 0)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: Icon(Icons.chevron_right, size: 12, color: theme.colorScheme.onSurfaceVariant),
+              ),
+            InkWell(
+              onTap: () => widget.controller.selectNode(path[i].flatIndex),
+              child: Text(
+                path[i].shortTag,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontFamily: 'monospace',
+                  color: i == path.length - 1
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
+                  fontWeight: i == path.length - 1 ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }
@@ -240,13 +288,42 @@ class _SizeRow extends StatelessWidget {
         children: [
           Icon(Icons.straighten, size: 14, color: theme.colorScheme.primary),
           const SizedBox(width: 6),
-          Text(
-            sizeText,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'monospace',
-              color: theme.colorScheme.onSurface,
+          Expanded(
+            child: Text(
+              sizeText,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'monospace',
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _A11yWarningBar extends StatelessWidget {
+  final String message;
+
+  const _A11yWarningBar({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      color: colorScheme.errorContainer.withValues(alpha: 0.5),
+      child: Row(
+        children: [
+          Icon(Icons.warning_amber, size: 14, color: colorScheme.error),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(fontSize: 11, color: colorScheme.onErrorContainer),
             ),
           ),
         ],
@@ -260,12 +337,14 @@ class _PropertyRow extends StatelessWidget {
   final String propValue;
   final bool isEven;
   final ThemeData theme;
+  final bool isResourceId;
 
   const _PropertyRow({
     required this.propKey,
     required this.propValue,
     required this.isEven,
     required this.theme,
+    this.isResourceId = false,
   });
 
   @override
@@ -299,6 +378,21 @@ class _PropertyRow extends StatelessWidget {
               ),
             ),
           ),
+          if (isResourceId && propValue.isNotEmpty)
+            InkWell(
+              onTap: () {
+                Clipboard.setData(ClipboardData(text: propValue));
+                ScaffoldMessenger.of(context).clearSnackBars();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Copied: $propValue'),
+                    duration: const Duration(seconds: 1),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
+              child: Icon(Icons.copy, size: 12, color: theme.colorScheme.onSurfaceVariant),
+            ),
         ],
       ),
     );

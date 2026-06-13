@@ -28,6 +28,11 @@ class XmlNode {
   String? get bounds => attributes['bounds'];
   String? get packageName => attributes['package'];
   bool get isFocused => attributes['focused'] == 'true';
+  bool get isClickable => attributes['clickable'] == 'true';
+  bool get isScrollable => attributes['scrollable'] == 'true';
+  bool get isEnabled => attributes['enabled'] == 'true';
+  bool get isChecked => attributes['checked'] == 'true';
+  bool get hasMissingContentDesc => (tag == 'ImageView' || tag == 'ImageButton' || shortTag == 'ImageView' || shortTag == 'ImageButton' || (className != null && (className!.contains('ImageView') || className!.contains('ImageButton')))) && (contentDesc == null || contentDesc!.isEmpty);
 
   static final _boundsPattern = RegExp(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]');
 
@@ -188,6 +193,19 @@ class XmlTreeModel {
     final ancestors = <int>[];
     _findAncestors(root, flatIndex, ancestors);
     return ancestors;
+  }
+
+  Map<String, int> getViewTypeCounts() {
+    final counts = <String, int>{};
+    _collectViewTypes(root, counts);
+    return counts;
+  }
+
+  void _collectViewTypes(XmlNode node, Map<String, int> counts) {
+    counts[node.shortTag] = (counts[node.shortTag] ?? 0) + 1;
+    for (final child in node.children) {
+      _collectViewTypes(child, counts);
+    }
   }
 
   bool _findAncestors(XmlNode node, int targetIndex, List<int> ancestors) {

@@ -2,33 +2,30 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 
-import 'xml_tree_controls.dart';
 import 'xml_tree_model.dart';
 
 class UiInspectorController extends ChangeNotifier {
   XmlTreeModel? _treeModel;
   final Set<int> _expandedNodes = {};
   final Set<int> _highlightedIndices = {};
-  XmlTreeMode _mode = XmlTreeMode.focus;
-  int _layersValue = 0;
   int _focusValue = 0;
   bool _isSearchMode = false;
   String _searchQuery = '';
   List<XmlNode> _searchResults = [];
   Set<int> _searchResultIndices = {};
   int? _selectedFlatIndex;
+  final Set<String> _activeFilters = {};
 
   XmlTreeModel? get treeModel => _treeModel;
   Set<int> get expandedNodes => _expandedNodes;
   Set<int> get highlightedIndices => _highlightedIndices;
-  XmlTreeMode get mode => _mode;
-  int get layersValue => _layersValue;
   int get focusValue => _focusValue;
   bool get isSearchMode => _isSearchMode;
   String get searchQuery => _searchQuery;
   List<XmlNode> get searchResults => _searchResults;
   Set<int> get searchResultIndices => _searchResultIndices;
   int? get selectedFlatIndex => _selectedFlatIndex;
+  Set<String> get activeFilters => _activeFilters;
 
   XmlNode? get selectedNode {
     if (_treeModel == null || _selectedFlatIndex == null) return null;
@@ -117,12 +114,12 @@ class UiInspectorController extends ChangeNotifier {
     _expandedNodes.clear();
     _highlightedIndices.clear();
     _selectedFlatIndex = null;
-    _layersValue = 0;
     _focusValue = 0;
     _isSearchMode = false;
     _searchQuery = '';
     _searchResults = [];
     _searchResultIndices = {};
+    _activeFilters.clear();
 
     if (_treeModel != null) {
       _expandAll();
@@ -151,11 +148,6 @@ class UiInspectorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void expandToDepth(int depth) {
-    if (_treeModel == null) return;
-    _expandNodeToDepth(_treeModel!.root, depth);
-  }
-
   // --- Selection ---
 
   void selectNode(int flatIndex) {
@@ -163,6 +155,27 @@ class UiInspectorController extends ChangeNotifier {
     _selectedFlatIndex = flatIndex;
     _highlightedIndices.clear();
     notifyListeners();
+  }
+
+  void goToParent() {
+    if (_treeModel == null || _selectedFlatIndex == null) return;
+    final ancestors = _treeModel!.getAncestorFlatIndices(_selectedFlatIndex!);
+    if (ancestors.isNotEmpty) {
+      selectNode(ancestors.last);
+    }
+  }
+
+  void goToChild(int index) {
+    if (_treeModel == null || _selectedFlatIndex == null) return;
+    final node = _treeModel!.getNodeAtFlatIndex(_selectedFlatIndex!);
+    if (node != null && node.hasChildren && index < node.children.length) {
+      final target = node.children[index];
+      for (final idx in _treeModel!.getAncestorFlatIndices(target.flatIndex)) {
+        _expandedNodes.add(idx);
+      }
+      _expandedNodes.add(_selectedFlatIndex!);
+      selectNode(target.flatIndex);
+    }
   }
 
   // --- Search ---
@@ -205,31 +218,33 @@ class UiInspectorController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // --- Mode / Highlight ---
-
-  void setMode(XmlTreeMode mode) {
-    _mode = mode;
-    if (mode == XmlTreeMode.layers) {
-      _applyLayersHighlight();
-    } else {
-      _applyFocusHighlight();
-    }
-    notifyListeners();
-  }
-
-  void setLayersValue(int value) {
-    _layersValue = value;
-    _selectedFlatIndex = null;
-    _applyLayersHighlight();
-    notifyListeners();
-  }
+  // --- Focus / Filter ---
 
   void setFocusValue(int value) {
     _focusValue = value;
     _selectedFlatIndex = null;
+    _activeFilters.clear();
     _applyFocusHighlight();
     notifyListeners();
   }
+
+  void toggleFilter(String filter) {
+    if (_activeFilters.contains(filter)) {
+      _activeFilters.remove(filter);
+    } else {
+      _activeFilters.add(filter);
+    }
+    if (_activeFilters.isEmpty) {
+      _highlightedIndices.clear();
+      _selectedFlatIndex = null;
+    } else {
+      _selectedFlatIndex = null;
+      _applyFilterHighlight();
+    }
+    notifyListeners();
+  }
+
+  bool isFilterActive(String filter) => _activeFilters.contains(filter);
 
   // --- Private helpers ---
 
@@ -240,7 +255,7 @@ class UiInspectorController extends ChangeNotifier {
     }
     return count;
   }
- 
+
   void _expandAll() {
     if (_treeModel == null) return;
     _expandAllRecursive(_treeModel!.root);
@@ -262,24 +277,6 @@ class UiInspectorController extends ChangeNotifier {
     }
   }
 
-  void _expandNodeToDepth(XmlNode node, int maxDepth) {
-    if (node.depth >= maxDepth) return;
-    if (node.hasChildren) {
-      _expandedNodes.add(node.flatIndex);
-      for (final child in node.children) {
-        _expandNodeToDepth(child, maxDepth);
-      }
-    }
-  }
-
-  void _applyLayersHighlight() {
-    if (_treeModel == null) return;
-    expandToDepth(_layersValue + 1);
-    _highlightedIndices
-      ..clear()
-      ..addAll(_treeModel!.getNodesAtDepth(_layersValue).map((n) => n.flatIndex));
-  }
-
   void _applyFocusHighlight() {
     if (_treeModel == null) return;
     final node = _treeModel!.getNodeAtFlatIndex(_focusValue);
@@ -290,5 +287,40 @@ class UiInspectorController extends ChangeNotifier {
     _highlightedIndices
       ..clear()
       ..add(_focusValue);
+  }
+
+  void _applyFilterHighlight() {
+    if (_treeModel == null) return;
+    _highlightedIndices.clear();
+    _collectFilteredNodes(_treeModel!.root);
+  }
+
+  void _collectFilteredNodes(XmlNode node) {
+    bool matches = true;
+    for (final filter in _activeFilters) {
+      switch (filter) {
+        case 'clickable':
+          if (!node.isClickable) matches = false;
+          break;
+        case 'scrollable':
+          if (!node.isScrollable) matches = false;
+          break;
+        case 'enabled':
+          if (!node.isEnabled) matches = false;
+          break;
+        case 'focused':
+          if (!node.isFocused) matches = false;
+          break;
+        case 'checked':
+          if (!node.isChecked) matches = false;
+          break;
+      }
+    }
+    if (matches) {
+      _highlightedIndices.add(node.flatIndex);
+    }
+    for (final child in node.children) {
+      _collectFilteredNodes(child);
+    }
   }
 }

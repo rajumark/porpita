@@ -114,6 +114,37 @@ class _UiInspectorScreenshotPanelState extends State<UiInspectorScreenshotPanel>
     }
   }
 
+  void _handleLongPress(Offset localPosition) async {
+    if (_rawImage == null) return;
+
+    final imgX = localPosition.dx.round().clamp(0, _rawImage!.width - 1);
+    final imgY = localPosition.dy.round().clamp(0, _rawImage!.height - 1);
+
+    final byteData = await _rawImage!.toByteData();
+    if (byteData == null || !mounted) return;
+
+    final pixels = byteData.buffer.asUint32List();
+    final pixelIndex = imgY * _rawImage!.width + imgX;
+    if (pixelIndex < 0 || pixelIndex >= pixels.length) return;
+
+    final pixel = pixels[pixelIndex];
+    final r = (pixel >> 16) & 0xFF;
+    final g = (pixel >> 8) & 0xFF;
+    final b = pixel & 0xFF;
+    final hex = '#${r.toRadixString(16).padLeft(2, '0')}${g.toRadixString(16).padLeft(2, '0')}${b.toRadixString(16).padLeft(2, '0')}';
+
+    Clipboard.setData(ClipboardData(text: hex));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Color: $hex'),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.screenshotPath == null || widget.screenshotPath!.isEmpty) {
@@ -129,15 +160,9 @@ class _UiInspectorScreenshotPanelState extends State<UiInspectorScreenshotPanel>
             listenable: widget.controller,
             builder: (context, _) {
               return XmlTreeControls(
-                mode: widget.controller.mode,
-                layersValue: widget.controller.layersValue,
-                maxDepth: treeModel.maxDepth,
-                layersNodeCount: widget.controller.highlightedIndices.length,
                 focusValue: widget.controller.focusValue,
                 totalNodes: treeModel.totalNodes,
                 focusNodeLabel: treeModel.getNodeAtFlatIndex(widget.controller.focusValue)?.shortTag,
-                onModeChanged: widget.controller.setMode,
-                onLayersChanged: widget.controller.setLayersValue,
                 onFocusChanged: widget.controller.setFocusValue,
               );
             },
@@ -184,6 +209,9 @@ class _UiInspectorScreenshotPanelState extends State<UiInspectorScreenshotPanel>
                           onTapDown: (details) {
                             final stackContext = context;
                             _handleTap(stackContext, details.localPosition);
+                          },
+                          onLongPressStart: (details) {
+                            _handleLongPress(details.localPosition);
                           },
                         ),
                       if (widget.error != null)
