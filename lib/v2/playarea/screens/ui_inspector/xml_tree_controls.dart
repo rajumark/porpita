@@ -53,28 +53,32 @@ class XmlTreeControls extends StatelessWidget {
 
   Widget _buildToggle(ColorScheme colorScheme) {
     return Container(
-      height: 30,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         color: colorScheme.surfaceContainerHighest,
       ),
-      child: Row(
-        children: [
-          _buildToggleButton(
-            colorScheme,
-            label: 'Layers',
-            icon: Icons.layers_outlined,
-            isSelected: mode == XmlTreeMode.layers,
-            onTap: () => onModeChanged(XmlTreeMode.layers),
-          ),
-          _buildToggleButton(
-            colorScheme,
-            label: 'Focus',
-            icon: Icons.center_focus_strong_outlined,
-            isSelected: mode == XmlTreeMode.focus,
-            onTap: () => onModeChanged(XmlTreeMode.focus),
-          ),
-        ],
+      child: IntrinsicHeight(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildToggleButton(
+              colorScheme,
+              label: 'Layers',
+              icon: Icons.layers_outlined,
+              isSelected: mode == XmlTreeMode.layers,
+              onTap: () => onModeChanged(XmlTreeMode.layers),
+              borderRadius: const BorderRadius.horizontal(left: Radius.circular(7)),
+            ),
+            _buildToggleButton(
+              colorScheme,
+              label: 'Focus',
+              icon: Icons.center_focus_strong_outlined,
+              isSelected: mode == XmlTreeMode.focus,
+              onTap: () => onModeChanged(XmlTreeMode.focus),
+              borderRadius: const BorderRadius.horizontal(right: Radius.circular(7)),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -85,40 +89,39 @@ class XmlTreeControls extends StatelessWidget {
     required IconData icon,
     required bool isSelected,
     required VoidCallback onTap,
+    required BorderRadius borderRadius,
   }) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(7),
-            color: isSelected ? colorScheme.primary : Colors.transparent,
-          ),
-          alignment: Alignment.center,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                size: 14,
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          borderRadius: borderRadius,
+          color: isSelected ? colorScheme.primary : Colors.transparent,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 14,
+              color: isSelected
+                  ? colorScheme.onPrimary
+                  : colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected
                     ? colorScheme.onPrimary
                     : colorScheme.onSurfaceVariant,
               ),
-              const SizedBox(width: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                  color: isSelected
-                      ? colorScheme.onPrimary
-                      : colorScheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

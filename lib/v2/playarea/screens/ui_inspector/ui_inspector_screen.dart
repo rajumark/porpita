@@ -22,6 +22,7 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
   UiInspectorResult? _result;
   bool _loading = false;
   String? _lastDeviceId;
+  int _screenshotVersion = 0;
 
   XmlTreeModel? _treeModel;
   final Set<int> _expandedNodes = {};
@@ -41,6 +42,7 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
         _result = result;
         _loading = false;
         _lastDeviceId = deviceId;
+        _screenshotVersion++;
         _parseTree();
       });
     }
@@ -60,9 +62,52 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
     _focusValue = 0;
 
     if (_treeModel != null) {
-      _expandedNodes.add(_treeModel!.root.flatIndex);
-      _expandToDepth(1);
+      _expandAll();
     }
+  }
+
+  bool get _isAllExpanded {
+    if (_treeModel == null) return false;
+    return _countExpandable(_treeModel!.root) <= _expandedNodes.length - (_treeModel!.root.hasChildren ? 0 : 0);
+  }
+
+  int _countExpandable(XmlNode node) {
+    var count = node.hasChildren ? 1 : 0;
+    for (final child in node.children) {
+      count += _countExpandable(child);
+    }
+    return count;
+  }
+
+  void _expandAll() {
+    if (_treeModel == null) return;
+    _expandAllRecursive(_treeModel!.root);
+  }
+
+  void _expandAllRecursive(XmlNode node) {
+    if (node.hasChildren) {
+      _expandedNodes.add(node.flatIndex);
+      for (final child in node.children) {
+        _expandAllRecursive(child);
+      }
+    }
+  }
+
+  void _collapseAll() {
+    _expandedNodes.clear();
+    if (_treeModel != null) {
+      _expandedNodes.add(_treeModel!.root.flatIndex);
+    }
+  }
+
+  void _toggleExpandAll() {
+    setState(() {
+      if (_isAllExpanded) {
+        _collapseAll();
+      } else {
+        _expandAll();
+      }
+    });
   }
 
   void _expandToDepth(int depth) {
@@ -140,11 +185,7 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
     final dm = context.watch<DeviceManager>();
     final device = dm.selected;
 
-    if (device == null || !device.isConnected) {
-      return const Center(child: Text('Connect a device to inspect UI'));
-    }
-
-    if (_lastDeviceId != device.id) {
+    if (device != null && _lastDeviceId != device.id) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _refresh(device.id));
     }
 
@@ -153,7 +194,7 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
       child: RoundedContainer(
         child: Column(
           children: [
-            _buildToolbar(device.id),
+            _buildToolbar(device?.id),
             const Divider(height: 1),
             Expanded(child: _buildBody()),
           ],
@@ -162,7 +203,7 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
     );
   }
 
-  Widget _buildToolbar(String deviceId) {
+  Widget _buildToolbar(String? deviceId) {
     final foregroundApp = _result?.foregroundApp;
 
     return Padding(
@@ -174,7 +215,7 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
             const SizedBox(width: 6),
             Expanded(
               child: Text(
-                '${foregroundApp.packageName} — ${foregroundApp.activityName.split('.').last}',
+                foregroundApp.activityName.split('.').last,
                 style: TextStyle(
                   fontFamily: 'monospace',
                   fontSize: 12,
@@ -196,7 +237,7 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
             ),
           IconButton(
             icon: const Icon(Icons.refresh, size: 20),
-            onPressed: _loading ? null : () => _refresh(deviceId),
+            onPressed: _loading || deviceId == null ? null : () => _refresh(deviceId),
             tooltip: 'Refresh',
             visualDensity: VisualDensity.compact,
           ),
@@ -206,11 +247,16 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
   }
 
   Widget _buildBody() {
+    final device = context.watch<DeviceManager>().selected;
+
     if (_result == null && _loading) {
       return const Center(child: CircularProgressIndicator());
     }
 
     if (_result == null) {
+      if (device == null || !device.isConnected) {
+        return const Center(child: Text('Connect a device to inspect UI'));
+      }
       return const Center(child: Text('Press refresh to capture UI'));
     }
 
@@ -280,16 +326,27 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
               Positioned(
                 top: 4,
                 right: 4,
-                child: IconButton(
-                  icon: const Icon(Icons.copy, size: 18),
-                  tooltip: 'Copy XML',
-                  visualDensity: VisualDensity.compact,
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(text: xml));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('XML copied'), duration: Duration(seconds: 1)),
-                    );
-                  },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: Icon(_isAllExpanded ? Icons.unfold_less : Icons.unfold_more, size: 18),
+                      tooltip: _isAllExpanded ? 'Collapse all' : 'Expand all',
+                      visualDensity: VisualDensity.compact,
+                      onPressed: _toggleExpandAll,
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.copy, size: 18),
+                      tooltip: 'Copy XML',
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () {
+                        Clipboard.setData(ClipboardData(text: xml));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('XML copied'), duration: Duration(seconds: 1)),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -313,6 +370,7 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
             child: Center(
               child: Image.file(
                 File(path),
+                key: ValueKey('screenshot_$_screenshotVersion'),
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
                   return Center(

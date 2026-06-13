@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'debug_adb_tab.dart';
 import 'debuginfo_widgets.dart';
 import 'debug_colors_tab.dart';
 import 'debug_typography_tab.dart';
@@ -10,11 +11,12 @@ class DebugInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4,
+      length: 5,
       child: Column(
         children: [
           TabBar(
             tabs: const [
+              Tab(text: 'ADB'),
               Tab(text: 'Techdetails'),
               Tab(text: 'Colors'),
               Tab(text: 'Typography'),
@@ -24,6 +26,7 @@ class DebugInfoScreen extends StatelessWidget {
           Expanded(
             child: TabBarView(
               children: [
+                DebugAdbTab(),
                 _TechDetailsTab(),
                 DebugColorsTab(),
                 DebugTypographyTab(),
