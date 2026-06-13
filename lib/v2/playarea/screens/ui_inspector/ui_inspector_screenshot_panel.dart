@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'ui_inspector_controller.dart';
+import 'xml_tree_controls.dart';
 
 class UiInspectorScreenshotPanel extends StatefulWidget {
   final String? screenshotPath;
@@ -119,93 +120,119 @@ class _UiInspectorScreenshotPanelState extends State<UiInspectorScreenshotPanel>
       return const Center(child: Text('No screenshot'));
     }
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return InteractiveViewer(
-          maxScale: 5.0,
-          transformationController: _transformController,
-          child: SizedBox(
-            width: constraints.maxWidth,
-            height: constraints.maxHeight,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Center(
-                  child: Image.file(
-                    File(widget.screenshotPath!),
-                    key: ValueKey('screenshot_${widget.screenshotVersion}'),
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Center(
-                        child: Text(
-                          'Failed to load screenshot: $error',
-                          style: TextStyle(color: Theme.of(context).colorScheme.error),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                if (_rawImage != null && (widget.boundsOverlays.isNotEmpty || widget.selectedBoundsOverlay != null))
-                  CustomPaint(
-                    size: Size(constraints.maxWidth, constraints.maxHeight),
-                    painter: _BoundsOverlayPainter(
-                      rawImage: _rawImage!,
-                      boundsList: widget.boundsOverlays,
-                      selectedBounds: widget.selectedBoundsOverlay,
-                    ),
-                  ),
-                if (_rawImage != null)
-                  GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTapDown: (details) {
-                      final stackContext = context;
-                      _handleTap(stackContext, details.localPosition);
-                    },
-                  ),
-                if (widget.error != null)
-                  Positioned(
-                    bottom: 8,
-                    left: 8,
-                    right: 8,
-                    child: Material(
-                      color: Theme.of(context).colorScheme.errorContainer,
-                      borderRadius: BorderRadius.circular(8),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Row(
-                          children: [
-                            Icon(Icons.warning_amber, size: 16, color: Theme.of(context).colorScheme.error),
-                            const SizedBox(width: 6),
-                            Expanded(
+    final treeModel = widget.controller.treeModel;
+
+    return Column(
+      children: [
+        if (treeModel != null)
+          ListenableBuilder(
+            listenable: widget.controller,
+            builder: (context, _) {
+              return XmlTreeControls(
+                mode: widget.controller.mode,
+                layersValue: widget.controller.layersValue,
+                maxDepth: treeModel.maxDepth,
+                layersNodeCount: widget.controller.highlightedIndices.length,
+                focusValue: widget.controller.focusValue,
+                totalNodes: treeModel.totalNodes,
+                focusNodeLabel: treeModel.getNodeAtFlatIndex(widget.controller.focusValue)?.shortTag,
+                onModeChanged: widget.controller.setMode,
+                onLayersChanged: widget.controller.setLayersValue,
+                onFocusChanged: widget.controller.setFocusValue,
+              );
+            },
+          ),
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return InteractiveViewer(
+                maxScale: 5.0,
+                transformationController: _transformController,
+                child: SizedBox(
+                  width: constraints.maxWidth,
+                  height: constraints.maxHeight,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Center(
+                        child: Image.file(
+                          File(widget.screenshotPath!),
+                          key: ValueKey('screenshot_${widget.screenshotVersion}'),
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Center(
                               child: Text(
-                                widget.error!,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Theme.of(context).colorScheme.onErrorContainer,
-                                ),
+                                'Failed to load screenshot: $error',
+                                style: TextStyle(color: Theme.of(context).colorScheme.error),
                               ),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.copy, size: 16, color: Theme.of(context).colorScheme.onErrorContainer),
-                              tooltip: 'Copy error',
-                              visualDensity: VisualDensity.compact,
-                              onPressed: () {
-                                Clipboard.setData(ClipboardData(text: widget.error!));
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Error copied'), duration: Duration(seconds: 1)),
-                                );
-                              },
-                            ),
-                          ],
+                            );
+                          },
                         ),
                       ),
-                    ),
+                      if (_rawImage != null && (widget.boundsOverlays.isNotEmpty || widget.selectedBoundsOverlay != null))
+                        CustomPaint(
+                          size: Size(constraints.maxWidth, constraints.maxHeight),
+                          painter: _BoundsOverlayPainter(
+                            rawImage: _rawImage!,
+                            boundsList: widget.boundsOverlays,
+                            selectedBounds: widget.selectedBoundsOverlay,
+                          ),
+                        ),
+                      if (_rawImage != null)
+                        GestureDetector(
+                          behavior: HitTestBehavior.translucent,
+                          onTapDown: (details) {
+                            final stackContext = context;
+                            _handleTap(stackContext, details.localPosition);
+                          },
+                        ),
+                      if (widget.error != null)
+                        Positioned(
+                          bottom: 8,
+                          left: 8,
+                          right: 8,
+                          child: Material(
+                            color: Theme.of(context).colorScheme.errorContainer,
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.warning_amber, size: 16, color: Theme.of(context).colorScheme.error),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      widget.error!,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Theme.of(context).colorScheme.onErrorContainer,
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.copy, size: 16, color: Theme.of(context).colorScheme.onErrorContainer),
+                                    tooltip: 'Copy error',
+                                    visualDensity: VisualDensity.compact,
+                                    onPressed: () {
+                                      Clipboard.setData(ClipboardData(text: widget.error!));
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Error copied'), duration: Duration(seconds: 1)),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-              ],
-            ),
+                ),
+              );
+            },
           ),
-        );
-      },
+        ),
+      ],
     );
   }
 }

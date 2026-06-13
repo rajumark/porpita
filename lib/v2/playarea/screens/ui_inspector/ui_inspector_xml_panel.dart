@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'ui_inspector_controller.dart';
-import 'xml_tree_controls.dart';
 import 'xml_tree_model.dart';
 import 'xml_tree_widget.dart';
 
@@ -70,31 +69,9 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
         ListenableBuilder(
           listenable: widget.controller,
           builder: (context, _) {
-            return AnimatedCrossFade(
-              firstChild: XmlTreeControls(
-                mode: widget.controller.mode,
-                layersValue: widget.controller.layersValue,
-                maxDepth: treeModel.maxDepth,
-                layersNodeCount: widget.controller.highlightedIndices.length,
-                focusValue: widget.controller.focusValue,
-                totalNodes: treeModel.totalNodes,
-                focusNodeLabel: treeModel.getNodeAtFlatIndex(widget.controller.focusValue)?.shortTag,
-                onModeChanged: widget.controller.setMode,
-                onLayersChanged: widget.controller.setLayersValue,
-                onFocusChanged: widget.controller.setFocusValue,
-              ),
-              secondChild: _buildSearchBar(),
-              crossFadeState: widget.controller.isSearchMode
-                  ? CrossFadeState.showSecond
-                  : CrossFadeState.showFirst,
-              duration: const Duration(milliseconds: 200),
-            );
-          },
-        ),
-        ListenableBuilder(
-          listenable: widget.controller,
-          builder: (context, _) {
-            if (widget.controller.isSearchMode) return const SizedBox.shrink();
+            if (widget.controller.isSearchMode) {
+              return _buildSearchBar();
+            }
             return Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -117,7 +94,9 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
                 ),
                 IconButton(
                   icon: const Icon(Icons.center_focus_strong, size: 18),
-                  tooltip: 'Jump to focused element',
+                  tooltip: widget.controller.focusedNode != null
+                      ? 'Jump to focused element'
+                      : 'No focused element found',
                   visualDensity: VisualDensity.compact,
                   onPressed: widget.controller.focusedNode != null ? _jumpToFocused : null,
                 ),

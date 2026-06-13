@@ -178,40 +178,34 @@ class _BoundsPreviewPainter extends CustomPainter {
     final imgW = rawImage.width.toDouble();
     final imgH = rawImage.height.toDouble();
 
-    final scaleX = size.width / imgW;
-    final scaleY = size.height / imgH;
+    final cropLeft = bounds.left.clamp(0.0, imgW);
+    final cropTop = bounds.top.clamp(0.0, imgH);
+    final cropRight = bounds.right.clamp(cropLeft, imgW);
+    final cropBottom = bounds.bottom.clamp(cropTop, imgH);
+    final cropW = cropRight - cropLeft;
+    final cropH = cropBottom - cropTop;
+
+    if (cropW <= 0 || cropH <= 0) return;
+
+    final scaleX = size.width / cropW;
+    final scaleY = size.height / cropH;
     final fitScale = scaleX < scaleY ? scaleX : scaleY;
 
-    final displayW = imgW * fitScale;
-    final displayH = imgH * fitScale;
+    final displayW = cropW * fitScale;
+    final displayH = cropH * fitScale;
     final offsetX = (size.width - displayW) / 2;
     final offsetY = (size.height - displayH) / 2;
 
-    final srcRect = Rect.fromLTWH(0, 0, imgW, imgH);
+    final srcRect = Rect.fromLTWH(cropLeft, cropTop, cropW, cropH);
     final dstRect = Rect.fromLTWH(offsetX, offsetY, displayW, displayH);
 
     canvas.drawImageRect(rawImage, srcRect, dstRect, Paint());
 
-    final cropRect = Rect.fromLTRB(
-      offsetX + bounds.left * fitScale,
-      offsetY + bounds.top * fitScale,
-      offsetX + bounds.right * fitScale,
-      offsetY + bounds.bottom * fitScale,
-    );
-
-    final dimPaint = Paint()..color = Colors.black.withValues(alpha: 0.4);
-
-    final path = Path()
-      ..addRect(dstRect)
-      ..addRect(cropRect)
-      ..fillType = PathFillType.evenOdd;
-    canvas.drawPath(path, dimPaint);
-
-    final strokePaint = Paint()
-      ..color = Colors.orange
+    final borderPaint = Paint()
+      ..color = Colors.grey.shade400
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-    canvas.drawRect(cropRect, strokePaint);
+      ..strokeWidth = 1.0;
+    canvas.drawRect(dstRect, borderPaint);
   }
 
   @override
