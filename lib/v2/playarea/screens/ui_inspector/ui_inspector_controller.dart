@@ -39,6 +39,39 @@ class UiInspectorController extends ChangeNotifier {
     return node?.boundsRect;
   }
 
+  List<({int flatIndex, Rect bounds})> get allBoundsNodes {
+    if (_treeModel == null) return [];
+    final list = <({int flatIndex, Rect bounds})>[];
+    _collectBounds(_treeModel!.root, list);
+    return list;
+  }
+
+  void _collectBounds(XmlNode node, List<({int flatIndex, Rect bounds})> list) {
+    final rect = node.boundsRect;
+    if (rect != null) {
+      list.add((flatIndex: node.flatIndex, bounds: rect));
+    }
+    for (final child in node.children) {
+      _collectBounds(child, list);
+    }
+  }
+
+  int? findNodeAtPoint(double x, double y) {
+    final point = Offset(x, y);
+    int? bestIndex;
+    double bestArea = double.infinity;
+    for (final entry in allBoundsNodes) {
+      if (entry.bounds.contains(point)) {
+        final area = entry.bounds.width * entry.bounds.height;
+        if (area < bestArea) {
+          bestArea = area;
+          bestIndex = entry.flatIndex;
+        }
+      }
+    }
+    return bestIndex;
+  }
+
   List<Rect> get highlightedBounds {
     if (_treeModel == null || _highlightedIndices.isEmpty) return [];
     final list = <Rect>[];

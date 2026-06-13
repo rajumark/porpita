@@ -183,6 +183,12 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
               error: _result?.error,
               screenshotVersion: _screenshotVersion,
               boundsOverlays: _controller.highlightedBounds,
+              controller: _controller,
+              onNodeTap: () {
+                if (!_showProperties && _controller.selectedNode != null) {
+                  setState(() => _showProperties = true);
+                }
+              },
             );
           },
         );

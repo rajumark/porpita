@@ -4,18 +4,24 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'ui_inspector_controller.dart';
+
 class UiInspectorScreenshotPanel extends StatefulWidget {
   final String? screenshotPath;
   final String? error;
   final int screenshotVersion;
   final List<Rect> boundsOverlays;
+  final UiInspectorController controller;
+  final VoidCallback? onNodeTap;
 
   const UiInspectorScreenshotPanel({
     super.key,
     required this.screenshotPath,
+    required this.controller,
     this.error,
     this.screenshotVersion = 0,
     this.boundsOverlays = const [],
+    this.onNodeTap,
   });
 
   @override
@@ -26,6 +32,7 @@ class _UiInspectorScreenshotPanelState extends State<UiInspectorScreenshotPanel>
   ui.Image? _rawImage;
   ImageStream? _imageStream;
   ImageStreamListener? _imageListener;
+  final TransformationController _transformController = TransformationController();
 
   @override
   void initState() {
@@ -46,6 +53,7 @@ class _UiInspectorScreenshotPanelState extends State<UiInspectorScreenshotPanel>
   @override
   void dispose() {
     _removeImageListener();
+    _transformController.dispose();
     super.dispose();
   }
 
@@ -76,6 +84,33 @@ class _UiInspectorScreenshotPanelState extends State<UiInspectorScreenshotPanel>
     stream.addListener(_imageListener!);
   }
 
+  void _handleTap(BuildContext boxContext, Offset localPosition) {
+    if (_rawImage == null) return;
+
+    final box = boxContext.findRenderObject() as RenderBox;
+    final size = box.size;
+    final imgW = _rawImage!.width.toDouble();
+    final imgH = _rawImage!.height.toDouble();
+
+    final scaleX = size.width / imgW;
+    final scaleY = size.height / imgH;
+    final scale = scaleX < scaleY ? scaleX : scaleY;
+
+    final displayW = imgW * scale;
+    final displayH = imgH * scale;
+    final offsetX = (size.width - displayW) / 2;
+    final offsetY = (size.height - displayH) / 2;
+
+    final imgX = (localPosition.dx - offsetX) / scale;
+    final imgY = (localPosition.dy - offsetY) / scale;
+
+    final flatIndex = widget.controller.findNodeAtPoint(imgX, imgY);
+    if (flatIndex != null) {
+      widget.controller.selectNode(flatIndex);
+      widget.onNodeTap?.call();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.screenshotPath == null || widget.screenshotPath!.isEmpty) {
@@ -86,6 +121,7 @@ class _UiInspectorScreenshotPanelState extends State<UiInspectorScreenshotPanel>
       builder: (context, constraints) {
         return InteractiveViewer(
           maxScale: 5.0,
+          transformationController: _transformController,
           child: SizedBox(
             width: constraints.maxWidth,
             height: constraints.maxHeight,
@@ -114,6 +150,14 @@ class _UiInspectorScreenshotPanelState extends State<UiInspectorScreenshotPanel>
                       rawImage: _rawImage!,
                       boundsList: widget.boundsOverlays,
                     ),
+                  ),
+                if (_rawImage != null)
+                  GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTapDown: (details) {
+                      final stackContext = context;
+                      _handleTap(stackContext, details.localPosition);
+                    },
                   ),
                 if (widget.error != null)
                   Positioned(
