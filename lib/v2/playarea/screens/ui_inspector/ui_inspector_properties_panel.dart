@@ -1,20 +1,89 @@
+import 'dart:io';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 
+import 'ui_inspector_controller.dart';
 import 'xml_tree_model.dart';
 
-class UiInspectorPropertiesPanel extends StatelessWidget {
+class UiInspectorPropertiesPanel extends StatefulWidget {
   final XmlNode? node;
   final VoidCallback onClose;
+  final UiInspectorController controller;
+  final String? screenshotPath;
+  final int screenshotVersion;
 
   const UiInspectorPropertiesPanel({
     super.key,
     required this.node,
     required this.onClose,
+    required this.controller,
+    required this.screenshotPath,
+    this.screenshotVersion = 0,
   });
+
+  @override
+  State<UiInspectorPropertiesPanel> createState() => _UiInspectorPropertiesPanelState();
+}
+
+class _UiInspectorPropertiesPanelState extends State<UiInspectorPropertiesPanel> {
+  ui.Image? _rawImage;
+  ImageStream? _imageStream;
+  ImageStreamListener? _imageListener;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _resolveImage());
+  }
+
+  @override
+  void didUpdateWidget(UiInspectorPropertiesPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.screenshotVersion != oldWidget.screenshotVersion ||
+        widget.screenshotPath != oldWidget.screenshotPath) {
+      _rawImage = null;
+      WidgetsBinding.instance.addPostFrameCallback((_) => _resolveImage());
+    }
+  }
+
+  @override
+  void dispose() {
+    _removeImageListener();
+    super.dispose();
+  }
+
+  void _removeImageListener() {
+    if (_imageStream != null && _imageListener != null) {
+      _imageStream!.removeListener(_imageListener!);
+      _imageStream = null;
+      _imageListener = null;
+    }
+  }
+
+  void _resolveImage() {
+    if (widget.screenshotPath == null || widget.screenshotPath!.isEmpty) return;
+    if (!mounted) return;
+
+    final provider = FileImage(File(widget.screenshotPath!));
+    final stream = provider.resolve(const ImageConfiguration());
+    _removeImageListener();
+    _imageStream = stream;
+    _imageListener = ImageStreamListener(
+      (imageInfo, _) {
+        if (mounted) {
+          setState(() => _rawImage = imageInfo.image);
+        }
+      },
+      onError: (e, st) {},
+    );
+    stream.addListener(_imageListener!);
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final node = widget.node;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -36,7 +105,7 @@ class UiInspectorPropertiesPanel extends StatelessWidget {
               const Spacer(),
               IconButton(
                 icon: const Icon(Icons.close, size: 18),
-                onPressed: onClose,
+                onPressed: widget.onClose,
                 visualDensity: VisualDensity.compact,
                 tooltip: 'Close',
               ),
@@ -50,53 +119,135 @@ class UiInspectorPropertiesPanel extends StatelessWidget {
           )
         else
           Expanded(
-            child: _PropertyList(node: node!),
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                if (node.boundsRect != null && _rawImage != null) ...[
+                  _BoundsPreview(
+                    bounds: node.boundsRect!,
+                    rawImage: _rawImage!,
+                  ),
+                  const Divider(height: 1),
+                ],
+                if (node.boundsRect != null)
+                  _SizeRow(bounds: node.boundsRect!, theme: theme),
+                ...node.attributes.entries.toList().asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final attr = entry.value;
+                  return _PropertyRow(
+                    propKey: attr.key,
+                    propValue: attr.value,
+                    isEven: index.isEven,
+                    theme: theme,
+                  );
+                }),
+              ],
+            ),
           ),
       ],
     );
   }
 }
 
-class _PropertyList extends StatelessWidget {
-  final XmlNode node;
+class _BoundsPreview extends StatelessWidget {
+  final Rect bounds;
+  final ui.Image rawImage;
 
-  const _PropertyList({required this.node});
+  const _BoundsPreview({required this.bounds, required this.rawImage});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final entries = node.attributes.entries.toList();
-
-    return ListViewItemBuilder(
-      itemCount: entries.length,
-      itemBuilder: (context, index) {
-        final entry = entries[index];
-        return _PropertyRow(
-          propKey: entry.key,
-          propValue: entry.value,
-          isEven: index.isEven,
-          theme: theme,
-        );
-      },
+    return SizedBox(
+      height: 140,
+      child: CustomPaint(
+        size: Size.infinite,
+        painter: _BoundsPreviewPainter(bounds: bounds, rawImage: rawImage),
+      ),
     );
   }
 }
 
-class ListViewItemBuilder extends StatelessWidget {
-  final int itemCount;
-  final Widget Function(BuildContext, int) itemBuilder;
+class _BoundsPreviewPainter extends CustomPainter {
+  final Rect bounds;
+  final ui.Image rawImage;
 
-  const ListViewItemBuilder({
-    super.key,
-    required this.itemCount,
-    required this.itemBuilder,
-  });
+  _BoundsPreviewPainter({required this.bounds, required this.rawImage});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final imgW = rawImage.width.toDouble();
+    final imgH = rawImage.height.toDouble();
+
+    final scaleX = size.width / imgW;
+    final scaleY = size.height / imgH;
+    final fitScale = scaleX < scaleY ? scaleX : scaleY;
+
+    final displayW = imgW * fitScale;
+    final displayH = imgH * fitScale;
+    final offsetX = (size.width - displayW) / 2;
+    final offsetY = (size.height - displayH) / 2;
+
+    final srcRect = Rect.fromLTWH(0, 0, imgW, imgH);
+    final dstRect = Rect.fromLTWH(offsetX, offsetY, displayW, displayH);
+
+    canvas.drawImageRect(rawImage, srcRect, dstRect, Paint());
+
+    final cropRect = Rect.fromLTRB(
+      offsetX + bounds.left * fitScale,
+      offsetY + bounds.top * fitScale,
+      offsetX + bounds.right * fitScale,
+      offsetY + bounds.bottom * fitScale,
+    );
+
+    final dimPaint = Paint()..color = Colors.black.withValues(alpha: 0.4);
+
+    final path = Path()
+      ..addRect(dstRect)
+      ..addRect(cropRect)
+      ..fillType = PathFillType.evenOdd;
+    canvas.drawPath(path, dimPaint);
+
+    final strokePaint = Paint()
+      ..color = Colors.orange
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+    canvas.drawRect(cropRect, strokePaint);
+  }
+
+  @override
+  bool shouldRepaint(_BoundsPreviewPainter oldDelegate) {
+    return oldDelegate.bounds != bounds || oldDelegate.rawImage != rawImage;
+  }
+}
+
+class _SizeRow extends StatelessWidget {
+  final Rect bounds;
+  final ThemeData theme;
+
+  const _SizeRow({required this.bounds, required this.theme});
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: itemCount,
-      itemBuilder: itemBuilder,
+    final width = (bounds.right - bounds.left).round();
+    final height = (bounds.bottom - bounds.top).round();
+    return Container(
+      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      child: Row(
+        children: [
+          Icon(Icons.straighten, size: 14, color: theme.colorScheme.primary),
+          const SizedBox(width: 6),
+          Text(
+            '$width × $height',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'monospace',
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

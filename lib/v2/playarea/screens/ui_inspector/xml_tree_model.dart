@@ -27,6 +27,7 @@ class XmlNode {
   String? get className => attributes['class'];
   String? get bounds => attributes['bounds'];
   String? get packageName => attributes['package'];
+  bool get isFocused => attributes['focused'] == 'true';
 
   static final _boundsPattern = RegExp(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]');
 

@@ -72,6 +72,22 @@ class UiInspectorController extends ChangeNotifier {
     return bestIndex;
   }
 
+  XmlNode? get focusedNode {
+    if (_treeModel == null) return null;
+    return _findFocused(_treeModel!.root);
+  }
+
+  XmlNode? _findFocused(XmlNode node) {
+    if (node.isFocused) return node;
+    for (final child in node.children) {
+      final found = _findFocused(child);
+      if (found != null) return found;
+    }
+    return null;
+  }
+
+  int? get focusedFlatIndex => focusedNode?.flatIndex;
+
   List<Rect> get highlightedBounds {
     if (_treeModel == null || _highlightedIndices.isEmpty) return [];
     final list = <Rect>[];

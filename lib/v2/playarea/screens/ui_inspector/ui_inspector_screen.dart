@@ -199,6 +199,9 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
             return UiInspectorPropertiesPanel(
               node: _controller.selectedNode,
               onClose: () => setState(() => _showProperties = false),
+              controller: _controller,
+              screenshotPath: _result?.screenshotPath,
+              screenshotVersion: _screenshotVersion,
             );
           },
         );

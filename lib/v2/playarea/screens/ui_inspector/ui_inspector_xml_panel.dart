@@ -23,6 +23,32 @@ class UiInspectorXmlPanel extends StatefulWidget {
 class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
   final _searchController = TextEditingController();
   final _searchFocusNode = FocusNode();
+  int? _blinkFlatIndex;
+
+  void _jumpToFocused() {
+    final focused = widget.controller.focusedNode;
+    if (focused == null) return;
+
+    final ancestors = widget.controller.treeModel?.getAncestorFlatIndices(focused.flatIndex);
+    if (ancestors != null) {
+      for (final idx in ancestors) {
+        widget.controller.expandedNodes.add(idx);
+      }
+    }
+    widget.controller.selectNode(focused.flatIndex);
+
+    setState(() {
+      _blinkFlatIndex = focused.flatIndex;
+    });
+
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted && _blinkFlatIndex == focused.flatIndex) {
+        setState(() {
+          _blinkFlatIndex = null;
+        });
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -100,6 +126,12 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
                     },
                   ),
                   IconButton(
+                    icon: const Icon(Icons.center_focus_strong, size: 18),
+                    tooltip: 'Jump to focused element',
+                    visualDensity: VisualDensity.compact,
+                    onPressed: widget.controller.focusedNode != null ? _jumpToFocused : null,
+                  ),
+                  IconButton(
                     icon: const Icon(Icons.search, size: 18),
                     tooltip: 'Search',
                     visualDensity: VisualDensity.compact,
@@ -127,6 +159,7 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
                 highlightedIndices: widget.controller.highlightedIndices,
                 onToggleExpand: widget.controller.toggleExpand,
                 onNodeSelected: widget.controller.selectNode,
+                focusedFlatIndex: _blinkFlatIndex,
               );
             },
           ),
@@ -223,8 +256,8 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
               child: Row(
                 children: [
                   Icon(
-                    node.hasChildren ? Icons.subdirectory_arrow_right : Icons.label, 
-                    size: 14, 
+                    node.hasChildren ? Icons.subdirectory_arrow_right : Icons.label,
+                    size: 14,
                     color: isHighlighted ? colorScheme.onSecondaryContainer : colorScheme.primary,
                   ),
                   const SizedBox(width: 4),
@@ -240,12 +273,28 @@ class _UiInspectorXmlPanelState extends State<UiInspectorXmlPanel> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  if (node.isFocused) _buildFocusedDot(),
                 ],
               ),
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildFocusedDot() {
+    return Tooltip(
+      message: 'Focused element',
+      child: Container(
+        margin: const EdgeInsets.only(left: 4),
+        width: 8,
+        height: 8,
+        decoration: BoxDecoration(
+          color: Colors.orange,
+          shape: BoxShape.circle,
+        ),
+      ),
     );
   }
 }
