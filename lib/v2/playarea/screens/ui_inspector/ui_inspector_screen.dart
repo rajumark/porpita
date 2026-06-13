@@ -115,29 +115,8 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
             ),
           if (foregroundApp != null) ...[
             const SizedBox(width: 4),
-            Icon(Icons.open_in_browser, size: 16, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(width: 6),
-            Flexible(
-              child: Text(
-                foregroundApp.activityName.split('.').last,
-                style: TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 12,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            if (foregroundApp.fragments.isNotEmpty) ...[
-              const SizedBox(width: 6),
-              Container(
-                width: 1,
-                height: 14,
-                color: Theme.of(context).colorScheme.outlineVariant,
-              ),
-              const SizedBox(width: 6),
-              ...foregroundApp.fragments.map((name) => _buildFragmentChip(name)),
-            ],
+            _buildFragmentChip(foregroundApp.activityName.split('.').last),
+            ...foregroundApp.fragments.map((name) => _buildFragmentChip(name)),
           ] else
             const Expanded(child: SizedBox.shrink()),
           ListenableBuilder(
