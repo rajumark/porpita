@@ -240,7 +240,7 @@ class UiInspectorController extends ChangeNotifier {
     }
     return count;
   }
-
+ 
   void _expandAll() {
     if (_treeModel == null) return;
     _expandAllRecursive(_treeModel!.root);
