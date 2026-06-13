@@ -143,10 +143,7 @@ class _XmlNodeRow extends StatelessWidget {
         ),
       ),
       child: InkWell(
-        onTap: () {
-          onTap?.call();
-          if (hasChildren) onToggleExpand();
-        },
+        onTap: onTap,
         borderRadius: BorderRadius.circular(4),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),

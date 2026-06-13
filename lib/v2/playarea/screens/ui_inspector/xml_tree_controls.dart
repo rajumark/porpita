@@ -139,10 +139,8 @@ class XmlTreeControls extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(Icons.layers_outlined, size: 14, color: colorScheme.primary),
-        const SizedBox(width: 6),
         Text(
-          '$layersValue/$maxDepth ($layersNodeCount)',
+          '$layersValue/$maxDepth',
           style: TextStyle(
             fontSize: 11,
             fontFamily: 'monospace',
@@ -179,10 +177,8 @@ class XmlTreeControls extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(Icons.center_focus_strong_outlined, size: 14, color: colorScheme.primary),
-        const SizedBox(width: 6),
         Text(
-          '$focusValue/${totalNodes - 1}${focusNodeLabel != null ? ' $focusNodeLabel' : ''}',
+          '$focusValue/${totalNodes - 1}',
           style: TextStyle(
             fontSize: 11,
             fontFamily: 'monospace',
