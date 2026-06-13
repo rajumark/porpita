@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 
 import 'package:porpita/services/device_manager.dart';
 import 'package:porpita/v2/widgets/rounded_container.dart';
+import 'package:porpita/v2/widgets/app_icon.dart';
+import 'package:porpita/v2/playarea/screens/apps/icons/app_icon_service.dart';
 import 'ui_inspector_controller.dart';
 import 'ui_inspector_error_view.dart';
 import 'ui_inspector_properties_panel.dart';
@@ -65,6 +67,9 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
         _screenshotVersion++;
         _controller.parseTree(result.xmlContent);
       });
+      if (result.foregroundApp != null) {
+        AppIconService.instance.fetchIcons(deviceId, [result.foregroundApp!.packageName]);
+      }
     }
   }
 
@@ -115,6 +120,12 @@ class _UiInspectorScreenState extends State<UiInspectorScreen> {
             ),
           if (foregroundApp != null) ...[
             const SizedBox(width: 4),
+            AppIcon(
+              packageName: foregroundApp.packageName,
+              deviceId: deviceId ?? '',
+              size: 24,
+            ),
+            const SizedBox(width: 6),
             _buildFragmentChip(foregroundApp.activityName.split('.').last),
             ...foregroundApp.fragments.map((name) => _buildFragmentChip(name)),
           ] else
