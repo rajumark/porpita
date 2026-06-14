@@ -154,7 +154,7 @@ class _StatusbarScreenshotViewState extends State<StatusbarScreenshotView> {
           ),
           clipBehavior: Clip.antiAlias,
           child: noStatusBar || _rawImage == null || _statusBarInfo == null
-              ? const Center(child: Text('--:--', style: TextStyle(fontSize: 12)))
+              ? const SizedBox.shrink()
               : ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: CustomPaint(
