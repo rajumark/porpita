@@ -2,20 +2,15 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:porpita/services/screen_capture_service.dart';
-import 'package:porpita/v2/playarea/screens/debuginfo/statusbar_screenshot/statusbar_screenshot_view.dart';
 import 'devicebutton/device_button.dart';
 import 'porpita_preferences/porpita_preferences_dialog.dart';
 
 class TopBar extends StatelessWidget {
   final VoidCallback onMenuTap;
-  final VoidCallback onQuickSettingsTap;
-  final GlobalKey? quickSettingsKey;
 
   const TopBar({
     super.key,
     required this.onMenuTap,
-    required this.onQuickSettingsTap,
-    this.quickSettingsKey,
   });
 
   @override
@@ -35,12 +30,6 @@ class TopBar extends StatelessWidget {
           const Text('Porpita'),
           const SizedBox(width: 16),
           const DeviceButton(),
-          const Spacer(),
-          StatusbarScreenshotView(
-            compact: true,
-            onTap: onQuickSettingsTap,
-            key: quickSettingsKey,
-          ),
           const Spacer(),
           if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
             IconButton(

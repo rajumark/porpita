@@ -25,7 +25,6 @@ import 'playarea/screens/ui_inspector/ui_inspector_screen.dart';
 import 'playarea/screens/systemui/systemui_screen.dart';
 import 'topbar/topbar.dart';
 import 'quickpanel/quick_panel.dart';
-import 'notification_shade/notification_shade_dialog.dart';
 
 class BaseScreen extends StatefulWidget {
   const BaseScreen({super.key});
@@ -39,7 +38,6 @@ class _BaseScreenState extends State<BaseScreen> {
 
   int _selectedIndex = 0;
   bool _showSidebar = true;
-  final _quickSettingsKey = GlobalKey();
 
   @override
   void initState() {
@@ -113,18 +111,6 @@ class _BaseScreenState extends State<BaseScreen> {
             TopBar(
               key: const ValueKey('topbar'),
               onMenuTap: () => setState(() => _showSidebar = !_showSidebar),
-              onQuickSettingsTap: () {
-                final renderBox = _quickSettingsKey.currentContext?.findRenderObject() as RenderBox?;
-                final overlay = Overlay.of(context).context.findRenderObject() as RenderBox?;
-                if (renderBox != null && overlay != null) {
-                  final rect = Rect.fromPoints(
-                    renderBox.localToGlobal(Offset.zero, ancestor: overlay),
-                    renderBox.localToGlobal(renderBox.size.bottomRight(Offset.zero), ancestor: overlay),
-                  );
-                  NotificationShadeDialog.show(context, pillRect: rect);
-                }
-              },
-              quickSettingsKey: _quickSettingsKey,
             ),
             Expanded(
               child: Row(
