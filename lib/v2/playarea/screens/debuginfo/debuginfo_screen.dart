@@ -4,6 +4,7 @@ import 'debuginfo_widgets.dart';
 import 'debug_colors_tab.dart';
 import 'debug_typography_tab.dart';
 import 'debug_cards_tab.dart';
+import 'debug_experimental_tab.dart';
 
 class DebugInfoScreen extends StatelessWidget {
   const DebugInfoScreen({super.key});
@@ -11,7 +12,7 @@ class DebugInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 5,
+      length: 6,
       child: Column(
         children: [
           TabBar(
@@ -21,6 +22,7 @@ class DebugInfoScreen extends StatelessWidget {
               Tab(text: 'Colors'),
               Tab(text: 'Typography'),
               Tab(text: 'Cards'),
+              Tab(text: 'Experimental'),
             ],
           ),
           Expanded(
@@ -31,6 +33,7 @@ class DebugInfoScreen extends StatelessWidget {
                 DebugColorsTab(),
                 DebugTypographyTab(),
                 DebugCardsTab(),
+                DebugExperimentalTab(),
               ],
             ),
           ),
