@@ -6,16 +6,14 @@ import 'package:porpita/services/adb_manager.dart';
 List<String> _splitRawSections(String raw) {
   final lines = raw.split('\n');
   final sections = <String>[];
-  final buf = StringBuffer();
+  StringBuffer? buf;
   for (final line in lines) {
-    if (line.trimLeft().startsWith('NotificationRecord(') && buf.isNotEmpty) {
-      sections.add(buf.toString().trimRight());
-      buf.clear();
+    if (line.trimLeft().startsWith('NotificationRecord(')) {
+      if (buf != null) sections.add(buf.toString().trimRight());
+      buf = StringBuffer();
     }
-    buf.writeln(line);
+    if (buf != null) buf.writeln(line);
   }
-  final last = buf.toString().trimRight();
-  if (last.isNotEmpty) sections.add(last);
   return sections;
 }
 
