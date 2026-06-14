@@ -9,7 +9,10 @@ import '../../../../../services/device_manager.dart';
 import 'statusbar_screenshot_service.dart';
 
 class StatusbarScreenshotView extends StatefulWidget {
-  const StatusbarScreenshotView({super.key});
+  final bool compact;
+  final VoidCallback? onTap;
+
+  const StatusbarScreenshotView({super.key, this.compact = false, this.onTap});
 
   @override
   State<StatusbarScreenshotView> createState() => _StatusbarScreenshotViewState();
@@ -25,8 +28,8 @@ class _StatusbarScreenshotViewState extends State<StatusbarScreenshotView> {
   ImageStream? _imageStream;
   ImageStreamListener? _imageListener;
 
-  int? _statusBarHeight;
-  int _refreshCount = 0;
+  StatusbarInfo? _statusBarInfo;
+  bool? _lastIsLandscape;
 
   @override
   void initState() {
@@ -66,7 +69,7 @@ class _StatusbarScreenshotViewState extends State<StatusbarScreenshotView> {
       onError: (e, st) {
         if (mounted) {
           setState(() {
-            _error = 'Failed to load image structure: $e';
+            _error = 'Failed to load image: $e';
           });
         }
       },
@@ -83,6 +86,8 @@ class _StatusbarScreenshotViewState extends State<StatusbarScreenshotView> {
           _error = 'No device connected';
           _imagePath = null;
           _rawImage = null;
+          _statusBarInfo = null;
+          _lastIsLandscape = null;
         });
       }
       return;
@@ -94,35 +99,97 @@ class _StatusbarScreenshotViewState extends State<StatusbarScreenshotView> {
       PaintingBinding.instance.imageCache.evict(FileImage(File(_imagePath!)));
     }
 
-    final shouldFetchHeight = _statusBarHeight == null || (_refreshCount % 3 == 0);
-    _refreshCount++;
+    final results = await Future.wait([
+      StatusbarScreenshotService.capture(deviceId),
+      StatusbarScreenshotService.getStatusBarInfo(deviceId),
+    ]);
 
-    int? newHeight = _statusBarHeight;
-    if (shouldFetchHeight) {
-      newHeight = await StatusbarScreenshotService.getStatusBarHeight(deviceId);
+    final path = results[0] as String?;
+    final info = results[1] as StatusbarInfo?;
+
+    if (path != null) {
+      final pngInfo = _PngHeaderInfo.read(path);
+      if (pngInfo != null) {
+        _lastIsLandscape = pngInfo.width > pngInfo.height;
+      }
     }
-
-    final path = await StatusbarScreenshotService.capture(deviceId);
 
     if (mounted) {
       setState(() {
         _loading = false;
         _imagePath = path;
-        _statusBarHeight = newHeight;
+        _statusBarInfo = info;
         _error = path == null ? 'Failed to capture screenshot' : null;
       });
       if (path != null) {
         _resolveImage(path);
       } else {
-        setState(() {
-          _rawImage = null;
-        });
+        _rawImage = null;
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.compact) {
+      return _buildCompact(context);
+    }
+    return _buildFull(context);
+  }
+
+  Widget _buildCompact(BuildContext context) {
+    final noStatusBar = _statusBarInfo != null && !_statusBarInfo!.visible;
+
+    return SizedBox(
+      height: 32,
+      child: InkWell(
+        onTap: widget.onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          height: 32,
+          padding: EdgeInsets.symmetric(horizontal: widget.onTap != null ? 0 : 8),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: noStatusBar || _rawImage == null || _statusBarInfo == null
+              ? const Center(child: Text('--:--', style: TextStyle(fontSize: 12)))
+              : ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: CustomPaint(
+                    size: Size(_rawImage!.width.toDouble() * 32 / _statusBarInfo!.height, 32),
+                    painter: _StatusbarPreviewPainter(
+                      rawImage: _rawImage!,
+                      statusBarHeight: _statusBarInfo!.height.toDouble(),
+                    ),
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFull(BuildContext context) {
+    final noStatusBar = _statusBarInfo != null && !_statusBarInfo!.visible;
+
+    if (noStatusBar) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.info_outline, size: 48, color: Theme.of(context).colorScheme.onSurfaceVariant),
+            const SizedBox(height: 8),
+            Text(
+              'Status bar is hidden\n(Full-screen mode)',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+            ),
+          ],
+        ),
+      );
+    }
+
     if (_error != null && _rawImage == null) {
       return Center(
         child: Column(
@@ -142,7 +209,10 @@ class _StatusbarScreenshotViewState extends State<StatusbarScreenshotView> {
       );
     }
 
-    final double activeHeight = _statusBarHeight?.toDouble() ?? (_rawImage?.height.toDouble() ?? 100.0) * 0.04;
+    double activeHeight = _statusBarInfo?.height.toDouble() ?? (_rawImage?.height.toDouble() ?? 100.0) * 0.04;
+    if (activeHeight <= 0) {
+      activeHeight = 24.0;
+    }
 
     return Column(
       children: [
@@ -214,3 +284,24 @@ class _StatusbarPreviewPainter extends CustomPainter {
   }
 }
 
+class _PngHeaderInfo {
+  final int width;
+  final int height;
+
+  _PngHeaderInfo(this.width, this.height);
+
+  static _PngHeaderInfo? read(String path) {
+    try {
+      final file = File(path);
+      if (!file.existsSync()) return null;
+      final bytes = file.readAsBytesSync();
+      if (bytes.length < 24) return null;
+      if (bytes[0] != 0x89 || bytes[1] != 0x50 || bytes[2] != 0x4E || bytes[3] != 0x47) return null;
+      final width = (bytes[16] << 24) | (bytes[17] << 16) | (bytes[18] << 8) | bytes[19];
+      final height = (bytes[20] << 24) | (bytes[21] << 16) | (bytes[22] << 8) | bytes[23];
+      return _PngHeaderInfo(width, height);
+    } catch (_) {
+      return null;
+    }
+  }
+}

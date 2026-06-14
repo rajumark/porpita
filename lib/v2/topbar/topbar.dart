@@ -2,10 +2,9 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:porpita/services/screen_capture_service.dart';
+import 'package:porpita/v2/playarea/screens/debuginfo/statusbar_screenshot/statusbar_screenshot_view.dart';
 import 'devicebutton/device_button.dart';
 import 'porpita_preferences/porpita_preferences_dialog.dart';
-import 'time_chip/time_chip.dart';
-import 'quick_settings_chip/quick_settings_chip.dart';
 
 class TopBar extends StatelessWidget {
   final VoidCallback onMenuTap;
@@ -37,34 +36,10 @@ class TopBar extends StatelessWidget {
           const SizedBox(width: 16),
           const DeviceButton(),
           const Spacer(),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                height: 26,
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(13),
-                ),
-                child: const Center(child: TimeChip()),
-              ),
-              const SizedBox(width: 8),
-              InkWell(
-                key: quickSettingsKey,
-                onTap: onQuickSettingsTap,
-                borderRadius: BorderRadius.circular(13),
-                child: Container(
-                  height: 26,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(13),
-                  ),
-                  child: Center(child: QuickSettingsChip(onTap: onQuickSettingsTap)),
-                ),
-              ),
-            ],
+          StatusbarScreenshotView(
+            compact: true,
+            onTap: onQuickSettingsTap,
+            key: quickSettingsKey,
           ),
           const Spacer(),
           if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
