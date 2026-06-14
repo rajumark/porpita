@@ -28,11 +28,11 @@ class QuickPanel extends StatelessWidget {
             _ChipGroup(
               scheme: scheme,
               children: [
-                _chip(Icons.volume_up, 'Volume Up', () => QuickPanelService.pressVolumeUp(deviceId)),
-                _chip(Icons.volume_down, 'Volume Down', () => QuickPanelService.pressVolumeDown(deviceId)),
-                _chip(Icons.play_arrow, 'Play', () => QuickPanelService.mediaPlay(deviceId)),
-                _chip(Icons.pause, 'Pause', () => QuickPanelService.mediaPause(deviceId)),
-                _chip(Icons.volume_off, 'Mute', () => QuickPanelService.volumeMute(deviceId)),
+                _chip(Icons.volume_up_outlined, 'Volume Up', () => QuickPanelService.pressVolumeUp(deviceId)),
+                _chip(Icons.volume_down_outlined, 'Volume Down', () => QuickPanelService.pressVolumeDown(deviceId)),
+                _chip(Icons.play_circle_outlined, 'Play', () => QuickPanelService.mediaPlay(deviceId)),
+                _chip(Icons.pause_circle_outlined, 'Pause', () => QuickPanelService.mediaPause(deviceId)),
+                _chip(Icons.volume_off_outlined, 'Mute', () => QuickPanelService.volumeMute(deviceId)),
               ],
             ),
             const SizedBox(height: 8),
