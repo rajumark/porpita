@@ -12,7 +12,7 @@ class QuickPanel extends StatelessWidget {
 
     return Container(
       width: 42,
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.only(right: 8, top: 8, bottom: 8),
       child: SingleChildScrollView(
         child: Column(
           children: [
