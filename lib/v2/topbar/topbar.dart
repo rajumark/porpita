@@ -5,11 +5,19 @@ import 'package:porpita/services/screen_capture_service.dart';
 import 'devicebutton/device_button.dart';
 import 'porpita_preferences/porpita_preferences_dialog.dart';
 import 'time_chip/time_chip.dart';
+import 'quick_settings_chip/quick_settings_chip.dart';
 
 class TopBar extends StatelessWidget {
   final VoidCallback onMenuTap;
   final VoidCallback onQuickSettingsTap;
-  const TopBar({super.key, required this.onMenuTap, required this.onQuickSettingsTap});
+  final GlobalKey? quickSettingsKey;
+
+  const TopBar({
+    super.key,
+    required this.onMenuTap,
+    required this.onQuickSettingsTap,
+    this.quickSettingsKey,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,40 +36,51 @@ class TopBar extends StatelessWidget {
           const Text('Porpita'),
           const SizedBox(width: 16),
           const DeviceButton(),
-          const SizedBox(width: 8),
           const Spacer(),
           Row(
             mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const TimeChip(),
-              const SizedBox(width: 8),
-              if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
-                IconButton(
-                  icon: const Icon(Icons.camera_alt_outlined),
-                  iconSize: 24,
-                  tooltip: 'Capture window screenshot',
-                  onPressed: () => ScreenCaptureService.captureAndSave(context),
-                  padding: EdgeInsets.zero,
-                  constraints: BoxConstraints.tight(const Size(36, 36)),
+              Container(
+                height: 26,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(13),
                 ),
-              IconButton(
-                icon: const Icon(Icons.settings),
-                iconSize: 24,
-                onPressed: () => PorpitaPreferencesDialog.show(context),
-                padding: EdgeInsets.zero,
-                constraints: BoxConstraints.tight(const Size(36, 36)),
+                child: const Center(child: TimeChip()),
               ),
-              IconButton(
-                icon: const Icon(Icons.menu),
-                iconSize: 24,
-                onPressed: onQuickSettingsTap,
-                padding: EdgeInsets.zero,
-                constraints: BoxConstraints.tight(const Size(36, 36)),
+              const SizedBox(width: 8),
+              InkWell(
+                key: quickSettingsKey,
+                onTap: onQuickSettingsTap,
+                borderRadius: BorderRadius.circular(13),
+                child: Container(
+                  height: 26,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(13),
+                  ),
+                  child: Center(child: QuickSettingsChip(onTap: onQuickSettingsTap)),
+                ),
               ),
             ],
           ),
           const Spacer(),
+          if (Platform.isMacOS || Platform.isWindows || Platform.isLinux)
+            IconButton(
+              icon: const Icon(Icons.camera_alt_outlined, size: 20),
+              onPressed: () => ScreenCaptureService.captureAndSave(context),
+              padding: EdgeInsets.zero,
+              constraints: BoxConstraints.tight(const Size(36, 36)),
+              tooltip: 'Screenshot',
+            ),
+          IconButton(
+            icon: const Icon(Icons.settings, size: 20),
+            onPressed: () => PorpitaPreferencesDialog.show(context),
+            padding: EdgeInsets.zero,
+            constraints: BoxConstraints.tight(const Size(36, 36)),
+          ),
           const SizedBox(width: 8),
         ],
       ),

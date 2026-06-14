@@ -58,6 +58,7 @@ class MyApp extends StatelessWidget {
         },
         child: MaterialApp(
           title: 'Porpita',
+          debugShowCheckedModeBanner: false,
           themeMode: themeManager.themeMode,
           theme: ThemeData(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

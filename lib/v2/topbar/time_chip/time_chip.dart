@@ -37,16 +37,11 @@ class _TimeChipState extends State<TimeChip> {
     final dm = context.read<DeviceManager>();
     final device = dm.selected;
     if (device == null) return;
-    try {
-      await SettingsService.openSetting(deviceId: device.id, intent: 'com.android.deskclock');
-    } catch (_) {}
+    await SettingsService.openSetting(deviceId: device.id, intent: 'android.intent.action.SHOW_ALARMS');
   }
 
   @override
   Widget build(BuildContext context) {
-    final dm = context.watch<DeviceManager>();
-    final hasDevice = dm.selected != null;
-
     return StreamBuilder<DateTime>(
       stream: _clockService.stream,
       builder: (context, snapshot) {
@@ -84,13 +79,7 @@ class _TimeChipState extends State<TimeChip> {
               ),
             ),
           ],
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              border: Border.all(color: Theme.of(context).colorScheme.outline),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
+          child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
@@ -99,17 +88,8 @@ class _TimeChipState extends State<TimeChip> {
                         fontFeatures: const [FontFeature.tabularFigures()],
                       ),
                 ),
-                const SizedBox(width: 2),
-                Icon(
-                  Icons.arrow_drop_down,
-                  size: 16,
-                  color: hasDevice
-                      ? Theme.of(context).colorScheme.onSurface
-                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-                ),
               ],
             ),
-          ),
         );
       },
     );
