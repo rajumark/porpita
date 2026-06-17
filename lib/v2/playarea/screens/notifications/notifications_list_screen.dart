@@ -211,6 +211,13 @@ class _NotificationsBaseScreenState extends State<NotificationsBaseScreen> {
                 ),
               ),
               const SizedBox(width: 8),
+              _quickAction(Icons.grid_view_outlined, 'Quick Settings',
+                  () => QuickPanelService.expandQuickSettings(device.id)),
+              _quickAction(Icons.notifications_outlined, 'Notifications',
+                  () => QuickPanelService.expandNotifications(device.id)),
+              _quickAction(Icons.unfold_less, 'Collapse',
+                  () => QuickPanelService.collapseAll(device.id)),
+              const SizedBox(width: 4),
               Text('${filtered.length}/${_sections.length}',
                   style: Theme.of(context).textTheme.bodySmall),
             ],
@@ -719,4 +726,18 @@ class _Row extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _quickAction(IconData icon, String tooltip, VoidCallback onTap) {
+  return Tooltip(
+    message: tooltip,
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(6),
+      child: Padding(
+        padding: const EdgeInsets.all(5),
+        child: Icon(icon, size: 18),
+      ),
+    ),
+  );
 }
