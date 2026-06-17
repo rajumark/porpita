@@ -300,22 +300,6 @@ class _MediaListScreenState extends State<MediaListScreen> {
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 0, 8, 4),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  '${_currentUri.uri}  ·  ${_entries.length}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ),
         Expanded(child: _buildContent()),
       ],
     );

@@ -229,20 +229,6 @@ class _ContactsListScreenState extends State<ContactsListScreen> {
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 0, 8, 4),
-          child: Row(
-            children: [
-              Text(
-                'content://com.android.contacts/contacts  ·  ${_contacts.length}',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
         Expanded(child: _buildContent()),
       ],
     );

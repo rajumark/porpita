@@ -1,1437 +1,657 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-screen overflow-hidden select-none">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Porpita — The Desktop GUI for Android Debug Bridge</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Google+Sans+Display:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --md-sys-color-primary: #006B5E;
-      --md-sys-color-on-primary: #FFFFFF;
-      --md-sys-color-primary-container: #74F8E2;
-      --md-sys-color-on-primary-container: #00201B;
-      --md-sys-color-secondary: #4A635C;
-      --md-sys-color-on-secondary: #FFFFFF;
-      --md-sys-color-secondary-container: #CCE8DF;
-      --md-sys-color-on-secondary-container: #05201A;
-      --md-sys-color-tertiary: #416278;
-      --md-sys-color-on-tertiary: #FFFFFF;
-      --md-sys-color-tertiary-container: #C7E7FF;
-      --md-sys-color-on-tertiary-container: #001E2F;
-      --md-sys-color-error: #BA1A1A;
-      --md-sys-color-background: #FAFDFA;
-      --md-sys-color-on-background: #191C1B;
-      --md-sys-color-surface: #FAFDFA;
-      --md-sys-color-on-surface: #191C1B;
-      --md-sys-color-surface-dim: #D9DDD9;
-      --md-sys-color-surface-bright: #FAFDFA;
-      --md-sys-color-surface-container-lowest: #FFFFFF;
-      --md-sys-color-surface-container-low: #F3F6F3;
-      --md-sys-color-surface-container: #EDEFE9;
-      --md-sys-color-surface-container-high: #E7EAE6;
-      --md-sys-color-surface-container-highest: #E2E5E1;
-      --md-sys-color-on-surface-variant: #3F4944;
-      --md-sys-color-outline: #6F7974;
-      --md-sys-color-outline-variant: #BFC9C2;
-      --md-sys-color-shadow: #000000;
-      --md-sys-color-inverse-surface: #2D312F;
-      --md-sys-color-inverse-on-surface: #EFF1ED;
-      --md-sys-color-inverse-primary: #5EDBC5;
-      --md-elevation-1: 0 1px 3px 1px rgba(0,0,0,0.08), 0 1px 2px 0 rgba(0,0,0,0.15);
-      --md-elevation-2: 0 2px 6px 2px rgba(0,0,0,0.08), 0 1px 2px 0 rgba(0,0,0,0.15);
-      --md-elevation-3: 0 4px 8px 3px rgba(0,0,0,0.08), 0 1px 3px 0 rgba(0,0,0,0.15);
-      --md-elevation-4: 0 6px 10px 4px rgba(0,0,0,0.08), 0 2px 3px 0 rgba(0,0,0,0.15);
-      --md-elevation-5: 0 8px 12px 6px rgba(0,0,0,0.08), 0 4px 4px 0 rgba(0,0,0,0.15);
-      --md-shape-extra-small: 4px;
-      --md-shape-small: 8px;
-      --md-shape-medium: 12px;
-      --md-shape-large: 16px;
-      --md-shape-extra-large: 28px;
-      --md-shape-full: 9999px;
-      --max-width: 1200px;
-      --font-display: 'Google Sans Display', 'Google Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-body: 'Google Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: var(--font-body);
-      background: var(--md-sys-color-background);
-      color: var(--md-sys-color-on-background);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-
-    .container {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    /* ─── Animations ─── */
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(32px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes scaleIn {
-      from { opacity: 0; transform: scale(0.92); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    @keyframes slideInLeft {
-      from { opacity: 0; transform: translateX(-40px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    @keyframes slideInRight {
-      from { opacity: 0; transform: translateX(40px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-12px); }
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.4; }
-      50% { opacity: 0.7; }
-    }
-
-    .animate-on-scroll {
-      opacity: 0;
-      transform: translateY(32px);
-      transition: opacity 0.7s cubic-bezier(0.2, 0, 0, 1), transform 0.7s cubic-bezier(0.2, 0, 0, 1);
-    }
-
-    .animate-on-scroll.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .animate-on-scroll.delay-1 { transition-delay: 0.1s; }
-    .animate-on-scroll.delay-2 { transition-delay: 0.2s; }
-    .animate-on-scroll.delay-3 { transition-delay: 0.3s; }
-    .animate-on-scroll.delay-4 { transition-delay: 0.4s; }
-    .animate-on-scroll.delay-5 { transition-delay: 0.5s; }
-
-    /* ─── Navbar ─── */
-    nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      background: rgba(250, 253, 250, 0.75);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border-bottom: 1px solid rgba(191, 201, 194, 0.5);
-      transition: background 0.3s, box-shadow 0.3s;
-    }
-
-    nav.scrolled {
-      background: rgba(250, 253, 250, 0.92);
-      box-shadow: var(--md-elevation-1);
-    }
-
-    nav .container {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 64px;
-    }
-
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: var(--font-display);
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--md-sys-color-primary);
-      text-decoration: none;
-      letter-spacing: -0.3px;
-    }
-
-    .nav-brand .icon {
-      font-size: 28px;
-    }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .nav-links a {
-      position: relative;
-      padding: 8px 16px;
-      border-radius: var(--md-shape-full);
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--md-sys-color-on-surface-variant);
-      text-decoration: none;
-      transition: background 0.2s, color 0.2s;
-      letter-spacing: 0.1px;
-    }
-
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: 2px;
-      left: 50%;
-      transform: translateX(-50%) scaleX(0);
-      width: 24px;
-      height: 3px;
-      border-radius: var(--md-shape-full);
-      background: var(--md-sys-color-primary);
-      transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1);
-    }
-
-    .nav-links a:hover::after {
-      transform: translateX(-50%) scaleX(1);
-    }
-
-    .nav-links a:hover {
-      background: var(--md-sys-color-surface-container);
-      color: var(--md-sys-color-on-surface);
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      padding: 10px 24px;
-      border-radius: var(--md-shape-full);
-      font-family: var(--font-body);
-      font-size: 14px;
-      font-weight: 600;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: box-shadow 0.25s cubic-bezier(0.2, 0, 0, 1), transform 0.2s, background 0.2s;
-      letter-spacing: 0.1px;
-    }
-
-    .btn:hover { transform: translateY(-1px); }
-    .btn:active { transform: translateY(0); }
-
-    .btn-filled {
-      background: var(--md-sys-color-primary);
-      color: var(--md-sys-color-on-primary);
-      box-shadow: var(--md-elevation-1);
-    }
-
-    .btn-filled:hover {
-      box-shadow: var(--md-elevation-2);
-      background: #005C50;
-    }
-
-    .btn-tonal {
-      background: var(--md-sys-color-secondary-container);
-      color: var(--md-sys-color-on-secondary-container);
-    }
-
-    .btn-tonal:hover {
-      background: #BBDDD3;
-      box-shadow: var(--md-elevation-1);
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: var(--md-sys-color-primary);
-      border: 1px solid var(--md-sys-color-outline);
-    }
-
-    .btn-outline:hover {
-      background: rgba(0, 107, 94, 0.08);
-    }
-
-    .btn .icon { font-size: 20px; }
-
-    /* ─── Hero ─── */
-    .hero {
-      padding: 160px 0 100px;
-      position: relative;
-      overflow: hidden;
-      background: linear-gradient(180deg, #E8F5F0 0%, var(--md-sys-color-background) 100%);
-    }
-
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -40%;
-      right: -15%;
-      width: 800px;
-      height: 800px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(116, 248, 226, 0.35) 0%, transparent 65%);
-      pointer-events: none;
-      animation: pulse 6s ease-in-out infinite;
-    }
-
-    .hero::after {
-      content: '';
-      position: absolute;
-      bottom: -25%;
-      left: -10%;
-      width: 600px;
-      height: 600px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(199, 231, 255, 0.3) 0%, transparent 65%);
-      pointer-events: none;
-      animation: pulse 8s ease-in-out infinite 2s;
-    }
-
-    .hero .container {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: center;
-    }
-
-    .hero-content {
-      animation: slideInLeft 0.9s cubic-bezier(0.2, 0, 0, 1) both;
-    }
-
-    .hero-content h1 {
-      font-family: var(--font-display);
-      font-size: 64px;
-      font-weight: 700;
-      line-height: 1.05;
-      letter-spacing: -2px;
-      color: var(--md-sys-color-on-background);
-      margin-bottom: 24px;
-    }
-
-    .hero-content h1 span {
-      background: linear-gradient(135deg, var(--md-sys-color-primary) 0%, #00A88E 50%, #00BFA5 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero-subtitle {
-      font-size: 18px;
-      color: var(--md-sys-color-on-surface-variant);
-      line-height: 1.7;
-      margin-bottom: 36px;
-      max-width: 520px;
-      animation: fadeInUp 0.9s cubic-bezier(0.2, 0, 0, 1) 0.2s both;
-    }
-
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 44px;
-      animation: fadeInUp 0.9s cubic-bezier(0.2, 0, 0, 1) 0.35s both;
-    }
-
-    .hero-badge {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      flex-wrap: wrap;
-      animation: fadeInUp 0.9s cubic-bezier(0.2, 0, 0, 1) 0.5s both;
-    }
-
-    .hero-badge-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--md-sys-color-on-surface-variant);
-    }
-
-    .hero-badge-item .icon {
-      font-size: 18px;
-      color: var(--md-sys-color-primary);
-    }
-
-    .hero-visual {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      animation: scaleIn 0.9s cubic-bezier(0.2, 0, 0, 1) 0.3s both;
-    }
-
-    .hero-card {
-      width: 100%;
-      max-width: 520px;
-      background: var(--md-sys-color-surface-container-lowest);
-      border-radius: var(--md-shape-extra-large);
-      box-shadow: var(--md-elevation-4);
-      border: 1px solid var(--md-sys-color-outline-variant);
-      overflow: hidden;
-      animation: float 6s ease-in-out infinite;
-    }
-
-    .hero-card-top {
-      background: linear-gradient(135deg, var(--md-sys-color-primary-container), #A0F0DF);
-      padding: 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .hero-card-top .badge-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .hero-card-top .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 6px 14px;
-      border-radius: var(--md-shape-full);
-      background: rgba(255,255,255,0.6);
-      backdrop-filter: blur(8px);
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--md-sys-color-on-primary-container);
-    }
-
-    .hero-card-top .chip .icon { font-size: 14px; }
-
-    .hero-card-top h3 {
-      font-family: var(--font-display);
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--md-sys-color-on-primary-container);
-    }
-
-    .hero-card-top p {
-      font-size: 14px;
-      color: var(--md-sys-color-on-primary-container);
-      opacity: 0.8;
-    }
-
-    .hero-card-body {
-      padding: 24px 32px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .hero-card-stat {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px;
-      border-radius: var(--md-shape-medium);
-      transition: background 0.2s;
-    }
-
-    .hero-card-stat:hover {
-      background: var(--md-sys-color-surface-container);
-    }
-
-    .hero-card-stat .icon {
-      font-size: 24px;
-      color: var(--md-sys-color-primary);
-    }
-
-    .hero-card-stat div {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .hero-card-stat strong {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--md-sys-color-on-surface);
-    }
-
-    .hero-card-stat span {
-      font-size: 12px;
-      color: var(--md-sys-color-on-surface-variant);
-    }
-
-    /* ─── Wave Divider ─── */
-    .wave-divider {
-      width: 100%;
-      overflow: hidden;
-      line-height: 0;
-      margin-top: -1px;
-    }
-
-    .wave-divider svg {
-      display: block;
-      width: 100%;
-      height: 80px;
-    }
-
-    .wave-divider.flip {
-      transform: rotate(180deg);
-      margin-top: 0;
-      margin-bottom: -1px;
-    }
-
-    /* ─── Section Headers ─── */
-    .section-header {
-      text-align: center;
-      max-width: 680px;
-      margin: 0 auto 64px;
-    }
-
-    .section-header .overline {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--md-sys-color-primary);
-      margin-bottom: 16px;
-      padding: 6px 16px;
-      border-radius: var(--md-shape-full);
-      background: var(--md-sys-color-primary-container);
-    }
-
-    .section-header h2 {
-      font-family: var(--font-display);
-      font-size: 44px;
-      font-weight: 700;
-      letter-spacing: -1px;
-      line-height: 1.15;
-      margin-bottom: 16px;
-      color: var(--md-sys-color-on-background);
-    }
-
-    .section-header p {
-      font-size: 17px;
-      color: var(--md-sys-color-on-surface-variant);
-      line-height: 1.7;
-    }
-
-    section { padding: 96px 0; }
-
-    section.dark-section {
-      background: var(--md-sys-color-inverse-surface);
-      color: var(--md-sys-color-inverse-on-surface);
-    }
-
-    section.dark-section .section-header h2 {
-      color: var(--md-sys-color-inverse-on-surface);
-    }
-
-    section.dark-section .section-header p {
-      color: rgba(239, 241, 237, 0.7);
-    }
-
-    section.surface-section {
-      background: var(--md-sys-color-surface-container);
-    }
-
-    /* ─── Features ─── */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-
-    .feature-card {
-      background: var(--md-sys-color-surface-container-lowest);
-      border-radius: var(--md-shape-extra-large);
-      padding: 32px;
-      border: 1px solid var(--md-sys-color-outline-variant);
-      transition: box-shadow 0.3s cubic-bezier(0.2, 0, 0, 1), transform 0.3s cubic-bezier(0.2, 0, 0, 1);
-    }
-
-    .feature-card:hover {
-      box-shadow: var(--md-elevation-3);
-      transform: translateY(-6px);
-    }
-
-    .feature-card .icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 56px;
-      height: 56px;
-      border-radius: var(--md-shape-large);
-      background: var(--md-sys-color-primary-container);
-      color: var(--md-sys-color-on-primary-container);
-      font-size: 28px;
-      margin-bottom: 20px;
-    }
-
-    .feature-card h3 {
-      font-family: var(--font-display);
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 10px;
-      color: var(--md-sys-color-on-surface);
-    }
-
-    .feature-card p {
-      font-size: 14px;
-      color: var(--md-sys-color-on-surface-variant);
-      line-height: 1.65;
-    }
-
-    /* ─── Feature highlight ─── */
-    .feature-highlight {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 64px;
-      align-items: center;
-      margin-bottom: 96px;
-    }
-
-    .feature-highlight:last-child { margin-bottom: 0; }
-    .feature-highlight.reverse { direction: rtl; }
-    .feature-highlight.reverse > * { direction: ltr; }
-
-    .feature-text .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 16px;
-      border-radius: var(--md-shape-full);
-      background: var(--md-sys-color-primary-container);
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--md-sys-color-on-primary-container);
-      margin-bottom: 20px;
-    }
-
-    .feature-text h3 {
-      font-family: var(--font-display);
-      font-size: 32px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      margin-bottom: 16px;
-      color: var(--md-sys-color-on-background);
-    }
-
-    .feature-text p {
-      font-size: 16px;
-      color: var(--md-sys-color-on-surface-variant);
-      line-height: 1.7;
-      margin-bottom: 24px;
-    }
-
-    .feature-text ul {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .feature-text ul li {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      font-size: 15px;
-      color: var(--md-sys-color-on-surface-variant);
-      line-height: 1.5;
-    }
-
-    .feature-text ul li .icon {
-      font-size: 20px;
-      color: var(--md-sys-color-primary);
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-    .feature-visual {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .feature-visual .mock-card {
-      width: 100%;
-      max-width: 480px;
-      border-radius: var(--md-shape-extra-large);
-      background: var(--md-sys-color-surface-container-lowest);
-      border: 1px solid var(--md-sys-color-outline-variant);
-      box-shadow: var(--md-elevation-3);
-      overflow: hidden;
-      transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.4s;
-    }
-
-    .feature-visual .mock-card:hover {
-      transform: translateY(-4px) scale(1.01);
-      box-shadow: var(--md-elevation-5);
-    }
-
-    .mock-card-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--md-sys-color-outline-variant);
-      background: var(--md-sys-color-surface-container);
-    }
-
-    .mock-card-header .dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-
-    .mock-card-header .dot:nth-child(1) { background: #FF5F56; }
-    .mock-card-header .dot:nth-child(2) { background: #FFBD2E; }
-    .mock-card-header .dot:nth-child(3) { background: #27C93F; }
-
-    .mock-card-header span {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--md-sys-color-on-surface-variant);
-      margin-left: 8px;
-    }
-
-    .mock-card-body {
-      padding: 24px;
-    }
-
-    .mock-card-body .row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 0;
-    }
-
-    .mock-card-body .row .icon {
-      font-size: 20px;
-      color: var(--md-sys-color-primary);
-    }
-
-    .mock-card-body .row .bar {
-      flex: 1;
-      height: 8px;
-      border-radius: var(--md-shape-full);
-      background: var(--md-sys-color-surface-container-high);
-      overflow: hidden;
-    }
-
-    .mock-card-body .row .bar .fill {
-      height: 100%;
-      border-radius: var(--md-shape-full);
-      background: var(--md-sys-color-primary);
-      transition: width 1s cubic-bezier(0.2, 0, 0, 1);
-    }
-
-    .mock-card-body .row .bar .fill.green { background: #4CAF50; width: 72%; }
-    .mock-card-body .row .bar .fill.blue { background: #2196F3; width: 55%; }
-    .mock-card-body .row .bar .fill.orange { background: #FF9800; width: 38%; }
-    .mock-card-body .row .bar .fill.teal { background: #009688; width: 88%; }
-
-    .mock-card-body .row .value {
-      font-size: 13px;
-      font-weight: 600;
-      min-width: 40px;
-      text-align: right;
-    }
-
-    .mock-card-footer {
-      display: flex;
-      gap: 8px;
-      padding: 16px 20px;
-      border-top: 1px solid var(--md-sys-color-outline-variant);
-    }
-
-    .mock-card-footer .chip {
-      padding: 4px 12px;
-      border-radius: var(--md-shape-full);
-      background: var(--md-sys-color-surface-container);
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--md-sys-color-on-surface-variant);
-    }
-
-    /* ─── Stats ─── */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-      text-align: center;
-    }
-
-    .stat-card {
-      padding: 40px 20px;
-      border-radius: var(--md-shape-extra-large);
-      background: var(--md-sys-color-surface-container-lowest);
-      border: 1px solid var(--md-sys-color-outline-variant);
-      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--md-elevation-2);
-    }
-
-    .stat-card .icon {
-      font-size: 40px;
-      color: var(--md-sys-color-primary);
-      margin-bottom: 16px;
-    }
-
-    .stat-card h4 {
-      font-family: var(--font-display);
-      font-size: 36px;
-      font-weight: 700;
-      color: var(--md-sys-color-on-background);
-      letter-spacing: -0.5px;
-    }
-
-    .stat-card p {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--md-sys-color-on-surface-variant);
-      margin-top: 4px;
-    }
-
-    /* ─── Downloads ─── */
-    .downloads-section {
-      text-align: center;
-    }
-
-    .download-grid {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-top: 48px;
-    }
-
-    .download-card {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      padding: 24px 36px;
-      border-radius: var(--md-shape-extra-large);
-      background: var(--md-sys-color-surface-container-lowest);
-      border: 1px solid var(--md-sys-color-outline-variant);
-      box-shadow: var(--md-elevation-1);
-      text-decoration: none;
-      color: inherit;
-      transition: box-shadow 0.3s cubic-bezier(0.2, 0, 0, 1), transform 0.3s cubic-bezier(0.2, 0, 0, 1), border-color 0.3s;
-      min-width: 220px;
-    }
-
-    .download-card:hover {
-      box-shadow: var(--md-elevation-4);
-      transform: translateY(-4px);
-      border-color: var(--md-sys-color-primary);
-    }
-
-    .download-card .icon {
-      font-size: 36px;
-      color: var(--md-sys-color-primary);
-    }
-
-    .download-card div { text-align: left; }
-
-    .download-card div strong {
-      display: block;
-      font-size: 17px;
-      font-weight: 600;
-      font-family: var(--font-display);
-    }
-
-    .download-card div span {
-      font-size: 13px;
-      color: var(--md-sys-color-on-surface-variant);
-    }
-
-    /* ─── Use cases ─── */
-    .usecases-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-
-    .usecase-card {
-      text-align: center;
-      padding: 40px 28px;
-      border-radius: var(--md-shape-extra-large);
-      background: var(--md-sys-color-surface-container-lowest);
-      border: 1px solid var(--md-sys-color-outline-variant);
-      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s;
-    }
-
-    .usecase-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--md-elevation-2);
-    }
-
-    .usecase-card .icon {
-      font-size: 44px;
-      color: var(--md-sys-color-tertiary);
-      margin-bottom: 20px;
-    }
-
-    .usecase-card h3 {
-      font-family: var(--font-display);
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-
-    .usecase-card p {
-      font-size: 14px;
-      color: var(--md-sys-color-on-surface-variant);
-      line-height: 1.65;
-    }
-
-    /* ─── Footer ─── */
-    footer {
-      padding: 48px 0;
-      border-top: 1px solid var(--md-sys-color-outline-variant);
-      text-align: center;
-      background: var(--md-sys-color-surface-container);
-    }
-
-    footer p {
-      font-size: 14px;
-      color: var(--md-sys-color-on-surface-variant);
-    }
-
-    footer .brand {
-      font-weight: 600;
-      color: var(--md-sys-color-primary);
-    }
-
-    /* ─── Responsive ─── */
-    @media (max-width: 1024px) {
-      .features-grid { grid-template-columns: repeat(2, 1fr); }
-      .usecases-grid { grid-template-columns: repeat(2, 1fr); }
-      .hero-content h1 { font-size: 48px; }
-      .section-header h2 { font-size: 36px; }
-    }
-
-    @media (max-width: 900px) {
-      .hero .container {
-        grid-template-columns: 1fr;
-        gap: 48px;
-        text-align: center;
-      }
-
-      .hero-content h1 { font-size: 42px; }
-      .hero-subtitle { margin-left: auto; margin-right: auto; }
-      .hero-actions { justify-content: center; }
-      .hero-badge { justify-content: center; }
-
-      .feature-highlight {
-        grid-template-columns: 1fr;
-        gap: 40px;
-      }
-
-      .feature-highlight.reverse { direction: ltr; }
-
-      .stats-row { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (max-width: 640px) {
-      nav .container { height: 56px; }
-      .nav-links a:not(.btn) { display: none; }
-
-      .hero { padding: 120px 0 64px; }
-      .hero-content h1 { font-size: 34px; letter-spacing: -1px; }
-      .hero-subtitle { font-size: 16px; }
-
-      section { padding: 64px 0; }
-
-      .features-grid { grid-template-columns: 1fr; }
-      .usecases-grid { grid-template-columns: 1fr; }
-      .stats-row { grid-template-columns: 1fr 1fr; }
-      .hero-card-body { grid-template-columns: 1fr; }
-      .section-header h2 { font-size: 28px; }
-      .section-header { margin-bottom: 40px; }
-
-      .feature-text h3 { font-size: 24px; }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- ═══ Navbar ═══ -->
-  <nav id="navbar">
-    <div class="container">
-      <a href="#" class="nav-brand">
-        <span class="icon material-symbols-rounded">sound_sampler</span>
-        Porpita
-      </a>
-      <div class="nav-links">
-        <a href="#features">Features</a>
-        <a href="#downloads">Download</a>
-        <a href="https://github.com/anomalyco/porpita" target="_blank">GitHub</a>
-        <a href="#downloads" class="btn btn-filled">
-          <span class="icon material-symbols-rounded">download</span>
-          Get Started
-        </a>
-      </div>
-    </div>
-  </nav>
-
-  <!-- ═══ Hero ═══ -->
-  <section class="hero" id="home">
-    <div class="container">
-      <div class="hero-content">
-        <h1>ADB, <span>Reimagined.</span></h1>
-        <p class="hero-subtitle">
-          A native desktop GUI for Android Debug Bridge. Stop memorizing commands&mdash;control, inspect, and debug your Android devices with a polished visual interface.
-        </p>
-        <div class="hero-actions">
-          <a href="#downloads" class="btn btn-filled">
-            <span class="icon material-symbols-rounded">download</span>
-            Download Free
-          </a>
-          <a href="#features" class="btn btn-outline">
-            <span class="icon material-symbols-rounded">explore</span>
-            Explore Features
-          </a>
-        </div>
-        <div class="hero-badge">
-          <span class="hero-badge-item">
-            <span class="icon material-symbols-rounded">check_circle</span>
-            macOS · Windows · Linux
-          </span>
-          <span class="hero-badge-item">
-            <span class="icon material-symbols-rounded">check_circle</span>
-            No SDK Required
-          </span>
-          <span class="hero-badge-item">
-            <span class="icon material-symbols-rounded">check_circle</span>
-            Open Source
-          </span>
-        </div>
-      </div>
-      <div class="hero-visual">
-        <div class="hero-card">
-          <div class="hero-card-top">
-            <div class="badge-row">
-              <span class="chip">
-                <span class="icon material-symbols-rounded">devices</span>
-                2 devices connected
-              </span>
-              <span class="chip">
-                <span class="icon material-symbols-rounded">bolt</span>
-                Android 14
-              </span>
-            </div>
-            <h3>Device Dashboard</h3>
-            <p>Battery, memory, CPU, storage &mdash; live at a glance.</p>
-          </div>
-          <div class="hero-card-body">
-            <div class="hero-card-stat">
-              <span class="icon material-symbols-rounded">battery_full</span>
-              <div>
-                <strong>87%</strong>
-                <span>Battery</span>
-              </div>
-            </div>
-            <div class="hero-card-stat">
-              <span class="icon material-symbols-rounded">memory</span>
-              <div>
-                <strong>3.2 GB</strong>
-                <span>RAM used</span>
-              </div>
-            </div>
-            <div class="hero-card-stat">
-              <span class="icon material-symbols-rounded">speed</span>
-              <div>
-                <strong>2.4 GHz</strong>
-                <span>CPU freq</span>
-              </div>
-            </div>
-            <div class="hero-card-stat">
-              <span class="icon material-symbols-rounded">storage</span>
-              <div>
-                <strong>46%</strong>
-                <span>Storage</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══ Wave Divider ═══ -->
-  <div class="wave-divider">
-    <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
-      <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,50 1440,40 L1440,80 L0,80 Z" fill="var(--md-sys-color-surface-container)"/>
-    </svg>
-  </div>
-
-  <!-- ═══ Stats ═══ -->
-  <section class="surface-section">
-    <div class="container">
-      <div class="stats-row">
-        <div class="stat-card animate-on-scroll">
-          <span class="icon material-symbols-rounded">terminal</span>
-          <h4>90+</h4>
-          <p>Pre-built ADB Commands</p>
-        </div>
-        <div class="stat-card animate-on-scroll delay-1">
-          <span class="icon material-symbols-rounded">settings</span>
-          <h4>170+</h4>
-          <p>Android Settings Shortcuts</p>
-        </div>
-        <div class="stat-card animate-on-scroll delay-2">
-          <span class="icon material-symbols-rounded">important_devices</span>
-          <h4>3</h4>
-          <p>Desktop Platforms</p>
-        </div>
-        <div class="stat-card animate-on-scroll delay-3">
-          <span class="icon material-symbols-rounded">lock_open</span>
-          <h4>100%</h4>
-          <p>Open Source</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══ Wave Divider ═══ -->
-  <div class="wave-divider flip">
-    <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
-      <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,50 1440,40 L1440,80 L0,80 Z" fill="var(--md-sys-color-surface-container)"/>
-    </svg>
-  </div>
-
-  <!-- ═══ Features ═══ -->
-  <section id="features">
-    <div class="container">
-      <div class="section-header animate-on-scroll">
-        <div class="overline">Everything you need</div>
-        <h2>Your Android Device, at Your Fingertips</h2>
-        <p>Every ADB operation exposed through an intuitive GUI. Powerful enough for engineers, accessible enough for everyone.</p>
-      </div>
-
-      <!-- Highlight 1 -->
-      <div class="feature-highlight">
-        <div class="feature-text animate-on-scroll">
-          <div class="chip">
-            <span class="icon material-symbols-rounded">grid_view</span>
-            8 categories
-          </div>
-          <h3>90+ Pre-built Commands</h3>
-          <p>Battery, memory, CPU, display, input, sensors, audio, WiFi, Bluetooth, connectivity, telephony, location, power, alarms, procfs, and more&mdash;all organized into intuitive categories.</p>
-          <ul>
-            <li>
-              <span class="icon material-symbols-rounded">check</span>
-              <span><strong>dumpsys</strong> &mdash; battery, meminfo, cpuinfo, gfxinfo, and 60+ more subsystems</span>
-            </li>
-            <li>
-              <span class="icon material-symbols-rounded">check</span>
-              <span><strong>procfs</strong> &mdash; cpuinfo, meminfo, partitions, modules, uptime, net/dev</span>
-            </li>
-            <li>
-              <span class="icon material-symbols-rounded">check</span>
-              <span><strong>Device data</strong> &mdash; call logs, SMS, contacts, calendar, media, notifications</span>
-            </li>
-            <li>
-              <span class="icon material-symbols-rounded">check</span>
-              <span><strong>logcat</strong>, <strong>dmesg</strong>, <strong>bugreport</strong> &mdash; full system diagnostics</span>
-            </li>
-          </ul>
-        </div>
-        <div class="feature-visual animate-on-scroll delay-2">
-          <div class="mock-card">
-            <div class="mock-card-header">
-              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-              <span>dumpsys battery</span>
-            </div>
-            <div class="mock-card-body">
-              <div class="row">
-                <span class="icon material-symbols-rounded">battery_full</span>
-                <span style="flex:1; font-size:13px;">Battery level</span>
-                <div class="bar"><div class="fill" style="width:87%"></div></div>
-                <span class="value">87%</span>
-              </div>
-              <div class="row">
-                <span class="icon material-symbols-rounded">power</span>
-                <span style="flex:1; font-size:13px;">Power source</span>
-                <span style="font-size:13px; color:var(--md-sys-color-on-surface-variant);">USB</span>
-                <span class="value" style="min-width:auto;"></span>
-              </div>
-              <div class="row">
-                <span class="icon material-symbols-rounded">thermostat</span>
-                <span style="flex:1; font-size:13px;">Temperature</span>
-                <span style="font-size:13px; color:var(--md-sys-color-on-surface-variant);">36.2 °C</span>
-                <span class="value" style="min-width:auto;"></span>
-              </div>
-              <div class="row">
-                <span class="icon material-symbols-rounded">battery_charging_full</span>
-                <span style="flex:1; font-size:13px;">Charging</span>
-                <span style="font-size:13px; color:var(--md-sys-color-primary); font-weight:600;">AC</span>
-                <span class="value" style="min-width:auto;"></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Highlight 2 -->
-      <div class="feature-highlight reverse">
-        <div class="feature-text animate-on-scroll">
-          <div class="chip">
-            <span class="icon material-symbols-rounded">terminal</span>
-            Interactive
-          </div>
-          <h3>Built-in Terminal</h3>
-          <p>An interactive <strong>adb shell</strong> session right inside the app. Command history, auto-complete, search, copy, and save to file&mdash;no separate terminal needed.</p>
-          <ul>
-            <li>
-              <span class="icon material-symbols-rounded">check</span>
-              <span>Command history persisted across sessions (up to 200 entries)</span>
-            </li>
-            <li>
-              <span class="icon material-symbols-rounded">check</span>
-              <span>Auto-complete from history &amp; command catalog</span>
-            </li>
-            <li>
-              <span class="icon material-symbols-rounded">check</span>
-              <span>Search within output, copy to clipboard, save to file</span>
-            </li>
-            <li>
-              <span class="icon material-symbols-rounded">check</span>
-              <span>10+ quick commands pre-loaded</span>
-            </li>
-          </ul>
-        </div>
-        <div class="feature-visual animate-on-scroll delay-2">
-          <div class="mock-card">
-            <div class="mock-card-header">
-              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-              <span>adb shell — interactive</span>
-            </div>
-            <div class="mock-card-body" style="font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; line-height: 1.8; background: #1a1d1b; color: #cdd6c5; border-radius: 0 0 16px 16px; padding: 20px 24px;">
-              <div style="color: #5bc0de;">$&nbsp; dumpsys battery</div>
-              <div style="color: #a0f0df;">Current Battery Service state:</div>
-              <div>&nbsp;&nbsp;AC powered: true</div>
-              <div>&nbsp;&nbsp;USB powered: false</div>
-              <div>&nbsp;&nbsp;level: 87</div>
-              <div>&nbsp;&nbsp;temperature: 362</div>
-              <div style="color: #5bc0de; margin-top: 6px;">$&nbsp; <span style="background: rgba(255,255,255,0.08); padding: 0 2px;">▌</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Highlight 3 -->
-      <div class="feature-highlight">
-        <div class="feature-text animate-on-scroll">
-          <div class="chip">
-            <span class="icon material-symbols-rounded">qr_code_scanner</span>
-            Android 11+
-          </div>
-          <h3>Wireless ADB Pairing</h3>
-          <p>Connect to devices over WiFi with zero cables. Generate a QR code or 6-digit pairing code directly from the app&mdash;no more typing IP addresses.</p>
-          <ul>
-            <li>
-              <span class="icon material-symbols-rounded">check</span>
-              <span>QR code pairing for Android 11+ devices</span>
-            </li>
-            <li>
-              <span class="icon material-symbols-rounded">check</span>
-              <span>6-digit pairing code fallback</span>
-            </li>
-            <li>
-              <span class="icon material-symbols-rounded">check</span>
-              <span>Auto-detection of USB and emulator devices</span>
-            </li>
-            <li>
-              <span class="icon material-symbols-rounded">check</span>
-              <span>Launch AVDs directly from the app</span>
-            </li>
-          </ul>
-        </div>
-        <div class="feature-visual animate-on-scroll delay-2">
-          <div class="mock-card" style="max-width: 360px;">
-            <div class="mock-card-header">
-              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-              <span>Wireless pairing</span>
-            </div>
-            <div class="mock-card-body" style="text-align: center; padding: 36px 24px;">
-              <div style="display: inline-block; padding: 16px; background: #fff; border-radius: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 20px;">
-                <div style="width: 120px; height: 120px; background: repeating-linear-gradient(45deg, #000 0px, #000 4px, #fff 4px, #fff 8px); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
-                  <div style="width: 36px; height: 36px; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                    <span class="icon material-symbols-rounded" style="font-size: 28px; color: var(--md-sys-color-primary);">devices</span>
-                  </div>
-                </div>
-              </div>
-              <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">Scan to pair</div>
-              <div style="font-size: 13px; color: var(--md-sys-color-on-surface-variant);">or enter code <strong style="color: var(--md-sys-color-primary);">382 917</strong></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Grid features -->
-      <div style="margin-top: 96px;">
-        <div class="features-grid">
-          <div class="feature-card animate-on-scroll">
-            <span class="icon material-symbols-rounded">touch_app</span>
-            <h3>Remote Control</h3>
-            <p>Back, Home, Recent Apps, volume, power, screenshot, and quick settings &mdash; all from your desktop.</p>
-          </div>
-          <div class="feature-card animate-on-scroll delay-1">
-            <span class="icon material-symbols-rounded">settings_accessibility</span>
-            <h3>170+ Settings Shortcuts</h3>
-            <p>Jump directly to any Android settings screen. Organized by network, accessibility, display, security, apps, and more.</p>
-          </div>
-          <div class="feature-card animate-on-scroll delay-2">
-            <span class="icon material-symbols-rounded">inventory_2</span>
-            <h3>UI Inspector</h3>
-            <p>Dump and browse the view hierarchy of any running app via uiautomator. Search, filter, expand/collapse the XML tree.</p>
-          </div>
-          <div class="feature-card animate-on-scroll delay-3">
-            <span class="icon material-symbols-rounded">battery_saver</span>
-            <h3>Battery Simulation</h3>
-            <p>Spoof charge levels, AC/USB/wireless states, and temperature &mdash; perfect for testing power-sensitive behavior.</p>
-          </div>
-          <div class="feature-card animate-on-scroll delay-4">
-            <span class="icon material-symbols-rounded">apps</span>
-            <h3>App Manager</h3>
-            <p>List, inspect, and manage installed packages. View APK paths, permissions, services, activities, and intent filters.</p>
-          </div>
-          <div class="feature-card animate-on-scroll delay-5">
-            <span class="icon material-symbols-rounded">favorite</span>
-            <h3>Always Free &amp; Open Source</h3>
-            <p>No paywalls, no subscriptions. MIT-licensed, community-driven, and built with Flutter for native performance.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══ Wave Divider ═══ -->
-  <div class="wave-divider">
-    <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
-      <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,50 1440,40 L1440,80 L0,80 Z" fill="var(--md-sys-color-inverse-surface)"/>
-    </svg>
-  </div>
-
-  <!-- ═══ Who It's For ═══ -->
-  <section class="dark-section">
-    <div class="container">
-      <div class="section-header animate-on-scroll">
-        <div class="overline" style="background: rgba(94, 219, 197, 0.15); color: var(--md-sys-color-inverse-primary);">Who it's for</div>
-        <h2>Built for Android Teams</h2>
-        <p>Whether you're an indie developer, QA engineer, or manage a device lab&mdash;Porpita fits your workflow.</p>
-      </div>
-      <div class="usecases-grid">
-        <div class="usecase-card animate-on-scroll" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1);">
-          <span class="icon material-symbols-rounded" style="color: var(--md-sys-color-inverse-primary);">code</span>
-          <h3 style="color: var(--md-sys-color-inverse-on-surface);">App Developers</h3>
-          <p style="color: rgba(239, 241, 237, 0.7);">Debug layouts, inspect services, read logs, and test battery scenarios without leaving your IDE flow.</p>
-        </div>
-        <div class="usecase-card animate-on-scroll delay-1" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1);">
-          <span class="icon material-symbols-rounded" style="color: var(--md-sys-color-inverse-primary);">bug_report</span>
-          <h3 style="color: var(--md-sys-color-inverse-on-surface);">QA Engineers</h3>
-          <p style="color: rgba(239, 241, 237, 0.7);">Run diagnostics, capture bugreports, browse device state, and automate testing with the CLI terminal.</p>
-        </div>
-        <div class="usecase-card animate-on-scroll delay-2" style="background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1);">
-          <span class="icon material-symbols-rounded" style="color: var(--md-sys-color-inverse-primary);">dns</span>
-          <h3 style="color: var(--md-sys-color-inverse-on-surface);">Device Lab Managers</h3>
-          <p style="color: rgba(239, 241, 237, 0.7);">Monitor multiple devices, take screenshots, pull media, and manage settings across a fleet of Android phones.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══ Wave Divider ═══ -->
-  <div class="wave-divider flip">
-    <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
-      <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,50 1440,40 L1440,80 L0,80 Z" fill="var(--md-sys-color-inverse-surface)"/>
-    </svg>
-  </div>
-
-  <!-- ═══ Downloads ═══ -->
-  <section id="downloads">
-    <div class="container downloads-section">
-      <div class="section-header animate-on-scroll">
-        <div class="overline">Get started</div>
-        <h2>Download Porpita</h2>
-        <p>No SDK setup. No Android Studio. Just download and run on your desktop OS.</p>
-      </div>
-      <div class="download-grid">
-        <a href="#" class="download-card animate-on-scroll">
-          <span class="icon material-symbols-rounded">desktop_mac</span>
-          <div>
-            <strong>macOS</strong>
-            <span>Intel &amp; Apple Silicon</span>
-          </div>
-        </a>
-        <a href="#" class="download-card animate-on-scroll delay-1">
-          <span class="icon material-symbols-rounded">window</span>
-          <div>
-            <strong>Windows</strong>
-            <span>64-bit, portable</span>
-          </div>
-        </a>
-        <a href="#" class="download-card animate-on-scroll delay-2">
-          <span class="icon material-symbols-rounded">terminal</span>
-          <div>
-            <strong>Linux</strong>
-            <span>.deb &amp; AppImage</span>
-          </div>
-        </a>
-      </div>
-      <p style="margin-top: 40px; font-size: 15px; color: var(--md-sys-color-on-surface-variant);">
-        Or build from source &mdash; <a href="https://github.com/anomalyco/porpita" target="_blank" style="color: var(--md-sys-color-primary); font-weight: 500; text-decoration: none;">github.com/anomalyco/porpita</a>
-      </p>
-    </div>
-  </section>
-
-  <!-- ═══ Footer ═══ -->
-  <footer>
-    <div class="container">
-      <p>
-        Made with
-        <span class="icon material-symbols-rounded" style="font-size: 14px; vertical-align: middle; color: var(--md-sys-color-error);">favorite</span>
-        by <span class="brand">Porpita</span> &mdash; an open-source ADB GUI built with Flutter.
-      </p>
-      <p style="margin-top: 8px;">
-        Not affiliated with Google or Android. ADB is a trademark of Google LLC.
-      </p>
-    </div>
-  </footer>
-
-  <!-- ═══ Scroll Animation Script ═══ -->
-  <script>
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Porpita - Minimalist ADB Desktop Companion</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        // Exact Material Design 3 Palette Configured from Hex Matrix
+                        primary: {
+                            DEFAULT: '#5F5289',
+                            on: '#FFFFFF',
+                            container: '#E5DFF9',
+                            onContainer: '#1C1342',
+                            fixed: '#E5DFF9',
+                            fixedDim: '#C9BFF6',
+                            onFixed: '#1C1342',
+                            onFixedVariant: '#473B6F'
+                        },
+                        secondary: {
+                            DEFAULT: '#5D5B72',
+                            on: '#FFFFFF',
+                            container: '#E2E0F9',
+                            onContainer: '#1A192B',
+                            fixed: '#E2E0F9',
+                            fixedDim: '#C6C4DC',
+                            onFixed: '#1A192B',
+                            onFixedVariant: '#454459'
+                        },
+                        tertiary: {
+                            DEFAULT: '#7B525F',
+                            on: '#FFFFFF',
+                            container: '#FFD9E3',
+                            onContainer: '#30111D',
+                            fixed: '#FFD9E3',
+                            fixedDim: '#ECB9C7',
+                            onFixed: '#30111D',
+                            onFixedVariant: '#5F3B47'
+                        },
+                        error: {
+                            DEFAULT: '#BA291A',
+                            on: '#FFFFFF',
+                            container: '#FFDAD6',
+                            onContainer: '#410002'
+                        },
+                        surface: {
+                            dim: '#DED8E0',
+                            DEFAULT: '#FDF7FF',
+                            bright: '#FDF7FF',
+                            lowest: '#FFFFFF',
+                            low: '#F7F2FA',
+                            container: '#F1ECF4',
+                            high: '#EBE6EE',
+                            highest: '#E5E0E8'
+                        },
+                        onSurface: {
+                            DEFAULT: '#1D1A21',
+                            variant: '#49454E'
+                        },
+                        outline: {
+                            DEFAULT: '#7A757F',
+                            variant: '#CAC4CF'
+                        },
+                        inverse: {
+                            surface: '#322F36',
+                            onSurface: '#F5EFF7',
+                            primary: '#CABEFF'
+                        }
+                    },
+                    borderRadius: {
+                        'm3-xs': '4px',
+                        'm3-sm': '8px',
+                        'm3-md': '12px',
+                        'm3-lg': '16px',
+                        'm3-xl': '28px',
+                        'm3-full': '9999px',
+                    },
+                    boxShadow: {
+                        'm3-1': '0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.30)',
+                        'm3-2': '0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.30)',
+                        'm3-3': '0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px 0px rgba(0, 0, 0, 0.30)'
+                    }
+                }
+            }
         }
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDF7FF; /* Surface */
+            color: #1D1A21; /* On Surface */
+        }
+        /* Lock viewports precisely to prevent standard scrollbars */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* M3 State Layer overlays */
+        .state-layer {
+            position: relative;
+            overflow: hidden;
+        }
+        .state-layer::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: currentColor;
+            opacity: 0;
+            transition: opacity 150ms ease;
+            pointer-events: none;
+        }
+        .state-layer:hover::after {
+            opacity: 0.08;
+        }
+        .state-layer:focus::after {
+            opacity: 0.12;
+        }
+        .state-layer:active::after {
+            opacity: 0.12;
+        }
+    </style>
+</head>
+<body class="h-screen max-h-screen overflow-hidden flex flex-col bg-surface selection:bg-primary-container selection:text-primary-onContainer antialiased">
 
-    document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+    <!-- Material 3 Standard Top App Bar (Header Height: 4rem / 64px) -->
+    <header class="h-16 shrink-0 border-b border-outline-variant px-6 lg:px-8 flex items-center justify-between bg-surface-lowest z-40">
+        <!-- Brand / App Identity -->
+        <a href="#" class="flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-m3-md bg-primary flex items-center justify-center text-primary-on shadow-m3-1 transform transition-transform group-hover:scale-105">
+                <!-- Porpita abstract radial icon -->
+                <svg class="w-5.5 h-5.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2.5" />
+                    <circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="2" />
+                    <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21" />
+                </svg>
+            </div>
+            <span class="text-xl font-bold tracking-tight text-onSurface">Porpita</span>
+        </a>
 
-    const navbar = document.getElementById('navbar');
-    window.addEventListener('scroll', () => {
-      navbar.classList.toggle('scrolled', window.scrollY > 20);
-    }, { passive: true });
-  </script>
+        <!-- Material 3 Adaptive Filled Button (Detects client OS) -->
+        <div class="flex items-center">
+            <button onclick="openDownloadPanel()" id="os-download-btn" class="state-layer flex items-center gap-2.5 px-6 py-3 text-xs font-semibold text-primary-on bg-primary rounded-m3-full shadow-m3-1 transition-all">
+                <!-- Platform Icon Placeholder -->
+                <span id="os-icon-container">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                </span>
+                <span id="os-text">Download App</span>
+            </button>
+        </div>
+    </header>
 
+    <!-- Unified Split Workspace (100% viewport, no vertical scroll) -->
+    <main class="flex-grow flex flex-col md:flex-row overflow-hidden h-[calc(100vh-4rem)]">
+        
+        <!-- Left Section: Feature Copy & Step Stepper Component (30% Width desktop) -->
+        <section class="w-full md:w-[30%] border-b md:border-b-0 md:border-r border-outline-variant flex flex-col justify-between p-6 lg:p-10 shrink-0 bg-surface-low">
+            
+            <!-- Step Status Chip -->
+            <div class="space-y-1">
+                <span class="text-[11px] uppercase tracking-widest font-extrabold text-primary-onContainer bg-primary-container px-3.5 py-1.5 rounded-m3-md border border-primary-fixedDim" id="feature-indicator">
+                    STEP 1 OF 4
+                </span>
+                <h2 class="text-xs font-semibold text-onSurface-variant pt-5 uppercase tracking-wider">Device Workspace</h2>
+            </div>
+
+            <!-- Focus Hero Copy -->
+            <div class="my-6 md:my-0 flex-1 flex flex-col justify-center max-w-sm">
+                <h1 id="feature-title" class="text-2xl lg:text-3xl.5 font-bold tracking-tight leading-tight text-onSurface transition-all duration-300">
+                    Zero cables. <br>Instant connection.
+                </h1>
+                <p id="feature-desc" class="text-sm lg:text-base text-onSurface-variant font-normal mt-4 leading-relaxed transition-all duration-300">
+                    Link your Android device wirelessly over local Wi-Fi. Simply click scan, pairing is completed automatically without cable reliance.
+                </p>
+            </div>
+
+            <!-- Material 3 Navigation Segment (Next/Prev Controls) -->
+            <div class="flex items-center gap-3 pt-5 border-t border-outline-variant">
+                <button onclick="changeFeature(-1)" class="state-layer w-11 h-11 rounded-m3-lg border border-outline text-onSurface-variant hover:border-primary active:bg-primary-container transition-all flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <button onclick="changeFeature(1)" class="state-layer w-11 h-11 rounded-m3-lg bg-primary hover:bg-opacity-95 active:scale-95 text-primary-on shadow-m3-1 transition-all flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+                <span class="text-xs font-semibold font-mono text-onSurface-variant ml-3" id="carousel-fraction">1 / 4</span>
+            </div>
+        </section>
+
+        <!-- Right Section: Material 3 Custom High-Fidelity App Simulation (70% Width desktop) -->
+        <section class="flex-grow bg-surface-container p-4 lg:p-10 flex items-center justify-center overflow-hidden relative">
+            
+            <!-- Ambient glows based strictly on secondary and tertiary container tones -->
+            <div class="absolute top-1/4 left-1/4 w-80 h-80 bg-secondary-container/20 rounded-m3-full blur-3xl pointer-events-none"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-tertiary-container/25 rounded-m3-full blur-3xl pointer-events-none"></div>
+
+            <!-- Interactive App Frame (Emulating Porpita desktop application running natively) -->
+            <div class="w-full max-w-4xl bg-surface-lowest rounded-m3-xl border border-outline-variant shadow-m3-3 flex flex-col overflow-hidden max-h-[80vh]">
+                
+                <!-- Window Chrome Titlebar -->
+                <div class="flex items-center justify-between px-5 py-3.5 border-b border-outline-variant bg-surface-low">
+                    <!-- Control buttons -->
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-m3-full bg-error block opacity-80"></span>
+                        <span class="w-3 h-3 rounded-m3-full bg-secondary-fixedDim block opacity-80"></span>
+                        <span class="w-3 h-3 rounded-m3-full bg-primary-fixedDim block opacity-80"></span>
+                    </div>
+                    
+                    <!-- Dynamic URL / State Indicator -->
+                    <div class="px-4 py-1.5 bg-surface-lowest border border-outline-variant rounded-m3-sm text-[10px] font-mono text-onSurface-variant flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-m3-full bg-primary block"></span>
+                        <span id="mockup-header-address">porpita://adb/wireless-pairing</span>
+                    </div>
+
+                    <!-- Client Target Mode Badge -->
+                    <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-primary-container text-primary-onContainer text-[10px] font-bold rounded-m3-full border border-primary-fixedDim">
+                        ADB WORKSPACE
+                    </div>
+                </div>
+
+                <!-- Live Container App Content Viewport (Height constrained with scroll prevention) -->
+                <div class="relative bg-surface-lowest flex flex-col overflow-y-auto no-scrollbar min-h-[360px] lg:min-h-[460px]">
+                    
+                    <!-- M3 View: Wireless ADB Portal -->
+                    <div id="mock-view-1" class="mockup-view-pane p-6 flex flex-col md:flex-row gap-6 h-full transition-all duration-300">
+                        
+                        <!-- Side Device Stack card -->
+                        <div class="w-full md:w-5/12 bg-surface border border-outline-variant rounded-m3-lg p-5 flex flex-col justify-between">
+                            <div class="space-y-4">
+                                <span class="text-[10px] font-extrabold text-onSurface-variant uppercase tracking-widest block">Available Devices</span>
+                                
+                                <div class="p-3 bg-primary-container border border-primary-fixedDim rounded-m3-md flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-2.5 h-2.5 rounded-m3-full bg-primary animate-ping"></span>
+                                        <span class="text-xs font-bold text-primary-onContainer">Pixel 8 Pro</span>
+                                    </div>
+                                    <span class="text-[9px] bg-primary text-primary-on px-2 py-0.5 rounded-m3-xs font-mono font-bold">5555</span>
+                                </div>
+                                
+                                <div class="p-3 bg-surface-container border border-outline-variant rounded-m3-md flex items-center justify-between opacity-60">
+                                    <div class="flex items-center gap-3">
+                                        <span class="w-2.5 h-2.5 rounded-m3-full bg-outline"></span>
+                                        <span class="text-xs font-semibold text-onSurface-variant">Galaxy S24 Ultra</span>
+                                    </div>
+                                    <span class="text-[9px] text-onSurface-variant font-mono font-semibold">Offline</span>
+                                </div>
+                            </div>
+                            
+                            <button class="state-layer w-full mt-6 py-2.5 bg-primary text-primary-on rounded-m3-full text-xs font-semibold shadow-m3-1">
+                                Scan Local Devices
+                            </button>
+                        </div>
+
+                        <!-- Active Connection State Control -->
+                        <div class="flex-grow bg-surface-container-low border border-outline-variant rounded-m3-lg p-5 flex flex-col justify-between">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between border-b border-outline-variant pb-3">
+                                    <h3 class="text-xs font-bold text-onSurface">SECURE COUPLING SYSTEM</h3>
+                                    <span class="text-[10px] text-tertiary font-extrabold bg-tertiary-container border border-tertiary-onFixedVariant px-2.5 py-0.5 rounded-m3-full">ACTIVE DAEMON</span>
+                                </div>
+                                
+                                <div class="p-4 bg-surface-lowest border border-outline-variant rounded-m3-lg text-center space-y-2">
+                                    <span class="text-[10px] text-onSurface-variant block uppercase font-bold tracking-wider">Wi-Fi Pairing Code</span>
+                                    <div class="flex justify-center gap-2 font-mono text-2xl font-black text-primary tracking-widest">
+                                        <span>4 8 2</span>
+                                        <span class="text-outline-variant">•</span>
+                                        <span>9 1 5</span>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-[11px] text-onSurface-variant">
+                                        <span>Connection Socket Port</span>
+                                        <span class="font-mono text-onSurface font-bold">37415</span>
+                                    </div>
+                                    <div class="flex justify-between text-[11px] text-onSurface-variant">
+                                        <span>Authentication Stage</span>
+                                        <span class="text-primary font-bold">Handshaking keys...</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-4 border-t border-outline-variant text-[10px] text-onSurface-variant flex items-center gap-2">
+                                <svg class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <span>Secured by native TLS tunnels. Trust permissions apply on device authorization screen.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- M3 View: Screen Mirroring Canvas -->
+                    <div id="mock-view-2" class="mockup-view-pane p-6 flex flex-col md:flex-row gap-6 h-full transition-all duration-300 hidden">
+                        
+                        <!-- Phone Frame simulation on left side -->
+                        <div class="w-full md:w-5/12 bg-surface-container border border-outline-variant rounded-m3-lg p-4 shadow-m3-1 flex flex-col items-center justify-center">
+                            <span class="text-[9px] font-extrabold text-onSurface-variant uppercase tracking-widest mb-3 block">Virtual display viewport</span>
+                            
+                            <!-- Phone -->
+                            <div class="w-[170px] aspect-[9/18.5] bg-inverse-surface rounded-m3-xl border-[6px] border-outline relative p-2 shadow-m3-2 flex flex-col justify-between overflow-hidden">
+                                <!-- Camera pill -->
+                                <div class="absolute top-2.5 left-1/2 -translate-x-1/2 w-14 h-4 bg-outline rounded-m3-full flex items-center justify-center z-10">
+                                    <span class="w-1.5 h-1.5 rounded-m3-full bg-inverse-surface"></span>
+                                </div>
+                                <!-- Virtual UI screen -->
+                                <div class="flex-grow bg-surface-lowest rounded-m3-lg p-3 flex flex-col justify-between relative overflow-hidden">
+                                    <div class="flex justify-between text-[8px] text-onSurface-variant font-bold pt-1">
+                                        <span>09:41</span>
+                                        <span>5G</span>
+                                    </div>
+                                    <div class="space-y-2 text-center my-auto">
+                                        <div class="w-9 h-9 rounded-m3-full bg-primary mx-auto flex items-center justify-center text-primary-on">
+                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                        </div>
+                                        <h4 class="text-[10px] font-bold text-onSurface">Interactive Node</h4>
+                                        <p class="text-[7px] text-onSurface-variant leading-relaxed">Direct rendering channel active. Streaming keystrokes over ADB loopback.</p>
+                                    </div>
+                                    <div class="h-1 w-12 bg-outline-variant rounded-m3-full mx-auto mb-1"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Touch display settings -->
+                        <div class="flex-grow bg-surface border border-outline-variant rounded-m3-lg p-5 flex flex-col justify-between">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between border-b border-outline-variant pb-3">
+                                    <h3 class="text-xs font-bold text-onSurface">DISPLAY ENGINE SPECS</h3>
+                                    <span class="text-[10px] text-primary bg-primary-container border border-primary-fixedDim px-2 py-0.5 rounded-m3-full font-bold">120HZ COMPATIBLE</span>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="p-3 bg-surface-container rounded-m3-md border border-outline-variant">
+                                        <span class="text-[9px] text-onSurface-variant block font-bold">FRAME LATENCY</span>
+                                        <span class="text-xs font-mono font-bold text-primary">~8.2ms</span>
+                                    </div>
+                                    <div class="p-3 bg-surface-container rounded-m3-md border border-outline-variant">
+                                        <span class="text-[9px] text-onSurface-variant block font-bold">BITRATE PROFILE</span>
+                                        <span class="text-xs font-mono font-bold text-primary">12 Mbps</span>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-3 pt-2">
+                                    <div class="flex justify-between items-center text-xs text-onSurface-variant">
+                                        <span>Render screen layout bounds</span>
+                                        <input type="checkbox" checked class="w-4.5 h-4.5 rounded-m3-xs accent-primary cursor-pointer">
+                                    </div>
+                                    <div class="flex justify-between items-center text-xs text-onSurface-variant">
+                                        <span>Compress Frame Buffer</span>
+                                        <input type="checkbox" class="w-4.5 h-4.5 rounded-m3-xs accent-primary cursor-pointer">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-4 border-t border-outline-variant text-[10px] text-onSurface-variant">
+                                Low overhead rendering architecture utilizes direct H.264 stream pipes inside Android's native screenrecord processes.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- M3 View: Package Installer Workspace -->
+                    <div id="mock-view-3" class="mockup-view-pane p-6 flex flex-col md:flex-row gap-6 h-full transition-all duration-300 hidden">
+                        <div class="flex-grow bg-surface border border-outline-variant rounded-m3-lg p-5 flex flex-col justify-between">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between border-b border-outline-variant pb-3">
+                                    <h3 class="text-xs font-bold text-onSurface">PACKAGE DEPLOYMENT MATRIX</h3>
+                                    <span class="text-[10px] text-onSurface-variant">ZIP, APK, AND APKS FILESETS</span>
+                                </div>
+
+                                <!-- Drag & Drop Dash Box styled in M3 Surface Variant and primary strokes -->
+                                <div class="border-2 border-dashed border-primary-fixedDim hover:border-primary bg-surface-container-low rounded-m3-lg p-8 text-center transition-all cursor-pointer">
+                                    <div class="w-11 h-11 rounded-m3-full bg-primary-container text-primary mx-auto flex items-center justify-center mb-3">
+                                        <svg class="w-5.5 h-5.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                        </svg>
+                                    </div>
+                                    <span class="text-xs font-bold text-onSurface block">Drop target for application APK</span>
+                                    <span class="text-[10px] text-onSurface-variant mt-1 block">Supports target installations with multiple split configs</span>
+                                </div>
+
+                                <!-- Active Item Upload Mock -->
+                                <div class="p-3 bg-tertiary-container border border-outline-variant rounded-m3-md flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-m3-sm bg-tertiary text-tertiary-on flex items-center justify-center text-xs font-black font-mono">APK</div>
+                                        <div>
+                                            <span class="text-xs font-bold text-tertiary-onContainer block">staging-release-v3.0.apk</span>
+                                            <span class="text-[9px] text-tertiary-onFixedVariant block">24.5 MB • Integrity signature verified</span>
+                                        </div>
+                                    </div>
+                                    <button class="state-layer px-4 py-2 bg-tertiary text-tertiary-on rounded-m3-full text-[10px] font-bold shadow-m3-1">
+                                        Install Package
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="pt-4 border-t border-outline-variant flex justify-between items-center text-[10px] text-onSurface-variant">
+                                <span>Installer runs ADB stream commands inside isolated virtual targets.</span>
+                                <span class="text-primary hover:underline cursor-pointer font-bold">Configure installation flags</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- M3 View: Terminal Shell Emulator -->
+                    <div id="mock-view-4" class="mockup-view-pane p-6 flex flex-col md:flex-row gap-6 h-full transition-all duration-300 hidden">
+                        <div class="flex-grow bg-inverse-surface rounded-m3-lg p-5 font-mono text-xs text-inverse-onSurface flex flex-col justify-between shadow-m3-2 border border-outline">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between border-b border-outline-variant pb-3 text-[10px] text-onSurface-variant">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-m3-full bg-primary block"></span>
+                                        <span class="font-bold">SHELL SUBSYSTEM CONSOLE</span>
+                                    </div>
+                                    <span class="text-inverse-primary font-bold">device://pixel8pro-wire</span>
+                                </div>
+                                <div class="space-y-2 text-[11px] leading-relaxed">
+                                    <p class="opacity-50"># Establishing remote process connection framework</p>
+                                    <p class="opacity-80">oriole_v2:/ $ <span class="text-inverse-primary font-bold">getprop ro.build.version.release</span></p>
+                                    <p class="text-tertiary-container font-extrabold">14</p>
+                                    <p class="opacity-80">oriole_v2:/ $ <span class="text-inverse-primary font-bold">pm path com.porpita.adb_link</span></p>
+                                    <p class="opacity-90">package:/data/app/~~hS9bS9vP8==/com.porpita.adb_link.apk</p>
+                                    <p class="opacity-80">oriole_v2:/ $ <span class="text-inverse-primary font-bold">_</span></p>
+                                </div>
+                            </div>
+
+                            <div class="pt-4 border-t border-outline-variant text-[10px] text-onSurface-variant flex justify-between">
+                                <span>Terminate container stream using Ctrl+C</span>
+                                <span class="text-inverse-primary font-bold cursor-pointer hover:underline">Flush standard output log</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- M3 Dialog Component (Platform download portal) -->
+    <div id="download-modal" class="fixed inset-0 z-[100] bg-scrim/40 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        
+        <div class="bg-surface-lowest w-full max-w-md rounded-m3-xl p-6 border border-outline-variant shadow-m3-3 relative">
+            
+            <!-- Dismiss action -->
+            <button onclick="closeDownloadPanel()" class="absolute top-4 right-4 text-onSurface-variant hover:text-onSurface p-2 hover:bg-surface-container rounded-m3-full transition-all">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <!-- Decorative App Emblem -->
+            <div class="w-12 h-12 bg-primary-container text-primary rounded-m3-lg flex items-center justify-center mb-4 border border-primary-fixedDim">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+            </div>
+
+            <h3 class="text-xl font-bold text-onSurface mb-1">Get Porpita</h3>
+            <p class="text-sm text-onSurface-variant mb-6">Choose the targeted platform package compiled for your hardware configuration:</p>
+
+            <!-- Option blocks -->
+            <div class="space-y-3">
+                
+                <!-- Windows -->
+                <a href="#" onclick="mockDownload('Windows')" class="state-layer flex items-center justify-between p-4 rounded-m3-lg border border-outline-variant hover:border-primary hover:bg-primary-container/20 group transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="text-onSurface font-semibold text-sm">Windows Binary (.exe)</div>
+                    </div>
+                    <span class="text-xs text-primary font-bold group-hover:translate-x-1 transition-transform flex items-center gap-1.5">
+                        Download x64
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                    </span>
+                </a>
+
+                <!-- macOS -->
+                <a href="#" onclick="mockDownload('macOS')" class="state-layer flex items-center justify-between p-4 rounded-m3-lg border border-outline-variant hover:border-primary hover:bg-primary-container/20 group transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="text-onSurface font-semibold text-sm">macOS Bundle (.dmg)</div>
+                    </div>
+                    <span class="text-xs text-primary font-bold group-hover:translate-x-1 transition-transform flex items-center gap-1.5">
+                        Apple Silicon / Intel
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                    </span>
+                </a>
+
+                <!-- Linux -->
+                <a href="#" onclick="mockDownload('Linux')" class="state-layer flex items-center justify-between p-4 rounded-m3-lg border border-outline-variant hover:border-primary hover:bg-primary-container/20 group transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="text-onSurface font-semibold text-sm">Linux AppImage (.AppImage)</div>
+                    </div>
+                    <span class="text-xs text-primary font-bold group-hover:translate-x-1 transition-transform flex items-center gap-1.5">
+                        Download Universal
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                    </span>
+                </a>
+
+            </div>
+
+            <!-- Toast dynamic feedback indicator -->
+            <div id="download-toast" class="mt-4 p-3 bg-tertiary-container text-tertiary-onContainer rounded-m3-md text-xs font-bold text-center border border-tertiary-onFixedVariant hidden">
+                ✓ Platform binaries initialized successfully! Check browser history.
+            </div>
+        </div>
+    </div>
+
+    <!-- Interface scripts -->
+    <script>
+        // M3 Guided Showcase Steps Configuration mapping the exact customized properties
+        const features = [
+            {
+                indicator: "STEP 1 OF 4",
+                title: "Zero cables.<br>Instant connection.",
+                desc: "Link your Android device wirelessly over local Wi-Fi. Simply click scan, pairing is completed automatically without cable reliance.",
+                address: "porpita://adb/wireless-pairing"
+            },
+            {
+                indicator: "STEP 2 OF 4",
+                title: "Lag-free<br>interactive mirror.",
+                desc: "Stream and manage your device display at high frame rates. Direct touch input simulation lets you run tests directly from your computer.",
+                address: "porpita://adb/display-pipeline"
+            },
+            {
+                indicator: "STEP 3 OF 4",
+                title: "Sideload APKs<br>in single drag.",
+                desc: "Drop standard and split bundle APKs onto the target workspace window frame to automatically construct install streams without command entry.",
+                address: "porpita://adb/install-matrix"
+            },
+            {
+                indicator: "STEP 4 OF 4",
+                title: "The command shell,<br>highly supercharged.",
+                desc: "Run interactive debugging statements inside an elegantly configured virtual terminal environment with device diagnostic monitoring presets.",
+                address: "porpita://adb/terminal-subsystem"
+            }
+        ];
+
+        let currentIdx = 0;
+
+        // Change feature indexing boundaries safely
+        function changeFeature(step) {
+            currentIdx = (currentIdx + step + features.length) % features.length;
+            updateDOMState();
+        }
+
+        // Apply updated text & interactive viewport frame parameters
+        function updateDOMState() {
+            const data = features[currentIdx];
+
+            // Left Copy Components
+            document.getElementById('feature-indicator').textContent = data.indicator;
+            document.getElementById('feature-title').innerHTML = data.title;
+            document.getElementById('feature-desc').textContent = data.desc;
+            document.getElementById('carousel-fraction').textContent = `${currentIdx + 1} / ${features.length}`;
+
+            // Top Mock Address bar indicator
+            document.getElementById('mockup-header-address').textContent = data.address;
+
+            // Display active view frame 
+            for (let i = 1; i <= features.length; i++) {
+                const pane = document.getElementById(`mock-view-${i}`);
+                if (i === (currentIdx + 1)) {
+                    pane.classList.remove('hidden');
+                } else {
+                    pane.classList.add('hidden');
+                }
+            }
+        }
+
+        // Automatic OS & Platform Architecture Recognition
+        function autoDetectOS() {
+            const userAgent = window.navigator.userAgent;
+            const osText = document.getElementById('os-text');
+            const iconContainer = document.getElementById('os-icon-container');
+
+            if (userAgent.indexOf("Win") !== -1) {
+                // Windows UI Icon
+                iconContainer.innerHTML = `
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M0 3.449L9.75 2.1v9.45H0V3.449zM0 12.45h9.75v9.45L0 20.551v-8.101zM11.25 1.899L24 0v11.55H11.25V1.899zM11.25 12.45H24v11.55l-12.75-1.9v-9.65z"/>
+                    </svg>
+                `;
+                osText.textContent = "Download for Windows";
+            } else if (userAgent.indexOf("Mac") !== -1) {
+                // macOS (Apple) Brand Icon
+                iconContainer.innerHTML = `
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.21.67-2.93 1.49-.62.69-1.16 1.84-1.01 2.96 1.12.09 2.27-.57 2.95-1.39z"/>
+                    </svg>
+                `;
+                osText.textContent = "Download for macOS";
+            } else if (userAgent.indexOf("Linux") !== -1) {
+                // Linux Tux Logo Icon
+                iconContainer.innerHTML = `
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 .003c-2.484 0-4.5 2.016-4.5 4.5 0 .86.243 1.666.666 2.355C5.006 8.01 2.5 10.72 2.5 14c0 4.133 3.367 7.5 7.5 7.5h4c4.133 0 7.5-3.367 7.5-7.5 0-3.28-2.506-5.99-5.666-7.142.423-.689.666-1.495.666-2.355 0-2.484-2.016-4.5-4.5-4.5zm0 1.5c1.663 0 3 1.337 3 3s-1.337 3-3 3-3-1.337-3-3 1.337-3 3-3zm0 8.5c2.484 0 4.5 2.016 4.5 4.5s-2.016 4.5-4.5 4.5-4.5-2.016-4.5-4.5 2.016-4.5 4.5-4.5z"/>
+                    </svg>
+                `;
+                osText.textContent = "Download for Linux";
+            } else {
+                // Default fallback OS action trigger text
+                osText.textContent = "Get Porpita";
+            }
+        }
+
+        // Modal Action Handles
+        function openDownloadPanel() {
+            const modal = document.getElementById('download-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+            }, 50);
+        }
+
+        function closeDownloadPanel() {
+            const modal = document.getElementById('download-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.getElementById('download-toast').classList.add('hidden');
+            }, 300);
+        }
+
+        function mockDownload(platform) {
+            const toast = document.getElementById('download-toast');
+            toast.textContent = `✓ Dynamic bundle download initiated for ${platform}!`;
+            toast.classList.remove('hidden');
+        }
+
+        // Close when clicking modal backdrop
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('download-modal');
+            if (e.target === modal) {
+                closeDownloadPanel();
+            }
+        });
+
+        // Initialize state configuration on viewport load
+        window.onload = function() {
+            autoDetectOS();
+            updateDOMState();
+        }
+    </script>
 </body>
 </html>

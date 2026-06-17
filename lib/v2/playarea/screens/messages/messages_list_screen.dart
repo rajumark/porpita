@@ -276,10 +276,6 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
     final uris = _tab == MessageTab.sms ? kSmsUris : kMmsUris;
     final currentUri = _currentUri();
     final isStandard = currentUri.isStandard;
-    final entryCount = isStandard
-        ? (_tab == MessageTab.sms ? _smsEntries.length : _mmsEntries.length)
-        : _rawEntries.length;
-
     if (device != null && device.id != _lastDeviceId) {
       _handleDeviceSwitch(device.id);
     }
@@ -374,20 +370,6 @@ class _MessagesListScreenState extends State<MessagesListScreen> {
                   });
                   _handleUriChange();
                 },
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(12, 0, 8, 4),
-          child: Row(
-            children: [
-              Text(
-                '${currentUri.uri}  ·  $entryCount',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
