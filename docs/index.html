@@ -1,53 +1,45 @@
 <!DOCTYPE html>
-<html lang="en" class="h-screen overflow-hidden select-none">
+<html lang="en" class="h-full select-none">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Porpita - Minimalist ADB Desktop Companion</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Inter Font -->
+    <!-- Google Roboto Flex Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wdth,wght@8..144,25..151,100..1000&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['"Roboto Flex"', 'sans-serif'],
                     },
                     colors: {
-                        // Exact Material Design 3 Palette Configured from Hex Matrix
+                        // Dynamically mapped Material Design 3 Palette via CSS variables
                         primary: {
-                            DEFAULT: '#5F5289',
-                            on: '#FFFFFF',
-                            container: '#E5DFF9',
-                            onContainer: '#1C1342',
+                            DEFAULT: 'var(--primary)',
+                            on: 'var(--primary-on)',
+                            container: 'var(--primary-container)',
+                            onContainer: 'var(--primary-on-container)',
                             fixed: '#E5DFF9',
                             fixedDim: '#C9BFF6',
                             onFixed: '#1C1342',
                             onFixedVariant: '#473B6F'
                         },
                         secondary: {
-                            DEFAULT: '#5D5B72',
-                            on: '#FFFFFF',
-                            container: '#E2E0F9',
-                            onContainer: '#1A192B',
-                            fixed: '#E2E0F9',
-                            fixedDim: '#C6C4DC',
-                            onFixed: '#1A192B',
-                            onFixedVariant: '#454459'
+                            DEFAULT: 'var(--secondary)',
+                            on: 'var(--secondary-on)',
+                            container: 'var(--secondary-container)',
+                            onContainer: 'var(--secondary-on-container)',
                         },
                         tertiary: {
-                            DEFAULT: '#7B525F',
-                            on: '#FFFFFF',
-                            container: '#FFD9E3',
-                            onContainer: '#30111D',
-                            fixed: '#FFD9E3',
-                            fixedDim: '#ECB9C7',
-                            onFixed: '#30111D',
-                            onFixedVariant: '#5F3B47'
+                            DEFAULT: 'var(--tertiary)',
+                            on: 'var(--tertiary-on)',
+                            container: 'var(--tertiary-container)',
+                            onContainer: 'var(--tertiary-on-container)',
                         },
                         error: {
                             DEFAULT: '#BA291A',
@@ -56,27 +48,22 @@
                             onContainer: '#410002'
                         },
                         surface: {
-                            dim: '#DED8E0',
-                            DEFAULT: '#FDF7FF',
-                            bright: '#FDF7FF',
-                            lowest: '#FFFFFF',
-                            low: '#F7F2FA',
-                            container: '#F1ECF4',
-                            high: '#EBE6EE',
-                            highest: '#E5E0E8'
+                            dim: 'var(--surface-dim)',
+                            DEFAULT: 'var(--surface)',
+                            bright: 'var(--surface-bright)',
+                            lowest: 'var(--surface-lowest)',
+                            low: 'var(--surface-low)',
+                            container: 'var(--surface-container)',
+                            high: 'var(--surface-high)',
+                            highest: 'var(--surface-highest)'
                         },
                         onSurface: {
-                            DEFAULT: '#1D1A21',
-                            variant: '#49454E'
+                            DEFAULT: 'var(--on-surface)',
+                            variant: 'var(--on-surface-variant)'
                         },
                         outline: {
-                            DEFAULT: '#7A757F',
-                            variant: '#CAC4CF'
-                        },
-                        inverse: {
-                            surface: '#322F36',
-                            onSurface: '#F5EFF7',
-                            primary: '#CABEFF'
+                            DEFAULT: 'var(--outline)',
+                            variant: 'var(--outline-variant)'
                         }
                     },
                     borderRadius: {
@@ -97,12 +84,76 @@
         }
     </script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #FDF7FF; /* Surface */
-            color: #1D1A21; /* On Surface */
+        /* M3 Theme Variable Declarations */
+        :root {
+            /* Light Theme Defaults */
+            --primary: #5F5289;
+            --primary-on: #FFFFFF;
+            --primary-container: #E5DFF9;
+            --primary-on-container: #1C1342;
+            --secondary: #5D5B72;
+            --secondary-container: #E2E0F9;
+            --secondary-on-container: #1A192B;
+            --tertiary: #7B525F;
+            --tertiary-container: #FFD9E3;
+            --tertiary-on-container: #30111D;
+            
+            --surface: #FDF7FF;
+            --surface-dim: #DED8E0;
+            --surface-bright: #FDF7FF;
+            --surface-lowest: #FFFFFF;
+            --surface-low: #F7F2FA;
+            --surface-container: #F1ECF4;
+            --surface-high: #EBE6EE;
+            --surface-highest: #E5E0E8;
+
+            --on-surface: #1D1A21;
+            --on-surface-variant: #49454E;
+            --outline: #7A757F;
+            --outline-variant: #CAC4CF;
         }
-        /* Lock viewports precisely to prevent standard scrollbars */
+
+        .dark-mode {
+            /* Dark Theme Mappings */
+            --primary: #C9BFF6;
+            --primary-on: #302357;
+            --primary-container: #473B6F;
+            --primary-on-container: #E5DFF9;
+            --secondary: #C6C4DC;
+            --secondary-container: #454459;
+            --secondary-on-container: #E2E0F9;
+            --tertiary: #ECB9C7;
+            --tertiary-container: #5F3B47;
+            --tertiary-on-container: #FFD9E3;
+
+            --surface: #141218;
+            --surface-dim: #0F0D13;
+            --surface-bright: #211F24;
+            --surface-lowest: #0F0D13;
+            --surface-low: #1C1B1F;
+            --surface-container: #211F24;
+            --surface-high: #2B2930;
+            --surface-highest: #36343B;
+
+            --on-surface: #E6E1E5;
+            --on-surface-variant: #CAC4CF;
+            --outline: #938F99;
+            --outline-variant: #49454E;
+        }
+
+        body {
+            font-family: "Roboto Flex", sans-serif;
+            background-color: var(--surface);
+            color: var(--on-surface);
+            transition: background-color 300ms ease, color 300ms ease;
+        }
+        /* Lock viewports precisely on desktop to prevent standard scrollbars */
+        @media (min-width: 768px) {
+            .desktop-no-scroll {
+                height: 100vh !important;
+                overflow: hidden !important;
+            }
+        }
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -110,7 +161,6 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-        /* M3 State Layer overlays */
         .state-layer {
             position: relative;
             overflow: hidden;
@@ -135,10 +185,10 @@
         }
     </style>
 </head>
-<body class="h-screen max-h-screen overflow-hidden flex flex-col bg-surface selection:bg-primary-container selection:text-primary-onContainer antialiased">
+<body class="min-h-full flex flex-col selection:bg-primary-container selection:text-primary-onContainer antialiased desktop-no-scroll">
 
     <!-- Material 3 Standard Top App Bar (Header Height: 4rem / 64px) -->
-    <header class="h-16 shrink-0 border-b border-outline-variant px-6 lg:px-8 flex items-center justify-between bg-surface-lowest z-40">
+    <header class="h-16 shrink-0 border-b border-outline-variant px-6 lg:px-8 flex items-center justify-between bg-surface-lowest z-40 transition-colors duration-300">
         <!-- Brand / App Identity -->
         <a href="#" class="flex items-center gap-3 group">
             <div class="w-10 h-10 rounded-m3-md bg-primary flex items-center justify-center text-primary-on shadow-m3-1 transform transition-transform group-hover:scale-105">
@@ -153,401 +203,241 @@
             <span class="text-xl font-bold tracking-tight text-onSurface">Porpita</span>
         </a>
 
-        <!-- Material 3 Adaptive Filled Button (Detects client OS) -->
-        <div class="flex items-center">
-            <button onclick="openDownloadPanel()" id="os-download-btn" class="state-layer flex items-center gap-2.5 px-6 py-3 text-xs font-semibold text-primary-on bg-primary rounded-m3-full shadow-m3-1 transition-all">
-                <!-- Platform Icon Placeholder -->
+        <!-- Controls container (OS Download + Light/Dark/System Toggle) -->
+        <div class="flex items-center gap-4">
+            <!-- Screenshot Theme Toggle Badge -->
+            <div class="flex items-center bg-surface-container border border-outline-variant rounded-m3-full p-1 text-xs transition-colors duration-300">
+                <button onclick="setAppTheme('light')" id="theme-btn-light" class="px-3 py-1.5 rounded-m3-full font-semibold transition-all">
+                    Light UI
+                </button>
+                <button onclick="setAppTheme('dark')" id="theme-btn-dark" class="px-3 py-1.5 rounded-m3-full font-semibold transition-all">
+                    Dark UI
+                </button>
+            </div>
+
+            <!-- Redirects directly to Releases -->
+            <a href="https://github.com/rajumark/porpita/releases" target="_blank" id="os-download-btn" class="state-layer flex items-center gap-2.5 px-5 py-2.5 text-xs font-bold text-primary-on bg-primary rounded-m3-full shadow-m3-1 transition-all">
                 <span id="os-icon-container">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                     </svg>
                 </span>
                 <span id="os-text">Download App</span>
-            </button>
+            </a>
         </div>
     </header>
 
-    <!-- Unified Split Workspace (100% viewport, no vertical scroll) -->
-    <main class="flex-grow flex flex-col md:flex-row overflow-hidden h-[calc(100vh-4rem)]">
-        
-        <!-- Left Section: Feature Copy & Step Stepper Component (30% Width desktop) -->
-        <section class="w-full md:w-[30%] border-b md:border-b-0 md:border-r border-outline-variant flex flex-col justify-between p-6 lg:p-10 shrink-0 bg-surface-low">
-            
-            <!-- Step Status Chip -->
-            <div class="space-y-1">
-                <span class="text-[11px] uppercase tracking-widest font-extrabold text-primary-onContainer bg-primary-container px-3.5 py-1.5 rounded-m3-md border border-primary-fixedDim" id="feature-indicator">
-                    STEP 1 OF 4
-                </span>
-                <h2 class="text-xs font-semibold text-onSurface-variant pt-5 uppercase tracking-wider">Device Workspace</h2>
-            </div>
+    <!-- MOBILE VIEW: Scrollable Vertical List (Visible only on Mobile/Tablet screens) -->
+    <div class="block md:hidden flex-grow overflow-y-auto px-6 py-8 space-y-12 bg-surface transition-colors duration-300">
+        <!-- Mobile Hero Title -->
+        <div class="text-center space-y-3 pb-4">
+            <h1 class="text-3xl font-extrabold tracking-tight text-onSurface">The Ultimate ADB Tool</h1>
+            <p class="text-sm text-onSurface-variant max-w-sm mx-auto">Explore all 14 workspaces in your preferred UI configuration dynamically.</p>
+        </div>
 
-            <!-- Focus Hero Copy -->
-            <div class="my-6 md:my-0 flex-1 flex flex-col justify-center max-w-sm">
-                <h1 id="feature-title" class="text-2xl lg:text-3xl.5 font-bold tracking-tight leading-tight text-onSurface transition-all duration-300">
-                    Zero cables. <br>Instant connection.
+        <!-- Vertical List Render Target (Generates via JS for sync) -->
+        <div id="mobile-features-list" class="space-y-12">
+            <!-- Dynamic Mobile Cards Inserted Here -->
+        </div>
+
+        <!-- Footer -->
+        <div class="pt-8 border-t border-outline-variant text-center text-xs text-onSurface-variant space-y-4">
+            <p>© 2026 Porpita Desktop Companion. Built with Google Material Design 3 guidelines.</p>
+            <a href="https://github.com/rajumark/porpita/releases" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-on rounded-m3-full font-bold">
+                Go to GitHub Releases
+            </a>
+        </div>
+    </div>
+
+    <!-- DESKTOP VIEW: Split Workspace layout (Strict height-locked, no vertical scroll) -->
+    <main class="hidden md:flex flex-grow flex-row overflow-hidden h-[calc(100vh-4rem)]">
+        
+        <!-- Left Section: Feature Copy & Step Stepper Component (30% Width desktop, NO border divider) -->
+        <section class="w-full md:w-[30%] flex flex-col justify-center p-8 lg:p-12 shrink-0 bg-surface-low transition-colors duration-300">
+            
+            <div class="max-w-sm space-y-4">
+                <h2 id="feature-workspace" class="text-sm font-bold text-primary uppercase tracking-widest transition-colors duration-300">Device Info</h2>
+                
+                <!-- Focus Hero Copy -->
+                <h1 id="feature-title" class="text-2xl lg:text-4xl font-extrabold tracking-tight leading-tight text-onSurface transition-all duration-300">
+                    Total command of <br>your hardware.
                 </h1>
-                <p id="feature-desc" class="text-sm lg:text-base text-onSurface-variant font-normal mt-4 leading-relaxed transition-all duration-300">
-                    Link your Android device wirelessly over local Wi-Fi. Simply click scan, pairing is completed automatically without cable reliance.
+                
+                <p id="feature-desc" class="text-sm lg:text-base text-onSurface-variant font-normal leading-relaxed transition-all duration-300">
+                    Inspect complete hardware specs, CPU usage, build variables, partition spaces, and real-time environment telemetry of your connected Android device instantly.
                 </p>
             </div>
+            
+        </section>
 
-            <!-- Material 3 Navigation Segment (Next/Prev Controls) -->
-            <div class="flex items-center gap-3 pt-5 border-t border-outline-variant">
-                <button onclick="changeFeature(-1)" class="state-layer w-11 h-11 rounded-m3-lg border border-outline text-onSurface-variant hover:border-primary active:bg-primary-container transition-all flex items-center justify-center">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <!-- Right Section: Pure Floating Screenshot Viewport with adjacent controls (70% Width desktop) -->
+        <section class="flex-grow bg-surface-container p-6 lg:p-12 flex items-center justify-center overflow-hidden relative transition-colors duration-300">
+            
+            <!-- Minimal background ambient glow patterns -->
+            <div class="absolute top-1/4 left-1/4 w-80 h-80 bg-secondary-container/10 rounded-m3-full blur-3xl pointer-events-none"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-tertiary-container/15 rounded-m3-full blur-3xl pointer-events-none"></div>
+
+            <!-- Frame containing screenshot flanked by Left and Right Arrow Navigation Controls -->
+            <div class="relative flex items-center justify-center w-full max-w-6xl gap-6">
+                
+                <!-- Left Carousel Control Button -->
+                <button onclick="changeFeature(-1)" class="state-layer w-12 h-12 shrink-0 rounded-m3-full border-2 border-outline-variant/60 bg-surface-lowest text-onSurface-variant hover:text-primary hover:border-primary hover:shadow-m3-1 active:scale-95 transition-all flex items-center justify-center z-30">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>
-                <button onclick="changeFeature(1)" class="state-layer w-11 h-11 rounded-m3-lg bg-primary hover:bg-opacity-95 active:scale-95 text-primary-on shadow-m3-1 transition-all flex items-center justify-center">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+
+                <!-- Screenshot Canvas Wrapper (Wraps EXACTLY around the image aspect height) -->
+                <div class="relative flex items-center justify-center max-h-[82vh] max-w-4xl">
+                    
+                    <!-- Screenshot loading screen indicator -->
+                    <div id="image-loader" class="absolute inset-0 flex flex-col items-center justify-center z-20 transition-opacity duration-200 pointer-events-none bg-surface-lowest/70 rounded-[20px]">
+                        <div class="w-10 h-10 border-4 border-primary-container border-t-primary rounded-full animate-spin"></div>
+                    </div>
+
+                    <!-- Main App Screenshot Render Target (Styling applied directly to the image itself) -->
+                    <img 
+                        id="screenshot-img" 
+                        src="https://raw.githubusercontent.com/rajumark/porpita/main/docs/desktop_app_screenshots/ss_light_device_info.png" 
+                        alt="Porpita Screenshot Preview"
+                        class="max-w-full max-h-[80vh] w-auto h-auto object-contain block rounded-[20px] border-2 border-outline-variant/50 shadow-m3-2 bg-surface-lowest transition-all duration-300"
+                        onload="onScreenshotLoaded()"
+                        onerror="onScreenshotError(this)"
+                    />
+
+                    <!-- Fallback Placeholder Block (Shown when GitHub images cannot load) -->
+                    <div id="screenshot-fallback" class="absolute inset-0 flex flex-col items-center justify-center p-8 hidden bg-surface-lowest rounded-[20px] border-2 border-outline-variant/50 shadow-m3-2 max-w-md mx-auto aspect-video">
+                        <div class="w-16 h-16 rounded-m3-full bg-error-container text-error flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <h4 class="text-base font-bold text-onSurface">Image Unavailable</h4>
+                        <p class="text-xs text-onSurface-variant text-center max-w-sm mt-1 mb-4">
+                            Secure communication pipeline block. Please verify your internet connection to fetch the live app assets.
+                        </p>
+                        <span class="text-[10px] bg-surface-lowest border border-outline-variant font-mono px-3 py-1.5 rounded text-onSurface-variant" id="fallback-filename">ss_light_device_info.png</span>
+                    </div>
+
+                </div>
+
+                <!-- Right Carousel Control Button -->
+                <button onclick="changeFeature(1)" class="state-layer w-12 h-12 shrink-0 rounded-m3-full border-2 border-outline-variant/60 bg-surface-lowest text-onSurface-variant hover:text-primary hover:border-primary hover:shadow-m3-1 active:scale-95 transition-all flex items-center justify-center z-30">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
                 </button>
-                <span class="text-xs font-semibold font-mono text-onSurface-variant ml-3" id="carousel-fraction">1 / 4</span>
-            </div>
-        </section>
 
-        <!-- Right Section: Material 3 Custom High-Fidelity App Simulation (70% Width desktop) -->
-        <section class="flex-grow bg-surface-container p-4 lg:p-10 flex items-center justify-center overflow-hidden relative">
-            
-            <!-- Ambient glows based strictly on secondary and tertiary container tones -->
-            <div class="absolute top-1/4 left-1/4 w-80 h-80 bg-secondary-container/20 rounded-m3-full blur-3xl pointer-events-none"></div>
-            <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-tertiary-container/25 rounded-m3-full blur-3xl pointer-events-none"></div>
-
-            <!-- Interactive App Frame (Emulating Porpita desktop application running natively) -->
-            <div class="w-full max-w-4xl bg-surface-lowest rounded-m3-xl border border-outline-variant shadow-m3-3 flex flex-col overflow-hidden max-h-[80vh]">
-                
-                <!-- Window Chrome Titlebar -->
-                <div class="flex items-center justify-between px-5 py-3.5 border-b border-outline-variant bg-surface-low">
-                    <!-- Control buttons -->
-                    <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 rounded-m3-full bg-error block opacity-80"></span>
-                        <span class="w-3 h-3 rounded-m3-full bg-secondary-fixedDim block opacity-80"></span>
-                        <span class="w-3 h-3 rounded-m3-full bg-primary-fixedDim block opacity-80"></span>
-                    </div>
-                    
-                    <!-- Dynamic URL / State Indicator -->
-                    <div class="px-4 py-1.5 bg-surface-lowest border border-outline-variant rounded-m3-sm text-[10px] font-mono text-onSurface-variant flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-m3-full bg-primary block"></span>
-                        <span id="mockup-header-address">porpita://adb/wireless-pairing</span>
-                    </div>
-
-                    <!-- Client Target Mode Badge -->
-                    <div class="hidden sm:flex items-center gap-1.5 px-3 py-1 bg-primary-container text-primary-onContainer text-[10px] font-bold rounded-m3-full border border-primary-fixedDim">
-                        ADB WORKSPACE
-                    </div>
-                </div>
-
-                <!-- Live Container App Content Viewport (Height constrained with scroll prevention) -->
-                <div class="relative bg-surface-lowest flex flex-col overflow-y-auto no-scrollbar min-h-[360px] lg:min-h-[460px]">
-                    
-                    <!-- M3 View: Wireless ADB Portal -->
-                    <div id="mock-view-1" class="mockup-view-pane p-6 flex flex-col md:flex-row gap-6 h-full transition-all duration-300">
-                        
-                        <!-- Side Device Stack card -->
-                        <div class="w-full md:w-5/12 bg-surface border border-outline-variant rounded-m3-lg p-5 flex flex-col justify-between">
-                            <div class="space-y-4">
-                                <span class="text-[10px] font-extrabold text-onSurface-variant uppercase tracking-widest block">Available Devices</span>
-                                
-                                <div class="p-3 bg-primary-container border border-primary-fixedDim rounded-m3-md flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <span class="w-2.5 h-2.5 rounded-m3-full bg-primary animate-ping"></span>
-                                        <span class="text-xs font-bold text-primary-onContainer">Pixel 8 Pro</span>
-                                    </div>
-                                    <span class="text-[9px] bg-primary text-primary-on px-2 py-0.5 rounded-m3-xs font-mono font-bold">5555</span>
-                                </div>
-                                
-                                <div class="p-3 bg-surface-container border border-outline-variant rounded-m3-md flex items-center justify-between opacity-60">
-                                    <div class="flex items-center gap-3">
-                                        <span class="w-2.5 h-2.5 rounded-m3-full bg-outline"></span>
-                                        <span class="text-xs font-semibold text-onSurface-variant">Galaxy S24 Ultra</span>
-                                    </div>
-                                    <span class="text-[9px] text-onSurface-variant font-mono font-semibold">Offline</span>
-                                </div>
-                            </div>
-                            
-                            <button class="state-layer w-full mt-6 py-2.5 bg-primary text-primary-on rounded-m3-full text-xs font-semibold shadow-m3-1">
-                                Scan Local Devices
-                            </button>
-                        </div>
-
-                        <!-- Active Connection State Control -->
-                        <div class="flex-grow bg-surface-container-low border border-outline-variant rounded-m3-lg p-5 flex flex-col justify-between">
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between border-b border-outline-variant pb-3">
-                                    <h3 class="text-xs font-bold text-onSurface">SECURE COUPLING SYSTEM</h3>
-                                    <span class="text-[10px] text-tertiary font-extrabold bg-tertiary-container border border-tertiary-onFixedVariant px-2.5 py-0.5 rounded-m3-full">ACTIVE DAEMON</span>
-                                </div>
-                                
-                                <div class="p-4 bg-surface-lowest border border-outline-variant rounded-m3-lg text-center space-y-2">
-                                    <span class="text-[10px] text-onSurface-variant block uppercase font-bold tracking-wider">Wi-Fi Pairing Code</span>
-                                    <div class="flex justify-center gap-2 font-mono text-2xl font-black text-primary tracking-widest">
-                                        <span>4 8 2</span>
-                                        <span class="text-outline-variant">•</span>
-                                        <span>9 1 5</span>
-                                    </div>
-                                </div>
-
-                                <div class="space-y-2">
-                                    <div class="flex justify-between text-[11px] text-onSurface-variant">
-                                        <span>Connection Socket Port</span>
-                                        <span class="font-mono text-onSurface font-bold">37415</span>
-                                    </div>
-                                    <div class="flex justify-between text-[11px] text-onSurface-variant">
-                                        <span>Authentication Stage</span>
-                                        <span class="text-primary font-bold">Handshaking keys...</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="pt-4 border-t border-outline-variant text-[10px] text-onSurface-variant flex items-center gap-2">
-                                <svg class="w-4 h-4 text-primary shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                <span>Secured by native TLS tunnels. Trust permissions apply on device authorization screen.</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- M3 View: Screen Mirroring Canvas -->
-                    <div id="mock-view-2" class="mockup-view-pane p-6 flex flex-col md:flex-row gap-6 h-full transition-all duration-300 hidden">
-                        
-                        <!-- Phone Frame simulation on left side -->
-                        <div class="w-full md:w-5/12 bg-surface-container border border-outline-variant rounded-m3-lg p-4 shadow-m3-1 flex flex-col items-center justify-center">
-                            <span class="text-[9px] font-extrabold text-onSurface-variant uppercase tracking-widest mb-3 block">Virtual display viewport</span>
-                            
-                            <!-- Phone -->
-                            <div class="w-[170px] aspect-[9/18.5] bg-inverse-surface rounded-m3-xl border-[6px] border-outline relative p-2 shadow-m3-2 flex flex-col justify-between overflow-hidden">
-                                <!-- Camera pill -->
-                                <div class="absolute top-2.5 left-1/2 -translate-x-1/2 w-14 h-4 bg-outline rounded-m3-full flex items-center justify-center z-10">
-                                    <span class="w-1.5 h-1.5 rounded-m3-full bg-inverse-surface"></span>
-                                </div>
-                                <!-- Virtual UI screen -->
-                                <div class="flex-grow bg-surface-lowest rounded-m3-lg p-3 flex flex-col justify-between relative overflow-hidden">
-                                    <div class="flex justify-between text-[8px] text-onSurface-variant font-bold pt-1">
-                                        <span>09:41</span>
-                                        <span>5G</span>
-                                    </div>
-                                    <div class="space-y-2 text-center my-auto">
-                                        <div class="w-9 h-9 rounded-m3-full bg-primary mx-auto flex items-center justify-center text-primary-on">
-                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
-                                        </div>
-                                        <h4 class="text-[10px] font-bold text-onSurface">Interactive Node</h4>
-                                        <p class="text-[7px] text-onSurface-variant leading-relaxed">Direct rendering channel active. Streaming keystrokes over ADB loopback.</p>
-                                    </div>
-                                    <div class="h-1 w-12 bg-outline-variant rounded-m3-full mx-auto mb-1"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Touch display settings -->
-                        <div class="flex-grow bg-surface border border-outline-variant rounded-m3-lg p-5 flex flex-col justify-between">
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between border-b border-outline-variant pb-3">
-                                    <h3 class="text-xs font-bold text-onSurface">DISPLAY ENGINE SPECS</h3>
-                                    <span class="text-[10px] text-primary bg-primary-container border border-primary-fixedDim px-2 py-0.5 rounded-m3-full font-bold">120HZ COMPATIBLE</span>
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-3">
-                                    <div class="p-3 bg-surface-container rounded-m3-md border border-outline-variant">
-                                        <span class="text-[9px] text-onSurface-variant block font-bold">FRAME LATENCY</span>
-                                        <span class="text-xs font-mono font-bold text-primary">~8.2ms</span>
-                                    </div>
-                                    <div class="p-3 bg-surface-container rounded-m3-md border border-outline-variant">
-                                        <span class="text-[9px] text-onSurface-variant block font-bold">BITRATE PROFILE</span>
-                                        <span class="text-xs font-mono font-bold text-primary">12 Mbps</span>
-                                    </div>
-                                </div>
-
-                                <div class="space-y-3 pt-2">
-                                    <div class="flex justify-between items-center text-xs text-onSurface-variant">
-                                        <span>Render screen layout bounds</span>
-                                        <input type="checkbox" checked class="w-4.5 h-4.5 rounded-m3-xs accent-primary cursor-pointer">
-                                    </div>
-                                    <div class="flex justify-between items-center text-xs text-onSurface-variant">
-                                        <span>Compress Frame Buffer</span>
-                                        <input type="checkbox" class="w-4.5 h-4.5 rounded-m3-xs accent-primary cursor-pointer">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="pt-4 border-t border-outline-variant text-[10px] text-onSurface-variant">
-                                Low overhead rendering architecture utilizes direct H.264 stream pipes inside Android's native screenrecord processes.
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- M3 View: Package Installer Workspace -->
-                    <div id="mock-view-3" class="mockup-view-pane p-6 flex flex-col md:flex-row gap-6 h-full transition-all duration-300 hidden">
-                        <div class="flex-grow bg-surface border border-outline-variant rounded-m3-lg p-5 flex flex-col justify-between">
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between border-b border-outline-variant pb-3">
-                                    <h3 class="text-xs font-bold text-onSurface">PACKAGE DEPLOYMENT MATRIX</h3>
-                                    <span class="text-[10px] text-onSurface-variant">ZIP, APK, AND APKS FILESETS</span>
-                                </div>
-
-                                <!-- Drag & Drop Dash Box styled in M3 Surface Variant and primary strokes -->
-                                <div class="border-2 border-dashed border-primary-fixedDim hover:border-primary bg-surface-container-low rounded-m3-lg p-8 text-center transition-all cursor-pointer">
-                                    <div class="w-11 h-11 rounded-m3-full bg-primary-container text-primary mx-auto flex items-center justify-center mb-3">
-                                        <svg class="w-5.5 h-5.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                        </svg>
-                                    </div>
-                                    <span class="text-xs font-bold text-onSurface block">Drop target for application APK</span>
-                                    <span class="text-[10px] text-onSurface-variant mt-1 block">Supports target installations with multiple split configs</span>
-                                </div>
-
-                                <!-- Active Item Upload Mock -->
-                                <div class="p-3 bg-tertiary-container border border-outline-variant rounded-m3-md flex items-center justify-between">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-m3-sm bg-tertiary text-tertiary-on flex items-center justify-center text-xs font-black font-mono">APK</div>
-                                        <div>
-                                            <span class="text-xs font-bold text-tertiary-onContainer block">staging-release-v3.0.apk</span>
-                                            <span class="text-[9px] text-tertiary-onFixedVariant block">24.5 MB • Integrity signature verified</span>
-                                        </div>
-                                    </div>
-                                    <button class="state-layer px-4 py-2 bg-tertiary text-tertiary-on rounded-m3-full text-[10px] font-bold shadow-m3-1">
-                                        Install Package
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="pt-4 border-t border-outline-variant flex justify-between items-center text-[10px] text-onSurface-variant">
-                                <span>Installer runs ADB stream commands inside isolated virtual targets.</span>
-                                <span class="text-primary hover:underline cursor-pointer font-bold">Configure installation flags</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- M3 View: Terminal Shell Emulator -->
-                    <div id="mock-view-4" class="mockup-view-pane p-6 flex flex-col md:flex-row gap-6 h-full transition-all duration-300 hidden">
-                        <div class="flex-grow bg-inverse-surface rounded-m3-lg p-5 font-mono text-xs text-inverse-onSurface flex flex-col justify-between shadow-m3-2 border border-outline">
-                            <div class="space-y-4">
-                                <div class="flex items-center justify-between border-b border-outline-variant pb-3 text-[10px] text-onSurface-variant">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-2.5 h-2.5 rounded-m3-full bg-primary block"></span>
-                                        <span class="font-bold">SHELL SUBSYSTEM CONSOLE</span>
-                                    </div>
-                                    <span class="text-inverse-primary font-bold">device://pixel8pro-wire</span>
-                                </div>
-                                <div class="space-y-2 text-[11px] leading-relaxed">
-                                    <p class="opacity-50"># Establishing remote process connection framework</p>
-                                    <p class="opacity-80">oriole_v2:/ $ <span class="text-inverse-primary font-bold">getprop ro.build.version.release</span></p>
-                                    <p class="text-tertiary-container font-extrabold">14</p>
-                                    <p class="opacity-80">oriole_v2:/ $ <span class="text-inverse-primary font-bold">pm path com.porpita.adb_link</span></p>
-                                    <p class="opacity-90">package:/data/app/~~hS9bS9vP8==/com.porpita.adb_link.apk</p>
-                                    <p class="opacity-80">oriole_v2:/ $ <span class="text-inverse-primary font-bold">_</span></p>
-                                </div>
-                            </div>
-
-                            <div class="pt-4 border-t border-outline-variant text-[10px] text-onSurface-variant flex justify-between">
-                                <span>Terminate container stream using Ctrl+C</span>
-                                <span class="text-inverse-primary font-bold cursor-pointer hover:underline">Flush standard output log</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
             </div>
         </section>
     </main>
 
-    <!-- M3 Dialog Component (Platform download portal) -->
-    <div id="download-modal" class="fixed inset-0 z-[100] bg-scrim/40 backdrop-blur-sm flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
-        
-        <div class="bg-surface-lowest w-full max-w-md rounded-m3-xl p-6 border border-outline-variant shadow-m3-3 relative">
-            
-            <!-- Dismiss action -->
-            <button onclick="closeDownloadPanel()" class="absolute top-4 right-4 text-onSurface-variant hover:text-onSurface p-2 hover:bg-surface-container rounded-m3-full transition-all">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-
-            <!-- Decorative App Emblem -->
-            <div class="w-12 h-12 bg-primary-container text-primary rounded-m3-lg flex items-center justify-center mb-4 border border-primary-fixedDim">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-            </div>
-
-            <h3 class="text-xl font-bold text-onSurface mb-1">Get Porpita</h3>
-            <p class="text-sm text-onSurface-variant mb-6">Choose the targeted platform package compiled for your hardware configuration:</p>
-
-            <!-- Option blocks -->
-            <div class="space-y-3">
-                
-                <!-- Windows -->
-                <a href="#" onclick="mockDownload('Windows')" class="state-layer flex items-center justify-between p-4 rounded-m3-lg border border-outline-variant hover:border-primary hover:bg-primary-container/20 group transition-all">
-                    <div class="flex items-center gap-3">
-                        <div class="text-onSurface font-semibold text-sm">Windows Binary (.exe)</div>
-                    </div>
-                    <span class="text-xs text-primary font-bold group-hover:translate-x-1 transition-transform flex items-center gap-1.5">
-                        Download x64
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
-                    </span>
-                </a>
-
-                <!-- macOS -->
-                <a href="#" onclick="mockDownload('macOS')" class="state-layer flex items-center justify-between p-4 rounded-m3-lg border border-outline-variant hover:border-primary hover:bg-primary-container/20 group transition-all">
-                    <div class="flex items-center gap-3">
-                        <div class="text-onSurface font-semibold text-sm">macOS Bundle (.dmg)</div>
-                    </div>
-                    <span class="text-xs text-primary font-bold group-hover:translate-x-1 transition-transform flex items-center gap-1.5">
-                        Apple Silicon / Intel
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
-                    </span>
-                </a>
-
-                <!-- Linux -->
-                <a href="#" onclick="mockDownload('Linux')" class="state-layer flex items-center justify-between p-4 rounded-m3-lg border border-outline-variant hover:border-primary hover:bg-primary-container/20 group transition-all">
-                    <div class="flex items-center gap-3">
-                        <div class="text-onSurface font-semibold text-sm">Linux AppImage (.AppImage)</div>
-                    </div>
-                    <span class="text-xs text-primary font-bold group-hover:translate-x-1 transition-transform flex items-center gap-1.5">
-                        Download Universal
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
-                    </span>
-                </a>
-
-            </div>
-
-            <!-- Toast dynamic feedback indicator -->
-            <div id="download-toast" class="mt-4 p-3 bg-tertiary-container text-tertiary-onContainer rounded-m3-md text-xs font-bold text-center border border-tertiary-onFixedVariant hidden">
-                ✓ Platform binaries initialized successfully! Check browser history.
-            </div>
-        </div>
-    </div>
-
     <!-- Interface scripts -->
     <script>
-        // M3 Guided Showcase Steps Configuration mapping the exact customized properties
+        // Mapping of exact 14 unique feature screenshots from desktop_app_screenshots
         const features = [
             {
-                indicator: "STEP 1 OF 4",
-                title: "Zero cables.<br>Instant connection.",
-                desc: "Link your Android device wirelessly over local Wi-Fi. Simply click scan, pairing is completed automatically without cable reliance.",
-                address: "porpita://adb/wireless-pairing"
+                workspace: "Device Info",
+                title: "Total command of<br>your hardware.",
+                desc: "Inspect complete hardware specs, CPU usage, build variables, partition spaces, and real-time environment telemetry of your connected Android device instantly.",
+                imageLight: "ss_light_device_info.png",
+                imageDark: "ss_dark_device_info.png"
             },
             {
-                indicator: "STEP 2 OF 4",
-                title: "Lag-free<br>interactive mirror.",
-                desc: "Stream and manage your device display at high frame rates. Direct touch input simulation lets you run tests directly from your computer.",
-                address: "porpita://adb/display-pipeline"
+                workspace: "Apps Manager",
+                title: "Fluid package<br>control & sideloads.",
+                desc: "List all installed user and system apps. Effortlessly sideload new APKs, launch activities, uninstall packages, or clear application data with a single click.",
+                imageLight: "ss_light_apps.png",
+                imageDark: "ss_dark_apps.png"
             },
             {
-                indicator: "STEP 3 OF 4",
-                title: "Sideload APKs<br>in single drag.",
-                desc: "Drop standard and split bundle APKs onto the target workspace window frame to automatically construct install streams without command entry.",
-                address: "porpita://adb/install-matrix"
+                workspace: "Files Explorer",
+                title: "Explore Android filesystem<br>seamlessly.",
+                desc: "Browse internal directories, download logs, push test files, and inspect system folders directly with a responsive desktop file explorer interface.",
+                imageLight: "ss_light_files.png",
+                imageDark: "ss_dark_files.png"
             },
             {
-                indicator: "STEP 4 OF 4",
+                workspace: "Terminal Shell",
                 title: "The command shell,<br>highly supercharged.",
-                desc: "Run interactive debugging statements inside an elegantly configured virtual terminal environment with device diagnostic monitoring presets.",
-                address: "porpita://adb/terminal-subsystem"
+                desc: "Run shell scripting, run ADB commands in real-time, view output history, and save your favorite snippets inside an integrated, syntax-friendly developer console.",
+                imageLight: "ss_light_terminal.png",
+                imageDark: "ss_dark_terminal.png"
+            },
+            {
+                workspace: "Demo Mode",
+                title: "Perfect screenshots<br>every single time.",
+                desc: "Force clean battery meters, wipe notification clutter, set mock clocks, and align connectivity icons into state configurations for pixel-perfect promotional shots.",
+                imageLight: "ss_light_system_ui_demo_mode.png",
+                imageDark: "ss_dark_system_ui_demo_mode.png"
+            },
+            {
+                workspace: "UI Inspector",
+                title: "Deep structural<br>node debugging.",
+                desc: "Render and dump XML layout trees. Hover and inspect node bounds, query layout coordinates, and trace layout nested rendering structures instantaneously.",
+                imageLight: "ss_light_ui_inspector.png",
+                imageDark: "ss_dark_ui_inspector.png"
+            },
+            {
+                workspace: "Battery Stats",
+                title: "Monitor health<br>& power states.",
+                desc: "Inspect diagnostic health specs, battery temperature, charge cycle counts, voltage graphs, and live current consumption metrics seamlessly.",
+                imageLight: "ss_light_battery.png",
+                imageDark: "ss_dark_battery.png"
+            },
+            {
+                workspace: "Call Logs",
+                title: "Unified logs<br>database manager.",
+                desc: "Access a unified, clean database view of all incoming, outgoing, and missed call logs with quick timestamps, profile names, and dialer records.",
+                imageLight: "ss_light_call_logs.png",
+                imageDark: "ss_dark_call_logs.png"
+            },
+            {
+                workspace: "Contacts",
+                title: "Comprehensive phone<br>directory control.",
+                desc: "Manage device contact entries. Search phone numbers, inspect email details, and export contacts data smoothly.",
+                imageLight: "ss_light_contacts.png",
+                imageDark: "ss_dark_contacts.png"
+            },
+            {
+                workspace: "Lifecycle",
+                title: "Process lifecycle<br>diagnostics console.",
+                desc: "Trace real-time application process state transitions, activity creation cycles, and service hooks for active developer diagnostic testing.",
+                imageLight: "ss_light_lifecycle.png",
+                imageDark: "ss_dark_lifecycle.png"
+            },
+            {
+                workspace: "Media Library",
+                title: "Direct photo &<br>video backups.",
+                desc: "Inspect on-device storage for photos, video clips, and audio files. Playback preview files or backup media streams instantly.",
+                imageLight: "ss_light_media.png",
+                imageDark: "ss_dark_media.png"
+            },
+            {
+                workspace: "Notifications",
+                title: "Log system alert<br>notifications payloads.",
+                desc: "Intercept active status notifications. Log and debug notifications payloads, banners, action channels, and background triggers.",
+                imageLight: "ss_light_notifications.png",
+                imageDark: "ss_dark_notifications.png"
+            },
+            {
+                workspace: "Settings",
+                title: "Global configurations<br>table modifier.",
+                desc: "Inspect and modify device global, secure, and system settings tables directly without digging into raw adb shell commands.",
+                imageLight: "ss_light_settings.png",
+                imageDark: "ss_dark_settings.png"
+            },
+            {
+                workspace: "SMS & MMS Hub",
+                title: "Secure message<br>payload explorer.",
+                desc: "View thread conversations, trace incoming SMS payloads, copy text verification codes, and export critical communications histories.",
+                imageLight: "ss_light_sms_mms.png",
+                imageDark: "ss_dark_sms_mms.png"
             }
         ];
 
         let currentIdx = 0;
+        let activeTheme = 'light'; // Light / Dark
 
         // Change feature indexing boundaries safely
         function changeFeature(step) {
@@ -555,38 +445,126 @@
             updateDOMState();
         }
 
-        // Apply updated text & interactive viewport frame parameters
+        // Toggle active theme on page and screens concurrently
+        function setAppTheme(theme) {
+            activeTheme = theme;
+            
+            const btnLight = document.getElementById('theme-btn-light');
+            const btnDark = document.getElementById('theme-btn-dark');
+
+            // Apply global CSS variable overrides
+            if (theme === 'light') {
+                document.documentElement.classList.remove('dark-mode');
+                btnLight.className = "px-4 py-1.5 rounded-m3-full font-bold text-primary bg-surface-lowest shadow-m3-1 transition-all";
+                btnDark.className = "px-4 py-1.5 rounded-m3-full font-semibold text-onSurface-variant hover:text-onSurface transition-all";
+            } else {
+                document.documentElement.classList.add('dark-mode');
+                btnDark.className = "px-4 py-1.5 rounded-m3-full font-bold text-primary bg-surface-lowest shadow-m3-1 transition-all";
+                btnLight.className = "px-4 py-1.5 rounded-m3-full font-semibold text-onSurface-variant hover:text-onSurface transition-all";
+            }
+
+            // Sync Desktop viewport
+            updateDOMState();
+            // Sync Mobile scroll list
+            generateMobileList();
+        }
+
+        // Apply updated text & interactive viewport parameters
         function updateDOMState() {
             const data = features[currentIdx];
 
+            // Show Loader spinner
+            document.getElementById('image-loader').classList.remove('opacity-0');
+            document.getElementById('image-loader').style.pointerEvents = 'auto';
+
+            // Hide the fallback layout initially
+            document.getElementById('screenshot-fallback').classList.add('hidden');
+            document.getElementById('screenshot-img').classList.remove('hidden');
+
             // Left Copy Components
-            document.getElementById('feature-indicator').textContent = data.indicator;
+            document.getElementById('feature-workspace').textContent = data.workspace;
             document.getElementById('feature-title').innerHTML = data.title;
             document.getElementById('feature-desc').textContent = data.desc;
-            document.getElementById('carousel-fraction').textContent = `${currentIdx + 1} / ${features.length}`;
 
-            // Top Mock Address bar indicator
-            document.getElementById('mockup-header-address').textContent = data.address;
+            // Compute correct screenshot file name based on active mode
+            const filename = (activeTheme === 'light') ? data.imageLight : data.imageDark;
+            const fullImgUrl = `https://raw.githubusercontent.com/rajumark/porpita/main/docs/desktop_app_screenshots/${filename}`;
 
-            // Display active view frame 
-            for (let i = 1; i <= features.length; i++) {
-                const pane = document.getElementById(`mock-view-${i}`);
-                if (i === (currentIdx + 1)) {
-                    pane.classList.remove('hidden');
-                } else {
-                    pane.classList.add('hidden');
-                }
-            }
+            // Trigger image source update
+            const imgElement = document.getElementById('screenshot-img');
+            imgElement.src = fullImgUrl;
+            imgElement.alt = `Porpita ${data.workspace} ${activeTheme} interface`;
         }
 
-        // Automatic OS & Platform Architecture Recognition
-        function autoDetectOS() {
+        // Generate the vertical scrolling list for Mobile users only
+        function generateMobileList() {
+            const listContainer = document.getElementById('mobile-features-list');
+            listContainer.innerHTML = '';
+
+            features.forEach((item, index) => {
+                const filename = (activeTheme === 'light') ? item.imageLight : item.imageDark;
+                const fullImgUrl = `https://raw.githubusercontent.com/rajumark/porpita/main/docs/desktop_app_screenshots/${filename}`;
+
+                const section = document.createElement('div');
+                section.className = "space-y-4 border-b border-outline-variant pb-8 last:border-b-0";
+                
+                section.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[9px] uppercase tracking-wider font-extrabold text-primary-onContainer bg-primary-container px-2.5 py-1 rounded-m3-md border border-primary-onContainer/10">
+                                Step ${index + 1} of ${features.length}
+                            </span>
+                            <span class="text-xs font-bold text-onSurface-variant">${item.workspace}</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-onSurface">${item.title.replace('<br>', ' ')}</h3>
+                        <p class="text-sm text-onSurface-variant leading-relaxed">${item.desc}</p>
+                    </div>
+                    <div class="relative w-full rounded-[14px] overflow-hidden border-2 border-outline-variant/50 bg-surface-lowest shadow-m3-1 flex justify-center items-center">
+                        <img 
+                            src="${fullImgUrl}" 
+                            alt="${item.workspace} mobile screenshot"
+                            class="max-w-full h-auto block object-contain"
+                            onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');"
+                        />
+                        <div class="hidden p-6 text-center text-xs text-error font-semibold">
+                            Asset failed to stream. Make sure you are connected to the network.
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(section);
+            });
+        }
+
+        // Action when screenshot successfully loads
+        function onScreenshotLoaded() {
+            const loader = document.getElementById('image-loader');
+            loader.classList.add('opacity-0');
+            loader.style.pointerEvents = 'none';
+        }
+
+        // Fallback action if raw content cannot load
+        function onScreenshotError(img) {
+            const loader = document.getElementById('image-loader');
+            loader.classList.add('opacity-0');
+            loader.style.pointerEvents = 'none';
+
+            img.classList.add('hidden');
+            const fallback = document.getElementById('screenshot-fallback');
+            fallback.classList.remove('hidden');
+
+            const currentData = features[currentIdx];
+            const filename = (activeTheme === 'light') ? currentData.imageLight : currentData.imageDark;
+            document.getElementById('fallback-filename').textContent = filename;
+        }
+
+        // Automatic OS Recognition and System Theme sync on load
+        function initApp() {
+            // 1. Detect OS for client Download Button Icon
             const userAgent = window.navigator.userAgent;
             const osText = document.getElementById('os-text');
             const iconContainer = document.getElementById('os-icon-container');
 
             if (userAgent.indexOf("Win") !== -1) {
-                // Windows UI Icon
                 iconContainer.innerHTML = `
                     <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                         <path d="M0 3.449L9.75 2.1v9.45H0V3.449zM0 12.45h9.75v9.45L0 20.551v-8.101zM11.25 1.899L24 0v11.55H11.25V1.899zM11.25 12.45H24v11.55l-12.75-1.9v-9.65z"/>
@@ -594,7 +572,6 @@
                 `;
                 osText.textContent = "Download for Windows";
             } else if (userAgent.indexOf("Mac") !== -1) {
-                // macOS (Apple) Brand Icon
                 iconContainer.innerHTML = `
                     <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                         <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.21.67-2.93 1.49-.62.69-1.16 1.84-1.01 2.96 1.12.09 2.27-.57 2.95-1.39z"/>
@@ -602,56 +579,20 @@
                 `;
                 osText.textContent = "Download for macOS";
             } else if (userAgent.indexOf("Linux") !== -1) {
-                // Linux Tux Logo Icon
                 iconContainer.innerHTML = `
                     <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
                         <path d="M12 .003c-2.484 0-4.5 2.016-4.5 4.5 0 .86.243 1.666.666 2.355C5.006 8.01 2.5 10.72 2.5 14c0 4.133 3.367 7.5 7.5 7.5h4c4.133 0 7.5-3.367 7.5-7.5 0-3.28-2.506-5.99-5.666-7.142.423-.689.666-1.495.666-2.355 0-2.484-2.016-4.5-4.5-4.5zm0 1.5c1.663 0 3 1.337 3 3s-1.337 3-3 3-3-1.337-3-3 1.337-3 3-3zm0 8.5c2.484 0 4.5 2.016 4.5 4.5s-2.016 4.5-4.5 4.5-4.5-2.016-4.5-4.5 2.016-4.5 4.5-4.5z"/>
                     </svg>
                 `;
                 osText.textContent = "Download for Linux";
-            } else {
-                // Default fallback OS action trigger text
-                osText.textContent = "Get Porpita";
             }
+
+            // 2. Sync to system light/dark scheme by default on boot
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            setAppTheme(systemDark ? 'dark' : 'light');
         }
 
-        // Modal Action Handles
-        function openDownloadPanel() {
-            const modal = document.getElementById('download-modal');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-            }, 50);
-        }
-
-        function closeDownloadPanel() {
-            const modal = document.getElementById('download-modal');
-            modal.classList.add('opacity-0');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                document.getElementById('download-toast').classList.add('hidden');
-            }, 300);
-        }
-
-        function mockDownload(platform) {
-            const toast = document.getElementById('download-toast');
-            toast.textContent = `✓ Dynamic bundle download initiated for ${platform}!`;
-            toast.classList.remove('hidden');
-        }
-
-        // Close when clicking modal backdrop
-        window.addEventListener('click', function(e) {
-            const modal = document.getElementById('download-modal');
-            if (e.target === modal) {
-                closeDownloadPanel();
-            }
-        });
-
-        // Initialize state configuration on viewport load
-        window.onload = function() {
-            autoDetectOS();
-            updateDOMState();
-        }
+        window.onload = initApp;
     </script>
 </body>
 </html>
